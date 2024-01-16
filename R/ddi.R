@@ -230,19 +230,22 @@ tti <- function(location, steps = 2,
     fdrUse <- fdr
 
     if (length(enrList1) > 0) {
-      cc_1 <- hypeR::hyp_dots(hypeR::hypeR(enrList1, GO.cc, background = backgroundGenes, test="hypergeometric"),
+      cc_1 <- hypeR::hyp_dots(hypeR::hypeR(enrList1, GO.cc, background = length(backgroundGenes), test="hypergeometric"),
                               fdr = fdrUse, title = "GO Cell Comp Enrichment", merge = TRUE)
-      bp_1 <- hypeR::hyp_dots(hypeR::hypeR(enrList1, GO.bp, background = backgroundGenes, test="hypergeometric"),
+      mf_1 <- hypeR::hyp_dots(hypeR::hypeR(enrList1, GO.mf, background = length(backgroundGenes), test="hypergeometric"),
+                              fdr = fdrUse, title = "GO Mol FXN Enrichment", merge = TRUE)
+      bp_1 <- hypeR::hyp_dots(hypeR::hypeR(enrList1, GO.bp, background = length(backgroundGenes), test="hypergeometric"),
                               fdr = fdrUse, title = "GO Biol Proc Enrichment", merge = TRUE)
-      kg_1 <- hypeR::hyp_dots(hypeR::hypeR(enrList1, genesetsC2, background = backgroundGenes, test="hypergeometric"),
+      kg_1 <- hypeR::hyp_dots(hypeR::hypeR(enrList1, genesetsC2, background = length(backgroundGenes), test="hypergeometric"),
                               fdr = fdrUse, title = "KEGG Enrichment", merge = TRUE)
-      bc_1 <- hypeR::hyp_dots(hypeR::hypeR(enrList1, geneset_BIOCARTA, background = backgroundGenes, test="hypergeometric"),
+      bc_1 <- hypeR::hyp_dots(hypeR::hypeR(enrList1, geneset_BIOCARTA, background = length(backgroundGenes), test="hypergeometric"),
                               fdr = fdrUse, title = "Biocarta Enrichment", merge = TRUE)
-      hm_1 <- hypeR::hyp_dots(hypeR::hypeR(enrList1, genesetsH, background = backgroundGenes, test="hypergeometric"),
+      hm_1 <- hypeR::hyp_dots(hypeR::hypeR(enrList1, genesetsH, background = length(backgroundGenes), test="hypergeometric"),
                               fdr = fdrUse, title = "Hallmark Enrichment", merge = TRUE)
 
       pdf(paste0(output_location, "tti_output/", dtr[i], '_unique_tti_', steps, '_steps_enrichment.pdf'))
       print(cc_1)
+      print(mf_1)
       print(bp_1)
       print(kg_1)
       print(bc_1)
@@ -250,19 +253,22 @@ tti <- function(location, steps = 2,
       dev.off()
     }
     if (length(enrList2) > 0) {
-      cc_2 <- hypeR::hyp_dots(hypeR::hypeR(enrList2, GO.cc, background = backgroundGenes, test="hypergeometric"),
+      cc_2 <- hypeR::hyp_dots(hypeR::hypeR(enrList2, GO.cc, background = length(backgroundGenes), test="hypergeometric"),
                               fdr = fdrUse, title = "GO Cell Comp Enrichment", merge = TRUE)
-      bp_2 <- hypeR::hyp_dots(hypeR::hypeR(enrList2, GO.bp, background = backgroundGenes, test="hypergeometric"),
+      mf_2 <- hypeR::hyp_dots(hypeR::hypeR(enrList2, GO.mf, background = length(backgroundGenes), test="hypergeometric"),
+                              fdr = fdrUse, title = "GO Mol FXN Enrichment", merge = TRUE)
+      bp_2 <- hypeR::hyp_dots(hypeR::hypeR(enrList2, GO.bp, background = length(backgroundGenes), test="hypergeometric"),
                               fdr = fdrUse, title = "GO Biol Proc Enrichment", merge = TRUE)
-      kg_2 <- hypeR::hyp_dots(hypeR::hypeR(enrList2, genesetsC2, background = backgroundGenes, test="hypergeometric"),
+      kg_2 <- hypeR::hyp_dots(hypeR::hypeR(enrList2, genesetsC2, background = length(backgroundGenes), test="hypergeometric"),
                               fdr = fdrUse, title = "KEGG Enrichment", merge = TRUE)
-      bc_2 <- hypeR::hyp_dots(hypeR::hypeR(enrList2, geneset_BIOCARTA, background = backgroundGenes, test="hypergeometric"),
+      bc_2 <- hypeR::hyp_dots(hypeR::hypeR(enrList2, geneset_BIOCARTA, background = length(backgroundGenes), test="hypergeometric"),
                               fdr = fdrUse, title = "Biocarta Enrichment", merge = TRUE)
-      hm_2 <- hypeR::hyp_dots(hypeR::hypeR(enrList2, genesetsH, background = backgroundGenes, test="hypergeometric"),
+      hm_2 <- hypeR::hyp_dots(hypeR::hypeR(enrList2, genesetsH, background = length(backgroundGenes), test="hypergeometric"),
                               fdr = fdrUse, title = "Hallmark Enrichment", merge = TRUE)
 
       pdf(paste0(output_location, "tti_output/", dtr[i+1], '_unique_tti_', steps, '_steps_enrichment.pdf'))
       print(cc_2)
+      print(mf_2)
       print(bp_2)
       print(kg_2)
       print(bc_2)
