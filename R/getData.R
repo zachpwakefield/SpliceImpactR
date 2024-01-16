@@ -80,6 +80,7 @@ getData <- function(cuD, fdr_use, min_sample_success, engine = c("FunFam","Gene3
     geom_bar(stat="identity", position=position_dodge())+ coord_flip() + theme_bw()+
     theme(axis.ticks.y=element_blank()  #remove y axis ticks
     )+ scale_fill_manual(values=c('brown','chartreuse4'))
+
   pdf(paste0(output_location, 'enrichmentPlot.pdf'))
   print(enrichmentPlot)
   dev.off()
