@@ -93,6 +93,11 @@ tti <- function(location, steps = 2,
 
     )
     {
+      if (x == 1) {
+        append_bool <- F
+      } else {
+          append_bool <- T
+      }
       readr::write_lines(paste(fgtsv$transcript[(x)], " : ", fgtsv$transcript[(x+1)], "[", unique(gt_df$geneID[gt_df$transcriptID %in% c(fgtsv$transcript[(x)], fgtsv$transcript[(x+1)])]), "]", '\n',
                                " iso1 trans #: ", length(t1_con),'\t', " iso1 genes #: ", length(unique(gt_df$geneID[gt_df$transcriptID %in% t1_con])), '\n',
                                " iso2 trans #: ", length(t2_con),'\t', " iso2 genes #: ", length(unique(gt_df$geneID[gt_df$transcriptID %in% t2_con])), '\n',
@@ -107,7 +112,7 @@ tti <- function(location, steps = 2,
                                                                                                                                     gt_df$geneID[gt_df$transcriptID %in% t1_con]))),
                                '\n','\n','\n'
                                , sep = ""), path = paste0(output_location, "tti_output/adjacency_stats.txt"),
-                         append = T)
+                         append = append_bool)
 
     }
 
