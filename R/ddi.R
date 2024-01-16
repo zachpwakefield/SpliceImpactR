@@ -15,7 +15,7 @@ tti <- function(location, steps = 2,
   geneset_BIOCARTA <- hypeR::msigdb_gsets("Homo sapiens", "C2", "CP:BIOCARTA", clean=TRUE)
   genesetsH <- hypeR::msigdb_gsets("Homo sapiens", "H", clean=TRUE)
 
-  i_fgtsv <- read_csv(paste0(output_location, 'paired_fgoutBed.csv')) %>% dplyr::filter(!(prot %in% c("none")))
+  i_fgtsv <- dplyr::filter(read_csv(paste0(output_location, 'paired_fgoutBed.csv')), !(prot %in% c("none")))
   t_fgtsv <- i_fgtsv
   t_fgtsv$rn <- 1:length(t_fgtsv$transcript)
   keep <- list()
