@@ -26,4 +26,7 @@ Imports:
   GenomicFeatures, 
   data.table, 
   Biostrings, 
-  parallel
+  parallel, 
+  igraph, 
+  biomaRt, 
+  hypeR
