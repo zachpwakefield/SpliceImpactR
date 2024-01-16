@@ -24,13 +24,15 @@ getTranscript <- function(gtf = gtf, redExon = redExon, ex_type = exon_type, min
     gtf_min <- gtf[gtf$geneID == redExon$geneR[i] & gtf$type == "exon" & gtf$classification %in% lim,]
 
     ## Calculate Jaccard
-    inEx <- seq(redExon$start[i], redExon$stop[i])
-    gtfEx <- lapply(1:length(gtf_min$geneID), function(x) seq(gtf_min$start[x], gtf_min$stop[x]))
-    un <- unlist(lapply(gtfEx, function(x) length(union(inEx, unlist(x)))))
-    ins <- unlist(lapply(gtfEx, function(x) length(intersect(inEx, unlist(x)))))
-    gtf_min$length_jacc <- ins/lengths(gtfEx)
-    gtf_min$jaccard <- ins/un
-    gtf_min <- gtf_min %>% dplyr::arrange(desc(jaccard))
+    if (dim(gtf_min)[1] != 0) {
+      inEx <- seq(redExon$start[i], redExon$stop[i])
+      gtfEx <- lapply(1:length(gtf_min$geneID), function(x) seq(gtf_min$start[x], gtf_min$stop[x]))
+      un <- unlist(lapply(gtfEx, function(x) length(union(inEx, unlist(x)))))
+      ins <- unlist(lapply(gtfEx, function(x) length(intersect(inEx, unlist(x)))))
+      gtf_min$length_jacc <- ins/lengths(gtfEx)
+      gtf_min$jaccard <- ins/un
+      gtf_min <- gtf_min %>% dplyr::arrange(desc(jaccard))
+    }
     ## Proceed through various checks to make sure matches are both identified and valid
 
     ## If no matches
