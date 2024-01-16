@@ -1,4 +1,4 @@
-getData <- function(cuD, engine = c("FunFam","Gene3D","CDD","PANTHER","SMART","ProSiteProfiles","Pfam","SUPERFAMILY","MobiDBLite","Coils","PRINTS","ProSitePatterns","PIRSF","NCBIfam","Hamap")[7]) {
+getData <- function(cuD, fdr_use, min_sample_success, engine = c("FunFam","Gene3D","CDD","PANTHER","SMART","ProSiteProfiles","Pfam","SUPERFAMILY","MobiDBLite","Coils","PRINTS","ProSitePatterns","PIRSF","NCBIfam","Hamap")[7]) {
 
   ## extract bed, fasta, and interproscan files from output_location
   tf <- list.files(cuD)
@@ -67,5 +67,22 @@ getData <- function(cuD, engine = c("FunFam","Gene3D","CDD","PANTHER","SMART","P
 
   data$rel_prop <- (data$sample_prop + .01) / (data$pop_prop + .01)
   data <- data[data$domain != "none" & data$domain != "" & data$domain != "-",] %>% dplyr::arrange(fdr)
-  return(data)
+
+  sp <- data[data$fdr <= fdr_use & data$sample_successes >= min_sample_success,c(1, 6)]
+  sp$category <- "foreground"
+  colnames(sp)[2] <- c("proportion")
+  pp <- data[data$fdr <= fdr_use & data$sample_successes >= min_sample_success,c(1, 9)]
+  pp$category <- "background"
+  colnames(pp)[2] <- c("proportion")
+  df <- rbind(sp, pp)
+
+  enrichmentPlot <- ggplot(data=df, aes(x=domain, y=proportion, fill=category)) +
+    geom_bar(stat="identity", position=position_dodge())+ coord_flip() + theme_bw()+
+    theme(axis.ticks.y=element_blank()  #remove y axis ticks
+    )+ scale_fill_manual(values=c('brown','chartreuse4'))
+  pdf(paste0(output_location, 'enrichmentPlot.pdf'))
+  print(enrichmentPlot)
+  dev.off()
+  return(list(data=data,
+              enrichmentPlot = enrichmentPlot))
 }
