@@ -1,7 +1,7 @@
 \name{ddi}
 \alias{ddi}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{
+\title{ddi
 %%  ~~function to do ... ~~
 }
 \description{
