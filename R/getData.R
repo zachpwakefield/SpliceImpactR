@@ -76,10 +76,13 @@ getData <- function(cuD, fdr_use, min_sample_success, engine = c("FunFam","Gene3
   colnames(pp)[2] <- c("proportion")
   df <- rbind(sp, pp)
 
-  enrichmentPlot <- ggplot(data=df, aes(x=domain, y=proportion, fill=category)) +
-    geom_bar(stat="identity", position=position_dodge())+ coord_flip() + theme_bw()+
-    theme(axis.ticks.y=element_blank()  #remove y axis ticks
-    )+ scale_fill_manual(values=c('brown','chartreuse4'))
+  enrichmentPlot <- ggplot2::ggplot(data=df, ggplot2::aes(x=domain, y=proportion, fill=category)) +
+    ggplot2::geom_bar(stat="identity", position=ggplot2::position_dodge())+
+    ggplot2::coord_flip() +
+    ggplot2::theme_bw()+
+    ggplot2::theme(axis.ticks.y=ggplot2::element_blank()  #remove y axis ticks
+    )+
+    ggplot2::scale_fill_manual(values=c('brown','chartreuse4'))
 
   pdf(paste0(output_location, 'enrichmentPlot.pdf'))
   print(enrichmentPlot)
