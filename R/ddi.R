@@ -4,7 +4,7 @@ tti <- function(location, steps = 2,
                 ddi = c("Gold", "Silver", "Bronze")[1],
                 output_location) {
   system(paste0("mkdir ", output_location, "tti_output"))
-  gtt <- readRDS(paste0(location,'hg38_geneRef_conv.RDS'))
+  gtt <- readRDS(paste0(location,'/hg38_geneRef_conv.RDS'))
   colnames(gtt) <- c("geneID", "geneName")
   gttf <- gtt[!duplicated(gtt),]
 
