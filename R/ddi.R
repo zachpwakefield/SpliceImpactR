@@ -2,7 +2,7 @@ tti <- function(location, steps = 2,
                 max_vertices_for_viz = 1000,
                 fdr = .05, plot_bool = T,
                 ddi = c("Gold", "Silver", "Bronze")[1],
-                ddi_type = c("dm", "3did")[1],
+                ddi_type = c("pdm", "3did")[1],
                 output_location) {
   system(paste0("mkdir ", output_location, "tti_output"))
   gtt <- readRDS(paste0(location,'/hg38_geneRef_conv.RDS'))
