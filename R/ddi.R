@@ -205,12 +205,12 @@ tti <- function(location, steps = 2,
       if (sum(c(length(igraph::V(e1g)),
                 length(igraph::V(e2g))) <= max_edges_for_viz) == 2) {
 
-        pdf(paste0(output_location, "tti_output/", dtr[i], '_tti_graph.pdf'))
+        pdf(paste0(output_location, "tti_output/", dtr[i], "_", steps, 'steps_tti_graph.pdf'))
         print(igraph::plot.igraph(e1g,vertex.size=3,vertex.label=NA,main=dtr[i],
                                   layout=igraph::layout.fruchterman.reingold(e1g, niter=10000)))
         dev.off()
 
-        pdf(paste0(output_location, "tti_output/", dtr[i+1], '_tti_graph.pdf'))
+        pdf(paste0(output_location, "tti_output/", dtr[i+1], "_", steps, 'steps_tti_graph.pdf'))
         print(igraph::plot.igraph(e2g,vertex.size=3,vertex.label=NA,main=dtr[i+1],
                                   layout=igraph::layout.fruchterman.reingold(e2g, niter=10000)))
         dev.off()
