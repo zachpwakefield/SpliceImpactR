@@ -68,6 +68,8 @@ getData <- function(cuD, fdr_use, min_sample_success, engine = c("FunFam","Gene3
   data$rel_prop <- (data$sample_prop + .01) / (data$pop_prop + .01)
   data <- data[data$domain != "none" & data$domain != "" & data$domain != "-",] %>% dplyr::arrange(fdr)
 
+  write.csv(data, paste0(output_location, "domainEnrichment.csv"))
+
   sp <- data[data$fdr <= fdr_use & data$sample_successes >= min_sample_success,c(1, 6)]
   sp$category <- "foreground"
   colnames(sp)[2] <- c("proportion")
