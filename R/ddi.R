@@ -208,11 +208,11 @@ tti <- function(location, steps = 2,
 
     igraph::V(e1g)$color <- rep("azure4", length(igraph::V(e1g)))
     igraph::E(e1g)$color <- rep("azure4", length(igraph::E(e1g)))
-    igraph::V(e1g)$color[V(e1g)$name == dtr[i]] <- "gold"
+
 
     igraph::V(e2g)$color <- rep("azure4", length(igraph::V(e2g)))
     igraph::E(e2g)$color <- rep("azure4", length(igraph::E(e2g)))
-    igraph::V(e2g)$color[V(e2g)$name == dtr[i+1]] <- "gold"
+
 
     if (length(setdiff(unique(igraph::V(e1g)), unique(igraph::V(e2g)))) > 0){
 
@@ -226,6 +226,9 @@ tti <- function(location, steps = 2,
       igraph::E(e2g)$color[setdiff(unique(igraph::E(e2g)), unique(igraph::E(e1g)))] <- rep("blue", length(setdiff(unique(igraph::E(e2g)), unique(igraph::E(e1g)))))
       igraph::E(e2g)$color[igraph::E(e2g) %in% igraph::E(e2g)[from(igraph::V(e2g)[setdiff(unique(igraph::V(e2g)), unique(igraph::V(e1g)))])]] <- rep("blue", length(igraph::E(e2g)[from(igraph::V(e2g)[setdiff(unique(igraph::V(e2g)), unique(igraph::V(e1g)))])]))
     }
+
+    igraph::V(e1g)$color[V(e1g)$name == dtr[i]] <- "gold"
+    igraph::V(e2g)$color[V(e2g)$name == dtr[i+1]] <- "gold"
 
     if (plot_bool)
     {
