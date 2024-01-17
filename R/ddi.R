@@ -57,7 +57,7 @@ tti <- function(location, steps = 2,
   d_transcripts <- d_transcripts[!duplicated(d_transcripts)]
 
   if (ddi_type == "3did") {
-    d1 <- read_lines('/projectnb2/evolution/zwakefield/proteinImpacts/3did_flat')
+    d1 <- read_lines('3did_flat')
     d2 <- gsub("\t", " ", d1[grep("#=ID", d1)])
     d3 <- lapply(d2, function(x) gsub("@Pfam", "", gsub("[)]", "", gsub("[(]", "", strsplit(x, split = " ")[[1]][c(2, 3, 5, 6)]))))
     d4 <- lapply(d3, function(x) data.frame(t(data.frame(x))))
@@ -196,9 +196,11 @@ tti <- function(location, steps = 2,
 
     igraph::V(e1g)$color <- rep("azure4", length(igraph::V(e1g)))
     igraph::E(e1g)$color <- rep("azure4", length(igraph::E(e1g)))
+    igraph::V(e1g)$color[V(e1g) == dtr[i]] <- "gold"
 
     igraph::V(e2g)$color <- rep("azure4", length(igraph::V(e2g)))
     igraph::E(e2g)$color <- rep("azure4", length(igraph::E(e2g)))
+    igraph::V(e1g)$color[V(e1g) == dtr[i+1]] <- "gold"
 
     if (length(setdiff(unique(igraph::V(e1g)), unique(igraph::V(e2g)))) > 0){
 
