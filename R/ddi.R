@@ -2,6 +2,7 @@ tti <- function(location, steps = 2,
                 max_edges_for_viz = 1000,
                 fdr = .05, plot_bool = T,
                 ddi = c("Gold", "Silver", "Bronze")[1],
+                ddi_type = c("dm", "3did")[1],
                 output_location) {
   system(paste0("mkdir ", output_location, "tti_output"))
   gtt <- readRDS(paste0(location,'/hg38_geneRef_conv.RDS'))
@@ -15,7 +16,8 @@ tti <- function(location, steps = 2,
   geneset_BIOCARTA <- hypeR::msigdb_gsets("Homo sapiens", "C2", "CP:BIOCARTA", clean=TRUE)
   genesetsH <- hypeR::msigdb_gsets("Homo sapiens", "H", clean=TRUE)
 
-  i_fgtsv <- dplyr::filter(read_csv(paste0(output_location, 'paired_fgoutBed.csv')), !(prot %in% c("none")))
+  i_fgtsv <- read_csv(paste0(output_location, 'paired_fgoutBed.csv'))
+  i_fgtsv <- i_fgtsv[i_fgtsv$prot != "none",]
   t_fgtsv <- i_fgtsv
   t_fgtsv$rn <- 1:length(t_fgtsv$transcript)
   keep <- list()
@@ -54,10 +56,21 @@ tti <- function(location, steps = 2,
   names(d_transcripts) <- unique(bgtsv$V5)
   d_transcripts <- d_transcripts[!duplicated(d_transcripts)]
 
-  pdm1 <- read_csv(paste(location,"/PPIDM_FullSortedDataset_84K_GSB.csv",sep=""))
-  d6 <- pdm1[pdm1$CLASS == ddi,c(1, 2)]
-  d6 <- pdm1[pdm1$IN_GOLDSTANDARD == "yes",c(1, 2)]
-  colnames(d6) <-c("n1", "n2")
+  if (ddi_type == "3did") {
+    d1 <- read_lines('/projectnb2/evolution/zwakefield/proteinImpacts/3did_flat')
+    d2 <- gsub("\t", " ", d1[grep("#=ID", d1)])
+    d3 <- lapply(d2, function(x) gsub("@Pfam", "", gsub("[)]", "", gsub("[(]", "", strsplit(x, split = " ")[[1]][c(2, 3, 5, 6)]))))
+    d4 <- lapply(d3, function(x) data.frame(t(data.frame(x))))
+    d5 <- do.call(rbind, d4)
+    rownames(d5) <- NULL
+    d6 <- data.frame(n1 = unlist(lapply(strsplit(d5$X3, split = "[.]"), "[[", 1)),
+                     n2 = unlist(lapply(strsplit(d5$X4, split = "[.]"), "[[", 1)))
+  } else {
+    pdm1 <- read_csv(paste(location,"/PPIDM_FullSortedDataset_84K_GSB.csv",sep=""))
+    d6 <- pdm1[pdm1$CLASS == ddi,c(1, 2)]
+    d6 <- pdm1[pdm1$IN_GOLDSTANDARD == "yes",c(1, 2)]
+    colnames(d6) <-c("n1", "n2")
+  }
 
   t_d_df <- do.call(rbind, lapply(1:length(d6$n1), function(x) {
     if (sum(names(d_transcripts) == d6$n1[x]) > 0 &
@@ -285,5 +298,6 @@ tti <- function(location, steps = 2,
   }
   names(graph_output) <- dtr
   saveRDS(graph_output, paste0(output_location, 'tti_output/igraph_objects.RDS'))
-  return(graph_output)
+  return(list(dtr = dtr,
+              graph_output = graph_output))
 }
