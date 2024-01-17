@@ -1,5 +1,5 @@
 tti <- function(location, steps = 2,
-                max_edges_for_viz = 1000,
+                max_vertices_for_viz = 1000,
                 fdr = .05, plot_bool = T,
                 ddi = c("Gold", "Silver", "Bronze")[1],
                 ddi_type = c("dm", "3did")[1],
@@ -57,8 +57,21 @@ tti <- function(location, steps = 2,
   d_transcripts <- d_transcripts[!duplicated(d_transcripts)]
 
   if (ddi_type == "3did") {
-    d1 <- read_lines('3did_flat')
-    d2 <- gsub("\t", " ", d1[grep("#=ID", d1)])
+
+
+    d1 <- read_lines('/projectnb2/evolution/zwakefield/proteinImpacts/3did_flat')
+    d2 <- gsub("\t", " ", d1[grepl("#=ID", d1) | grepl("#=3D", d1)])
+
+    iter <- c(grep("#=ID", d2), length(d2))
+    strong <- unlist(lapply(1:(length(iter)-1), function(x) {
+      i2 <- d2[(iter[x]+1):(iter[x+1]-1)]
+      i3 <- as.numeric(unlist(lapply(strsplit(i2, split = " "), "[[", 5)))
+      if (sum(i3 >= 2.3) >= 1) {
+        iter[x]
+      }
+    }))
+
+    d2 <- d2[strong]
     d3 <- lapply(d2, function(x) gsub("@Pfam", "", gsub("[)]", "", gsub("[(]", "", strsplit(x, split = " ")[[1]][c(2, 3, 5, 6)]))))
     d4 <- lapply(d3, function(x) data.frame(t(data.frame(x))))
     d5 <- do.call(rbind, d4)
@@ -218,7 +231,7 @@ tti <- function(location, steps = 2,
     if (plot_bool)
     {
       if (sum(c(length(igraph::V(e1g)),
-                length(igraph::V(e2g))) <= max_edges_for_viz) == 2) {
+                length(igraph::V(e2g))) <= max_vertices_for_viz) == 2) {
 
         pdf(paste0(output_location, "tti_output/", dtr[i], "_", steps, 'steps_tti_graph.pdf'))
         print(igraph::plot.igraph(e1g,vertex.size=3,vertex.label=NA,main=dtr[i],
