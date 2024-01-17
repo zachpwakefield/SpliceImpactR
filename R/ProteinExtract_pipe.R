@@ -36,7 +36,7 @@
 ### gdf : alignment plot (background = F)
 ### deExons : volcano plot (background = F)
 
-proteinExtract_pipe <- function(files_dir, background = T, updown = c('up', 'down')[1], thresh = .4, fdr = .05, mOverlap = .5,
+proteinExtract_pipe <- function(files_dir, background = T, updown = c('up', 'down')[1], thresh = .3, fdr = .05, mOverlap = .5,
                                 saveOutput = F, inCores = 8, nC = 0, nE = 0, exon_type = "AFE",
                                 location = system.file(package="domainEnrichment"), output_location) {
 
@@ -85,7 +85,7 @@ proteinExtract_pipe <- function(files_dir, background = T, updown = c('up', 'dow
       cdf.l <- df.l[df.l$delta_PSI <= -(thresh) & df.l$p_value <= fdr,]
     }
 
-    ## Make data.frame with gene, location of each exon
+    ## Make data.frame with gene, location of each exon on up/down filtered redExon
     redExon_filt <- data.frame(geneR = unlist(lapply(strsplit(cdf.l$gene, split = "[.]"), "[[", 1)),
                           chr = sapply(strsplit(cdf.l$exon, split = ":"), "[[", 1),
                           start = sapply(strsplit(sapply(strsplit(cdf.l$exon, split = ":"), "[[", 2), split = "[-]"), "[[", 1),
@@ -95,6 +95,7 @@ proteinExtract_pipe <- function(files_dir, background = T, updown = c('up', 'dow
     redExon_filt$start <- as.numeric(redExon_filt$start)
     redExon_filt$stop <- as.numeric(redExon_filt$stop)
 
+    ## Make data.frame with gene, location of each exon on total foreground
     redExon <- data.frame(geneR = unlist(lapply(strsplit(bdf.l$gene, split = "[.]"), "[[", 1)),
                                chr = sapply(strsplit(bdf.l$exon, split = ":"), "[[", 1),
                                start = sapply(strsplit(sapply(strsplit(bdf.l$exon, split = ":"), "[[", 2), split = "[-]"), "[[", 1),
@@ -132,7 +133,8 @@ proteinExtract_pipe <- function(files_dir, background = T, updown = c('up', 'dow
   }))
 
   if (background) {print("making background output...")} else {print("making paired output...")}
-  ## Make dataframe proBed for output of matched transcripts withprotein code
+
+  ## Make dataframe proBed for output of matched transcripts with protein code
   proBed <- data.frame(id = unique(bed$name), strand = unlist(lapply(unique(bed$name), function(x) unique(bed$strand[bed$name == x][1]))), prot = protCode) %>%
     tidyr::separate(id, c("transcript", "id"), "#") %>%
     tidyr::separate("id", c("gene", "chr"), ";") %>%

@@ -3,7 +3,7 @@ getData <- function(cuD, fdr_use, min_sample_success, engine = c("FunFam","Gene3
   ## extract bed, fasta, and interproscan files from output_location
   tf <- list.files(cuD)
   ipscan <- tf[grep("fa.tsv", tf)]
-  outFast <- tf[(!(grepl(".tsv", tf)) & !(grepl("xml", tf)) & !(grepl("gff3", tf)) & !(grepl("json", tf)) & grepl("outFast.fa", tf) & !grepl("paired", tf))]
+  outFast<- tf[(!(grepl(".tsv", tf)) & !(grepl("xml", tf)) & !(grepl("gff3", tf)) & !(grepl("json", tf)) & grepl("outFast.fa", tf) & !grepl("paired", tf))]
   outBed <- tf[grepl("outBed.csv", tf) & !grepl("paired", tf)]
 
   ## collate interproscan results
