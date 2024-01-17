@@ -213,7 +213,7 @@ tti <- function(location, steps = 2,
 
     igraph::V(e2g)$color <- rep("azure4", length(igraph::V(e2g)))
     igraph::E(e2g)$color <- rep("azure4", length(igraph::E(e2g)))
-    igraph::V(e1g)$color[V(e1g)$name == dtr[i+1]] <- "gold"
+    igraph::V(e2g)$color[V(e2g)$name == dtr[i+1]] <- "gold"
 
     if (length(setdiff(unique(igraph::V(e1g)), unique(igraph::V(e2g)))) > 0){
 
