@@ -287,4 +287,3 @@ tti <- function(location, steps = 2,
   saveRDS(graph_output, paste0(output_location, 'tti_output/igraph_objects.RDS'))
   return(graph_output)
 }
-# tti_trial <- tti(steps = 2, max_edges_for_viz = 500, ddi = c("Gold", "Silver", "Bronze")[1], output_location = '/projectnb2/evolution/zwakefield/proteinImpacts/mpc_cpc5/')
