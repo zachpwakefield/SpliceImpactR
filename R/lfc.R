@@ -39,10 +39,10 @@ lfc <- function(de_df, numCont, numExp, exon_type, cores = 8) {
   for (i in 1:length(de_df$gene)) {
     col[[i]] <- "#A7A9AC"#natparks.pals("Acadia", 15)[7]
       if (de_df$lfc[i] <= -1.0 & de_df$p_value[i] < .01) {
-        col[[i]] <- "#FE9234" #natparks.pals("Acadia", 15)[15]
+        col[[i]] <- 'brown'#"#FE9234" #natparks.pals("Acadia", 15)[15]
       }
     if (de_df$lfc[i] >= 1.0 & de_df$p_value[i] < .01) {
-      col[[i]] <- "#00A79D"# natparks.pals("Acadia", 15)[1]
+      col[[i]] <- 'chartreuse4'#"#00A79D"# natparks.pals("Acadia", 15)[1]
     }
 
   }
