@@ -106,7 +106,11 @@ tti <- function(location, steps = 2,
     }
 
   }))
-
+  if (file.exists(paste0(output_location, "tti_output/adjacency_stats.txt"))) {
+    append_bool <- F
+  } else {
+    append_bool <- T
+  }
   domainDiff <- lapply(seq(1, length(fgtsv$transcript)-1, by = 2), function(x) {
     t1 <- fgtsv$transcript[(x)]
     t2 <- fgtsv$transcript[(x+1)]
@@ -119,11 +123,6 @@ tti <- function(location, steps = 2,
 
     )
     {
-      if (x == 1) {
-        append_bool <- F
-      } else {
-          append_bool <- T
-      }
       readr::write_lines(paste(fgtsv$transcript[(x)], " : ", fgtsv$transcript[(x+1)], "[", unique(gt_df$geneID[gt_df$transcriptID %in% c(fgtsv$transcript[(x)], fgtsv$transcript[(x+1)])]), "]", '\n',
                                " iso1 trans #: ", length(t1_con),'\t', " iso1 genes #: ", length(unique(gt_df$geneID[gt_df$transcriptID %in% t1_con])), '\n',
                                " iso2 trans #: ", length(t2_con),'\t', " iso2 genes #: ", length(unique(gt_df$geneID[gt_df$transcriptID %in% t2_con])), '\n',
