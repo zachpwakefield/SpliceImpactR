@@ -1,0 +1,172 @@
+differential_inclusion <- function(test_names, control_names, outlier_threshold = c("4/n", "4/mean", "4/(N-k-1)", "1", 1)[1]) {
+  sample_types <- list()
+
+  for (i in test_names) {
+    sample_types <- c(sample_types, list(c(i, 'test')))
+  }
+
+  for (i in control_names) {
+    sample_types <- c(sample_types, list(c(i, 'control')))
+  }
+
+  final_data <- do.call(rbind, lapply(c("AFE", "ALE"), function(et) {
+
+    sample_types_sorted <- c(sample_types[which(unlist(lapply(sample_types, "[[", 2)) == "control")], sample_types[which(unlist(lapply(sample_types, "[[", 2)) == "test")])
+    load_output <- lapply(sample_types_sorted, function(x) read.table(paste0(x[1], paste0(".", et, "PSI")), header = T, sep = '\t'))
+    genes <- unique(unlist(lapply(load_output, function(x) x$gene)))
+    exons <- lapply(genes, function(x) unique(unlist(lapply(load_output, function(y) y$exon[y$gene == x]))))
+    dic <- exons
+    names(dic) <- genes
+
+    df <- data.frame(gene = unlist(lapply(1:length(dic), function(x) rep(names(dic)[x], length(dic[[x]])))),
+                     exon = unlist(exons))
+
+
+    ctrl_index <- which(unlist(lapply(sample_types_sorted, "[[", 2)) == "control")
+    test_index <- which(unlist(lapply(sample_types_sorted, "[[", 2)) == "test")
+
+
+    vals <- do.call(rbind, lapply(1:length(df$gene), function(i) {
+      val_extract <- lapply(load_output, function(x) {
+        if (et == "AFE") {
+          psi_holder <- x$AFEPSI[x$gene == df$gene[i] & x$exon == df$exon[i]]
+        } else if (et == "ALE") {
+          psi_holder <- x$ALEPSI[x$gene == df$gene[i] & x$exon == df$exon[i]]
+        }
+        if (length(psi_holder) > 0) {
+          c(psi_holder,
+            abs(x$nUP[x$gene == df$gene[i] & x$exon == df$exon[i]]-x$nDOWN[x$gene == df$gene[i] & x$exon == df$exon[i]]),
+            x$nUP[x$gene == df$gene[i] & x$exon == df$exon[i]],
+            x$nDOWN[x$gene == df$gene[i] & x$exon == df$exon[i]],
+            x$HITindex[x$gene == df$gene[i] & x$exon == df$exon[i]])
+        } else {
+          c(0, 0, 0, 0, NA)
+        }
+      })
+      psi <- unlist(lapply(val_extract, "[[", 1))
+      nDiff <- unlist(lapply(val_extract, "[[", 2))
+      nUP <- unlist(lapply(val_extract, "[[", 3))
+      nDOWN <- unlist(lapply(val_extract, "[[", 4))
+      HITindex <- unlist(lapply(val_extract, "[[", 5))
+
+      model <- lm(psi ~ unlist(lapply(sample_types_sorted, "[[", 2)))
+      influence <- as.numeric(cooks.distance(model))
+      if (outlier_threshold == "4/n") {
+
+      } else if (outlier_threshold == "4/mean") {
+        usable <- which(influence <= 4/mean(influence))
+      } else if (outlier_threshold == "4/mean") {
+        usable <- which(influence <= 4/length(sample_types_sorted))
+      } else if (outlier_threshold == "1") {
+        usable <- which(influence <= 1)
+      } else {
+        usable <- which(influence <= outlier_threshold)
+      }
+      condition <- intersect(usable, test_index)
+      log_nDiff <- log(nDiff+1)
+
+      with_outliers_df <- data.frame(gene = df$gene[i],
+                                     exon = df$exon[i],
+                                     nDiff = nDiff,
+                                     log_nDiff = log_nDiff,
+                                     psi = psi,
+                                     sample = 1:length(sample_types_sorted),
+                                     sample_name = unlist(lapply(sample_types_sorted, "[[", 1)),
+                                     condition = 0,
+                                     cooks_d = influence,
+                                     type = et,
+                                     nUP = nUP,
+                                     nDOWN = nDOWN,
+                                     HITindex = HITindex)
+      with_outliers_df$condition[condition] <- rep(1, length(condition))
+      remove_outliers_df <- with_outliers_df[usable,]
+      gdf <- remove_outliers_df
+      gdf
+
+    }))
+    p_vals <- lapply(unique(vals$exon), function(x) {
+      if (sum(vals$exon == x) > (.5*length(sample_types_sorted))) {
+
+        gene_exon <- unique(vals$gene[vals$exon == x])
+        df <- vals[!is.na(match(vals$gene, gene_exon)),]
+        df$cond2 <- 0
+        df$cond2[df$exon == x & df$condition == 1] <- 1
+        snames <- lapply(sample_types_sorted, "[[", 1)
+        dsamp1f <- do.call(cbind, lapply(unique(df$sample), function(d) {
+          init <- rep(0, length(df$sample))
+          init[df$sample == d] <- 1
+          df1d <- data.frame("plh" = init)
+          colnames(df1d) <- paste(unlist(lapply(sample_types_sorted, "[[", 1))[d])
+          df1d
+        }))
+
+        dpsi1f <- do.call(cbind, lapply(unique(df$exon), function(e) {
+          init <- rep(0, length(df$exon))
+          init[df$exon == e] <- 1
+          dp1d <- data.frame("plh" = init)
+          colnames(dp1d) <- e
+          dp1d
+        }))
+        d1f <- cbind(dpsi1f, dsamp1f)
+        d1f$condition <- df$cond2
+        d1f$y1 <- df$log_nDiff
+
+        ## full model
+        x1 <- d1f
+        full_model <- lm(y1 ~ ., data = x1)
+        full_ll <- logLik(full_model)
+
+        ## reduced model
+        x2 <- d1f[,colnames(d1f) != 'condition']
+        reduced_model <- lm(y1 ~ ., data = x2)
+        reduced_ll <- logLik(reduced_model)
+
+        LR_statistic <- -2 * (as.numeric(reduced_ll) - as.numeric(full_ll))
+        p_val <- pchisq(LR_statistic, df = 1, lower.tail = FALSE)
+        ifelse(!is.na(p_val), p_val, -1)} else {-1}
+
+    })
+    p.adj <- p.adjust(p_vals, method = 'fdr')
+    p.adj[p.adj < 0] <- -1
+
+    init_output <- vals[!duplicated(vals[,c('gene', 'exon')]),c('gene', 'exon')]
+    data <- do.call(rbind, lapply(1:length(unique(vals$exon)), function(h) { #500, function(h) {#
+      ex <- init_output[h,2]
+      gene_ex <- init_output[h,1]
+
+      vals_min <- vals[vals$gene == gene_ex & vals$exon == ex,]
+
+
+      dpsi <- mean(vals_min$psi[vals_min$exon == ex & vals_min$condition == 1]) - mean(vals_min$psi[vals_min$exon == ex & vals_min$condition == 0])
+      outlier <- setdiff(unlist(lapply(sample_types_sorted, "[[", 1)), vals_min$sample_name[vals_min$exon == ex])
+      init_df <- data.frame(gene = unique(vals_min$gene[vals_min$exon == ex]),
+                            exon = ex,
+                            type = unique(vals_min$type[vals_min$exon == ex]),
+                            delta.psi = dpsi,
+                            p.val = p_vals[h][[1]],
+                            p.adj = p.adj[h],
+                            control_average_psi = mean(vals_min$psi[vals_min$exon == ex & vals_min$condition == 0]),
+                            test_average_psi = mean(vals_min$psi[vals_min$exon == ex & vals_min$condition == 1]),
+                            control_average_nDiff = mean(vals_min$nDiff[vals_min$exon == ex & vals_min$condition == 0]),
+                            test_average_nDiff = mean(vals_min$nDiff[vals_min$exon == ex & vals_min$condition == 1],
+                                                      outlier = ifelse(length(outlier) > 0, outlier, "none")
+                            )
+                            , check.names = F)
+      add_numerics <- data.frame(t(unlist(lapply(unlist(lapply(sample_types_sorted, "[[", 1)), function(s) {
+        ifelse(length(intersect(vals_min$sample_name[vals_min$exon == ex], s)) >=1,
+               out <- c(vals_min$psi[vals_min$exon == ex & vals_min$sample_name == s],
+                        vals_min$nDiff[vals_min$exon == ex & vals_min$sample_name == s],
+                        vals_min$cooks_d[vals_min$exon == ex & vals_min$sample_name == s]),
+               out <- c(0, 0, 0))
+        out
+      }))))
+      colnames(add_numerics) <- paste0(rep(unlist(lapply(sample_types_sorted, "[[", 1)), each = 3), c("_psi", "_nDiff", "_cooks_d"))
+      ex_df <- cbind(init_df, add_numerics)
+    }))
+
+    data
+
+  }))
+
+  return(final_data)
+}
