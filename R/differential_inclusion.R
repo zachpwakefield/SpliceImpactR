@@ -1,4 +1,4 @@
-differential_inclusion <- function(test_names, control_names, outlier_threshold = c("4/n", "4/mean", "4/(N-k-1)", "1", 1)[1]) {
+differential_inclusion <- function(test_names, control_names, outlier_threshold = c("4/n", "4/mean", "1", 1)[1]) {
   sample_types <- list()
 
   for (i in test_names) {
@@ -52,11 +52,9 @@ differential_inclusion <- function(test_names, control_names, outlier_threshold 
       model <- lm(psi ~ unlist(lapply(sample_types_sorted, "[[", 2)))
       influence <- as.numeric(cooks.distance(model))
       if (outlier_threshold == "4/n") {
-
+        usable <- which(influence <= 4/length(sample_types_sorted))
       } else if (outlier_threshold == "4/mean") {
         usable <- which(influence <= 4/mean(influence))
-      } else if (outlier_threshold == "4/mean") {
-        usable <- which(influence <= 4/length(sample_types_sorted))
       } else if (outlier_threshold == "1") {
         usable <- which(influence <= 1)
       } else {
