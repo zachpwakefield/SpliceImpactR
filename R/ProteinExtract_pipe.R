@@ -1,6 +1,7 @@
 # proteinExtract_pipe
 # inputs:
 ### files_dir : either a list of hit exon output directories for background domain generation or a differential inclusion output file for foreground domains
+### differential inclusion final output : dataframe output from differential inclusion function
 ### background : T for generating background domains or F for generating foreground (differentially included) domains
 #                defauls to T
 ### updown : whether looking at exons differentially included more (up) or less (down)
@@ -36,7 +37,7 @@
 ### gdf : alignment plot (background = F)
 ### deExons : volcano plot (background = F)
 
-proteinExtract_pipe <- function(files_dir, background = T, updown = c('up', 'down')[1], thresh = .3, fdr = .05, mOverlap = .5,
+proteinExtract_pipe <- function(files_dir, diff_incl_df, background = T, updown = c('up', 'down')[1], thresh = .3, fdr = .05, mOverlap = .5,
                                 saveOutput = F, inCores = 8, nC = 0, nE = 0, exon_type = "AFE",
                                 location = system.file(package="domainEnrichment"), output_location) {
 
@@ -68,7 +69,7 @@ proteinExtract_pipe <- function(files_dir, background = T, updown = c('up', 'dow
   } else {
 
     ## If using foreground set, read in diExon file and extract differentially included exons using lfc()
-    df <- read.delim(files_dir, sep = " ")
+    df <- diff_incl_df
     df.l <- lfc(df, numCont = nC, numExp = nE, exon_type = exon_type, cores = inCores)
 
     ## Filter df.l for paired analysis
