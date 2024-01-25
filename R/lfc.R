@@ -1,5 +1,5 @@
 lfc <- function(de_df, numCont, numExp, exon_type, cores = 8) {
-  de_df <- de_df[de_df$type == exon_type,]
+  de_df <- de_df[de_df$type == exon_type,c(1:11, seq(12, ncol(de_df), by = 3), seq(13, ncol(de_df), by = 3), seq(14, ncol(de_df), by = 3))]
   samps <- colnames(de_df)
 
   lfc <- list()
@@ -7,11 +7,11 @@ lfc <- function(de_df, numCont, numExp, exon_type, cores = 8) {
 
 
   lfc <- mclapply(1:length(de_df$gene), mc.cores = cores, function(i) {
-    outlier <- which(unlist(lapply(samps, function(x) grepl(x, de_df$outlier[i]))))+10
+    outlier <- which(unlist(lapply(samps, function(x) grepl(x, de_df$outlier[i]))))+11
 
-    cont <- c(11:(11-1+numCont))
+    cont <- c(12:(12-1+numCont))
     cont <- cont[!(cont %in% outlier)]
-    exp <- c((numCont+10+1):(11-1+numCont+numExp))
+    exp <- c((numCont+11+1):(12-1+numCont+numExp))
     exp <- exp[!(exp %in% outlier)]
 
 
@@ -34,14 +34,14 @@ lfc <- function(de_df, numCont, numExp, exon_type, cores = 8) {
   })
 
   de_df$lfc <- unlist(lfc)
-  de_df <- de_df[de_df$p_value >= 0,]
+  de_df <- de_df[de_df$p.adj >= 0 & !is.na(de_df$p.adj),]
   col <- list()
   for (i in 1:length(de_df$gene)) {
     col[[i]] <- "#A7A9AC"#natparks.pals("Acadia", 15)[7]
-      if (de_df$lfc[i] <= -1.0 & de_df$p_value[i] < .01) {
+      if (de_df$lfc[i] <= -1.0 & de_df$p.adj[i] < .01) {
         col[[i]] <- 'brown'#"#FE9234" #natparks.pals("Acadia", 15)[15]
       }
-    if (de_df$lfc[i] >= 1.0 & de_df$p_value[i] < .01) {
+    if (de_df$lfc[i] >= 1.0 & de_df$p.adj[i] < .01) {
       col[[i]] <- 'chartreuse4'#"#00A79D"# natparks.pals("Acadia", 15)[1]
     }
 
