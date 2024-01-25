@@ -26,7 +26,7 @@ lfc <- function(de_df, numCont, numExp, exon_type, cores = 8) {
       lfc_t <- 0
     }
     if (length(exp) != 0 & length(cont) != 0) {
-      lfc_t <- log((as.numeric(rowMeans(de_df[i,exp, drop = FALSE]))+.01)/as.numeric(rowMeans(de_df[i,cont, drop = FALSE])+.01))
+      lfc_t <- log2((as.numeric(rowMeans(de_df[i,exp, drop = FALSE]))+.01)/as.numeric(rowMeans(de_df[i,cont, drop = FALSE])+.01))
     }
 
 
