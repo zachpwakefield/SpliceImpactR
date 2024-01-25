@@ -1,4 +1,4 @@
-differential_inclusion <- function(test_names, control_names, outlier_threshold = c("4/n", "4/mean", "1", 1)[1]) {
+differential_inclusion <- function(test_names, control_names, cores = 2, outlier_threshold = c("4/n", "4/mean", "1", 1)[1]) {
   sample_types <- list()
 
   for (i in test_names) {
@@ -26,7 +26,7 @@ differential_inclusion <- function(test_names, control_names, outlier_threshold 
     test_index <- which(unlist(lapply(sample_types_sorted, "[[", 2)) == "test")
 
 
-    vals <- do.call(rbind, lapply(1:length(df$gene), function(i) {
+    vals <- do.call(rbind, mclapply(1:length(df$gene), mc.cores = cores, function(i) {
       val_extract <- lapply(load_output, function(x) {
         if (et == "AFE") {
           psi_holder <- x$AFEPSI[x$gene == df$gene[i] & x$exon == df$exon[i]]
@@ -82,7 +82,7 @@ differential_inclusion <- function(test_names, control_names, outlier_threshold 
       gdf
 
     }))
-    p_vals <- lapply(unique(vals$exon), function(x) {
+    p_vals <- mclapply(unique(vals$exon), mc.cores = cores, function(x) {
       if (sum(vals$exon == x) > (.5*length(sample_types_sorted))) {
 
         gene_exon <- unique(vals$gene[vals$exon == x])
@@ -128,7 +128,7 @@ differential_inclusion <- function(test_names, control_names, outlier_threshold 
     p.adj[p.adj < 0] <- -1
 
     init_output <- vals[!duplicated(vals[,c('gene', 'exon')]),c('gene', 'exon')]
-    data <- do.call(rbind, lapply(1:length(unique(vals$exon)), function(h) { #500, function(h) {#
+    data <- do.call(rbind, mclapply(1:length(unique(vals$exon)), mc.cores = cores, function(h) {
       ex <- init_output[h,2]
       gene_ex <- init_output[h,1]
 
