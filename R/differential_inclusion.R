@@ -136,7 +136,7 @@ differential_inclusion <- function(test_names, control_names, cores = 2, outlier
 
 
       dpsi <- mean(vals_min$psi[vals_min$exon == ex & vals_min$condition == 1]) - mean(vals_min$psi[vals_min$exon == ex & vals_min$condition == 0])
-      outlier <- setdiff(unlist(lapply(sample_types_sorted, "[[", 1)), vals_min$sample_name[vals_min$exon == ex])
+      outlier <- paste(setdiff(unlist(lapply(sample_types_sorted, "[[", 1)), vals_min$sample_name[vals_min$exon == ex]), collapse = "#", sep = "#")
       init_df <- data.frame(gene = unique(vals_min$gene[vals_min$exon == ex]),
                             exon = ex,
                             type = unique(vals_min$type[vals_min$exon == ex]),
