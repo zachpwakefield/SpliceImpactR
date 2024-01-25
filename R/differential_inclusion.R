@@ -147,7 +147,7 @@ differential_inclusion <- function(test_names, control_names, cores = 2, outlier
                             test_average_psi = mean(vals_min$psi[vals_min$exon == ex & vals_min$condition == 1]),
                             control_average_nDiff = mean(vals_min$nDiff[vals_min$exon == ex & vals_min$condition == 0]),
                             test_average_nDiff = mean(vals_min$nDiff[vals_min$exon == ex & vals_min$condition == 1]),
-                            outlier = ifelse(length(outlier) > 0, outlier, "none")
+                            outlier = ifelse(outlier != "" , outlier, "none")
                             , check.names = F)
       add_numerics <- data.frame(t(unlist(lapply(unlist(lapply(sample_types_sorted, "[[", 1)), function(s) {
         ifelse(length(intersect(vals_min$sample_name[vals_min$exon == ex], s)) >=1,
