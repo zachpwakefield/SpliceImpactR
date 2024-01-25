@@ -72,7 +72,7 @@ proteinExtract_pipe <- function(input, background = T, updown = c('up', 'down')[
     df.l <- lfc(df, numCont = nC, numExp = nE, exon_type = exon_type, cores = inCores)
 
     ## Filter df.l for paired analysis
-    bdf.l <- df.l[abs(df.l$delta_PSI) >= thresh & df.l$p_value <= fdr,]
+    bdf.l <- df.l[abs(df.l$delta.psi) >= thresh & df.l$p.adj <= fdr,]
 
     ## Make volcano plot with make_lfcPlot()
     lfcPlot <- make_lfcPlot(df.l)
@@ -80,9 +80,9 @@ proteinExtract_pipe <- function(input, background = T, updown = c('up', 'down')[
 
     ## Filter based on fdr and thresh inputs for all analysis
     if (updown == "up") {
-      cdf.l <- df.l[df.l$delta_PSI >= thresh & df.l$p_value <= fdr,]
+      cdf.l <- df.l[df.l$delta.psi >= thresh & df.l$p.adj <= fdr,]
     } else {
-      cdf.l <- df.l[df.l$delta_PSI <= -(thresh) & df.l$p_value <= fdr,]
+      cdf.l <- df.l[df.l$delta.psi <= -(thresh) & df.l$p.adj <= fdr,]
     }
 
     ## Make data.frame with gene, location of each exon on up/down filtered redExon
