@@ -43,7 +43,7 @@ proteinExtract_pipe <- function(input, background = T, updown = c('up', 'down')[
   if (background == T) {
 
     ## If using background set, extract all first exons and create combined data.frame with gene, location
-    files <- paste(input, list.files(input)[grep('[.]exon', list.files(input))], sep = "")
+    files <- paste(a1, unlist(lapply(a1, function(x) list.files(x)[grep('[.]exon', list.files(x))])), sep = "")
     cat(files)
     if (exon_type == "AFE") {
       lim <- c("first")
