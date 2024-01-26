@@ -110,14 +110,13 @@ differential_inclusion <- function(test_names, control_names, cores = 2, outlier
         d1f$y1 <- df$log_nDiff
 
 
-        ## full model
+        ## full / alternative model
         x1 <- d1f
         full_model <- glm(y1 ~ ., family = binomial(link = "logit"), data = x1)
         full_ll <- logLik(full_model)
 
-        ## reduced model
+        ## reduced / null model
         x2 <- d1f[,colnames(d1f) != 'condition']
-        # reduced_model <- lm(y1 ~ ., data = x2)
         reduced_model <- glm(y1 ~ ., family = binomial(link = "logit"), data = x2)
         reduced_ll <- logLik(reduced_model)
 
@@ -128,8 +127,7 @@ differential_inclusion <- function(test_names, control_names, cores = 2, outlier
         df <- length(coef(full_model)) - length(coef(reduced_model))
 
         # Compute the p-value
-        p_value <- pchisq(LR_statistic, df = df, lower.tail = FALSE)
-        p_val <- pchisq(LR_statistic, df = 1, lower.tail = FALSE)
+        p_val <- pchisq(LR_statistic, df = df, lower.tail = FALSE)
         ifelse(!is.na(p_val), p_val, -1)} else {-1}
 
     })
