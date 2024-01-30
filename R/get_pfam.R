@@ -1,5 +1,5 @@
-get_pfam <- function(background, output_location) {
-  pfam_hg38 <- read_tsv('/projectnb2/evolution/zwakefield/proteinImpacts/protein_code_from_gencodev43_headerFix.txt.tsv', col_names = F)
+get_pfam <- function(background, pdir, output_location) {
+  pfam_hg38 <- read_tsv(paste0(pdir, '/protein_code_from_gencodev43_headerFix.txt.tsv'), col_names = F)
   pfam_hg38$transcriptID <- unlist(lapply(strsplit(pfam_hg38$X1, split = "#"),
                                           "[[", 1))
   pfam_hg38 <- pfam_hg38 %>% dplyr::relocate(transcriptID)
