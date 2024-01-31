@@ -8,8 +8,25 @@ get_pfam <- function(background, foreground, pdir, output_location) {
   pfam_hg38 <- pfam_hg38 %>% dplyr::relocate(geneID, .after = transcriptID)
 
 
-  fg_out <- pfam_hg38[pfam_hg38$transcriptID %in% foreground$matched$tot_matched$transcriptID,]
-  bg_out <- pfam_hg38[pfam_hg38$transcriptID %in% background$matched$tot_matched$transcriptID,]
+  fg_out <- do.call(rbind, mclapply(1:length(foreground$matched$tot_matched$input_id), mc.cores = 8, function(c) {
+    cx <- foreground$matched$tot_matched[c,]
+    cxdf <- pfam_hg38[pfam_hg38$transcriptID %in% cx$transcriptID,]
+    loc <- unlist(lapply(strsplit(cx$input_id, split = ";"), "[[", 2))
+    id <- unlist(lapply(strsplit(cxdf$X1, split = ";"), "[[", 1))
+    strand <- unlist(lapply(strsplit(cxdf$X1, split = ";"), "[[", 2))
+    cxdf$X1 <- paste0(id, ";", loc, ";", strand)
+    cxdf
+  }))
+
+  bgout <- do.call(rbind, mclapply(1:length(background$matched$tot_matched$input_id), mc.cores = 8, function(c) {
+    cx <- background$matched$tot_matched[c,]
+    cxdf <- pfam_hg38[pfam_hg38$transcriptID %in% cx$transcriptID,]
+    loc <- unlist(lapply(strsplit(cx$input_id, split = ";"), "[[", 2))
+    id <- unlist(lapply(strsplit(cxdf$X1, split = ";"), "[[", 1))
+    strand <- unlist(lapply(strsplit(cxdf$X1, split = ";"), "[[", 2))
+    cxdf$X1 <- paste0(id, ";", loc, ";", strand)
+    cxdf
+  }))
 
   write_tsv(fg_out, paste0(output_location, "fgoutFast.fa.tsv"))
   write_tsv(bg_out, paste0(output_location, "bgoutFast.fa.tsv"))
