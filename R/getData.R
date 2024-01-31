@@ -8,7 +8,7 @@ getData <- function(cuD, fdr_use, min_sample_success, engine = c("FunFam","Gene3
 
   ## collate interproscan results
   interproscan_results <- lapply(c("bg", "fg"), function(o) {
-    ip <- readr::read_delim(paste(cuD, ipscan[grep(o, ipscan)], sep = ""), col_names = F, delim = '\t')
+    ip <- readr::read_delim(paste(cuD, ipscan[grep(o, ipscan)], sep = ""), col_names = T, delim = '\t')
     s <- readr::read_csv(paste(cuD, outBed[grep(o, outBed)], sep =""))
     s$id <- paste(paste(paste(paste(s$transcript, s$gene, sep = "#"), s$chr, sep = ";"), paste(s$start, s$stop, sep = "-"), sep = ":"), s$strand, sep = ";")
     fa <- readr::read_lines(paste(cuD, outFast[grep(o, outFast)], sep = ""))
