@@ -18,7 +18,7 @@ get_pfam <- function(background, foreground, pdir, output_location) {
     cxdf
   }))
 
-  bgout <- do.call(rbind, mclapply(1:length(background$matched$tot_matched$input_id), mc.cores = 8, function(c) {
+  bg_out <- do.call(rbind, mclapply(1:length(background$matched$tot_matched$input_id), mc.cores = 8, function(c) {
     cx <- background$matched$tot_matched[c,]
     cxdf <- pfam_hg38[pfam_hg38$transcriptID %in% cx$transcriptID,]
     loc <- unlist(lapply(strsplit(cx$input_id, split = ";"), "[[", 2))
