@@ -20,7 +20,7 @@ get_pfam <- function(background, foreground, pdir, output_location, cores) {
       df
     }
   }))
-  bg_out <- do.call(rbind, paralell::mclapply(1:length(background$proBed$transcript), mc.cores = cores, function(i) {
+  bg_out <- do.call(rbind, parallel::mclapply(1:length(background$proBed$transcript), mc.cores = cores, function(i) {
     if (background$proBed$transcript[i] %in% pfam_hg38$transcriptID) {
       df <- pfam_hg38[pfam_hg38$transcriptID == background$proBed$transcript[i],]
       id <- paste0(background$proBed$transcript[i], "#",
