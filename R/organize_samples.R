@@ -5,7 +5,7 @@
 
 organize_samples <- function(samples, cores) {
   system(paste0("mkdir ", paste0(output_location, 'data/')))
-  sample_names <- unlist(parallel::mclapply(samples, mc.cores=8, function(y) {
+  sample_names <- unlist(parallel::mclapply(samples, mc.cores=cores, function(y) {
     sample <- strsplit(y, '/')[[1]][length(strsplit(y, '/')[[1]])]
     system(paste0("mkdir ", paste0(output_location, 'data/', sample)))
     se_dir <- paste0(y, 'rmats/', "SE.MATS.JC.txt")
