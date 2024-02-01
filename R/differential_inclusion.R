@@ -30,12 +30,14 @@ differential_inclusion <- function(test_names, control_names, cores = 2, outlier
       val_extract <- lapply(load_output, function(x) {
         if (et == "AFE") {
           psi_holder <- x$AFEPSI[x$gene == df$gene[i] & x$exon == df$exon[i]]
+          nDiff_i <- x$nDOWN[x$gene == df$gene[i] & x$exon == df$exon[i]]-x$nUP[x$gene == df$gene[i] & x$exon == df$exon[i]]
         } else if (et == "ALE") {
           psi_holder <- x$ALEPSI[x$gene == df$gene[i] & x$exon == df$exon[i]]
+          nDiff_i <- x$nUP[x$gene == df$gene[i] & x$exon == df$exon[i]]-x$nDOWN[x$gene == df$gene[i] & x$exon == df$exon[i]]
         }
         if (length(psi_holder) > 0) {
           c(psi_holder,
-            abs(x$nUP[x$gene == df$gene[i] & x$exon == df$exon[i]]-x$nDOWN[x$gene == df$gene[i] & x$exon == df$exon[i]]),
+            nDiff_i,
             x$nUP[x$gene == df$gene[i] & x$exon == df$exon[i]],
             x$nDOWN[x$gene == df$gene[i] & x$exon == df$exon[i]],
             x$HITindex[x$gene == df$gene[i] & x$exon == df$exon[i]])
