@@ -1,3 +1,8 @@
+## if in structure:
+# sample
+# # rmats
+# # hit
+
 organizeSamples <- function(samples, cores = 1) {
   system(paste0("mkdir ", paste0(output_location, 'data/')))
   sample_names <- unlist(parallel::mclapply(samples, mc.cores = cores, function(y) {
