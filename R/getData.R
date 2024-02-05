@@ -102,7 +102,7 @@ getData <- function(cuD, fdr_use, min_sample_success, engine = c("FunFam","Gene3
       ggplot2::theme_bw()+
       ggplot2::theme(axis.ticks.y=ggplot2::element_blank()  #remove y axis ticks
       )+
-      ggplot2::scale_fill_manual(values=c('brown','chartreuse4')) + ggtitle(paste0("Domain Enrichment of ", ifelse(x == "1", "(+)", "(-)"),
+      ggplot2::scale_fill_manual(values=c('brown','chartreuse4')) + ggplot2::ggtitle(paste0("Domain Enrichment of ", ifelse(x == "1", "(+)", "(-)"),
                                                                                    " PSI Exons"))
 
     pdf(paste0(output_location, ifelse(x == "1", "(+)", "(-)"), 'enrichmentPlot.pdf'))
