@@ -23,12 +23,12 @@ getForeground <- function(input, thresh, fdr, mOverlap, nC, nE, exon_type, pdir,
   print("exon loaded...")
 
   ## Use getTranscript() to extract total and (if background = F) paired transcripts matched to input exons
-  matched <- getTranscript2(gtf = gtf, redExon = redExon, ex_type = exon_type, minOverlap = mOverlap, cores = cores)
+  matched <- getTranscriptForeground(gtf = gtf, redExon = redExon, ex_type = exon_type, minOverlap = mOverlap, cores = cores)
   print("exons matched, bed-ifying...")
 
   ## Use bedify() to extract the  bed file
 
-  bed <- bedify2(matched, outname = output_location, cores = cores)
+  bed <- bedifyForeground(matched, outname = output_location, cores = cores)
   print("done bed-ifying...")
 
   ## extract unqiue transcript names as trans and all trancript names as possT
