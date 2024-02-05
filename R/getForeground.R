@@ -22,11 +22,11 @@ getForeground <- function(input, thresh, fdr, mOverlap, nC, nE, exon_type, pdir,
 
   print("exon loaded...")
 
-  ## Use getTranscript() to extract total and (if background = F) paired transcripts matched to input exons
+  ## Use getTranscriptForeground() to extract total and (if background = F) paired transcripts matched to input exons
   matched <- getTranscriptForeground(gtf = gtf, redExon = redExon, ex_type = exon_type, minOverlap = mOverlap, cores = cores)
   print("exons matched, bed-ifying...")
 
-  ## Use bedify() to extract the  bed file
+  ## Use bedifyForeground() to extract the  bed file
 
   bed <- bedifyForeground(matched, outname = output_location, cores = cores)
   print("done bed-ifying...")
