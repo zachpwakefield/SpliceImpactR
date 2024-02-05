@@ -1,5 +1,5 @@
 getPaired <- function(foreground) {
-  proBed <- foreground$proBed %>% arrange(gene)
+  proBed <- foreground$proBed[order(foreground$proBed$gene),]
   paired_proBed <- proBed[proBed$gene %in% names(table(proBed$gene))[as.numeric(table(proBed$gene)) > 1],]
   moreThanTwo <- names(table(paired_proBed$gene))[table(paired_proBed$gene) > 2]
   if (length(moreThanTwo) > 0) {
