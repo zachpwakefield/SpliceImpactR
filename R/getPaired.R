@@ -28,8 +28,8 @@ getPaired <- function(foreground) {
 
     # Join back to get the delta.psi values for the positive and negative exons
     combos <- combos %>%
-      dplyr::left_join(pos %>% select(exon_id, delta.psi), by = c("pos_exon_id" = "exon_id")) %>%
-      dplyr::left_join(neg %>% select(exon_id, delta.psi), by = c("neg_exon_id" = "exon_id"))
+      dplyr::left_join(pos %>% dplyr::select(exon_id, delta.psi), by = c("pos_exon_id" = "exon_id")) %>%
+      dplyr::left_join(neg %>% dplyr::select(exon_id, delta.psi), by = c("neg_exon_id" = "exon_id"))
 
     # Rename delta.psi columns
     combos <- combos %>%
