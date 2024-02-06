@@ -60,7 +60,7 @@ getTranscriptForeground <- function(gtf = gtf, redExon = redExon, ex_type = exon
 
     ## If multiple best, use length of matched exon
     else if (gtf_min$jaccard[1] == gtf_min$jaccard[2]) {
-      c_gtf <- gtf_min[gtf_min$jaccard == max(gtf_min$jaccard),][order(-gtf_min[length_jacc]),]
+      c_gtf <- gtf_min[gtf_min$jaccard == max(gtf_min$jaccard),] %>% dplyr::arrange(desc(length_jacc))
       rowOuts <- c_gtf$rownum[1]
     }
 
