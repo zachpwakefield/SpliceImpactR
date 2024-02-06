@@ -97,7 +97,7 @@ getData <- function(cuD, fdr_use, min_sample_success, engine = c("FunFam","Gene3
     data <- data[data$domain != "none" & data$domain != "" & data$domain != "-",] %>% dplyr::arrange(fdr)
 
     # Write domain enrichment results to CSV files
-    write.csv(data, paste0(output_location, ifelse(x == "1", "(+)", "(-)"), "domainEnrichment.csv"))
+    write.csv(data, paste0(output_location, ifelse(x == "up", "(+)", "(-)"), "domainEnrichment.csv"))
     data
 
 
