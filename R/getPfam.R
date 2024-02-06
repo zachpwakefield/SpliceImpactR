@@ -5,7 +5,7 @@
 
 getPfam <- function(background, foreground, pdir, output_location, cores) {
   # Load the Pfam reference data, which maps transcripts to protein codes
-  pfam_hg38 <- read_tsv(paste0(pdir, '/protein_code_from_gencodev43_headerFix.txt.tsv'), col_names = F)
+  pfam_hg38 <- readr::read_tsv(paste0(pdir, '/protein_code_from_gencodev43_headerFix.txt.tsv'), col_names = F)
 
   # Extract transcript IDs from the reference data
   pfam_hg38$transcriptID <- unlist(lapply(strsplit(pfam_hg38$X1, split = "#"),
