@@ -4,7 +4,7 @@ getTTI <- function(paired_foreground, pdir = pdir, steps = 1, max_vertices_for_v
     system(paste0("mkdir ", output_location, "tti"))
   }
 
-  # Read the transcript-gene-protein mapping data
+  # Read the transcript-gene-protein mapping data for current genome
   tgp <- read.csv(paste0(pdir, '/gencodev42_transcriptGeneProtein.csv'))
 
   # Combine edgelists from multiple files into a single dataframe, with a conditional regarding which edgelist is selected
