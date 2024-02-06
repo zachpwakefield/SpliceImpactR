@@ -10,8 +10,8 @@ getPaired <- function(foreground) {
   valid_genes <- intersect(pos_exons$gene, neg_exons$gene)  # Genes with both positive and negative delta.psi
 
   # Filter out genes with only one type of delta.psi (edge case handled here)
-  pos_exons <- pos_exons %>% filter(gene %in% valid_genes)
-  neg_exons <- neg_exons %>% filter(gene %in% valid_genes)
+  pos_exons <- pos_exons %>% dplyr::filter(gene %in% valid_genes)
+  neg_exons <- neg_exons %>% dplyr::filter(gene %in% valid_genes)
 
   # Initialize an empty list to store exon pairs for each valid gene
   exon_pairs_list <- list()
