@@ -1,21 +1,21 @@
 ## This function retrieves and processes data for domain enrichment analysis using various protein domain databases.
 ## It compares domain occurrences in foreground (differentially expressed) and background datasets to identify enriched domains.
 
-getData <- function(cuD, fdr_use, min_sample_success, engine = c("FunFam","Gene3D","CDD","PANTHER","SMART","ProSiteProfiles","Pfam","SUPERFAMILY","MobiDBLite","Coils","PRINTS","ProSitePatterns","PIRSF","NCBIfam","Hamap")[7]) {
+getData <- function(output_location, fdr_use, min_sample_success, engine = c("FunFam","Gene3D","CDD","PANTHER","SMART","ProSiteProfiles","Pfam","SUPERFAMILY","MobiDBLite","Coils","PRINTS","ProSitePatterns","PIRSF","NCBIfam","Hamap")[7]) {
 
   ## extract bed, fasta, and interproscan files from output_location
-  tf <- list.files(cuD)
-  ipscan <- c("bgoutFast.fa.tsv", "fgoutFast.fa.tsv") #tf[grep("fa.tsv", tf)]
-  outFast<- c("bgoutFast.fa", "fgoutFast.fa") #tf[(!(grepl(".tsv", tf)) & !(grepl("xml", tf)) & !(grepl("gff3", tf)) & !(grepl("json", tf)) & grepl("outFast.fa", tf) & !grepl("paired", tf))]
-  outBed <- c("bgoutBed.csv", "fgoutBed.csv") #tf[grepl("outBed.csv", tf) & !grepl("paired", tf)]
+  tf <- list.files(output_location)
+  ipscan <- c("bgoutFast.fa.tsv", "fgoutFast.fa.tsv")
+  outFast<- c("bgoutFast.fa", "fgoutFast.fa")
+  outBed <- c("bgoutBed.csv", "fgoutBed.csv")
 
   ## Process interproscan results for background and foreground datasets
   interproscan_results <- lapply(c("bg", "fg"), function(o) {
     # Read domain scan results and sequence information
-    ip <- readr::read_delim(paste(cuD, ipscan[grep(o, ipscan)], sep = ""), col_names = T, delim = '\t')
-    s <- readr::read_csv(paste(cuD, outBed[grep(o, outBed)], sep =""))
+    ip <- readr::read_delim(paste(output_location, ipscan[grep(o, ipscan)], sep = ""), col_names = T, delim = '\t')
+    s <- readr::read_csv(paste(output_location, outBed[grep(o, outBed)], sep =""))
     s$id <- paste(paste(paste(paste(s$transcript, s$gene, sep = "#"), s$chr, sep = ";"), paste(s$start, s$stop, sep = "-"), sep = ":"), s$strand, sep = ";")
-    fa <- readr::read_lines(paste(cuD, outFast[grep(o, outFast)], sep = ""))
+    fa <- readr::read_lines(paste(output_location, outFast[grep(o, outFast)], sep = ""))
     nFa <- fa[grep(">", fa)]
     gN <- gsub(">", "", nFa)
     geneL <- unlist(lapply(strsplit(unlist(lapply(strsplit(fa[grep(">", fa)], split = ";"), "[[", 1)), split = "#"), "[[", 2))
@@ -58,7 +58,7 @@ getData <- function(cuD, fdr_use, min_sample_success, engine = c("FunFam","Gene3
       fg_ip <- interproscan_results[[2]][interproscan_results[[2]]$delta.psi < 0,]
     }
 
-
+    # Extract key values for phyper() hypergeometric
     bg_dom <- unlist(strsplit(interproscan_results[[1]]$protInfor, split = ';'))
     fg_dom <- unlist(strsplit(fg_ip$protInfor, split = ';'))
     fg_dom_li <- lapply(strsplit(fg_ip$protInfor, split = ';'), unique)
@@ -66,7 +66,7 @@ getData <- function(cuD, fdr_use, min_sample_success, engine = c("FunFam","Gene3
 
     successes <- lapply(searcher, function(x) c(sum(fg_dom == x), sum(bg_dom == x)))
     pop_size <- length(bg_dom)
-    sample_size <- length(searcher)
+    sample_size <- length(fg_dom)
 
     # Compute hypergeometric test for domain enrichment
     pvals <- suppressWarnings(signif(stats::phyper(sapply(successes, "[[", 1)-1,
@@ -123,7 +123,7 @@ getData <- function(cuD, fdr_use, min_sample_success, engine = c("FunFam","Gene3
       ggplot2::theme(axis.ticks.y=ggplot2::element_blank()  #remove y axis ticks
       )+
       ggplot2::scale_fill_manual(values=c('brown','chartreuse4')) + ggplot2::ggtitle(paste0("Domain Enrichment of ", ifelse(x == "1", "(+)", "(-)"),
-                                                                                   " PSI Exons"))
+                                                                                            " PSI Exons"))
 
     pdf(paste0(output_location, ifelse(x == "1", "(+)", "(-)"), 'enrichmentPlot.pdf'))
     print(enrichmentPlot)
