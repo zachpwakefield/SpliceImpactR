@@ -306,7 +306,7 @@ init_ddi <- function(pdir, output_location, ppidm_class = c("Gold", "Silver", "B
 
   # Write the graph edgelist to a file
   write_graph(
-    ge,
+    g,
     paste(output_location, 'tti_igraph_edgelist_', paste(ppidm_class, collapse = ""), '_removeDups'),
     format = "ncol"
   )
