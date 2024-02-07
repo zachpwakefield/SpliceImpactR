@@ -1,0 +1,195 @@
+differential_inclusion_rMATS <- function(control_names, test_names, ex_t = "SE", cores, outlier_threshold) {
+
+  sample_types <- list()
+
+  # Categorize each sample name as 'test' or 'control'
+  for (i in test_names) {
+    sample_types <- c(sample_types, list(c(i, 'test')))
+  }
+
+  for (i in control_names) {
+    sample_types <- c(sample_types, list(c(i, 'control')))
+  }
+
+  # Sort samples by type (control then test)
+  sample_types_sorted <- c(sample_types[which(unlist(lapply(sample_types, "[[", 2)) == "control")], sample_types[which(unlist(lapply(sample_types, "[[", 2)) == "test")])
+
+  # Load PSI values for each sample and splicing event type
+  load_output <- lapply(sample_types_sorted, function(x) read.table(paste0(x[1], paste0(".", et, "PSI")), header = T, sep = '\t'))
+
+  rMATS_df <- extract_rMATS(ex_t = "SE", frM.list = load_output,
+                            sample_ids = unlist(lapply(sample_types_sorted, "[[", 1)),
+                            cores)
+
+  rMATS_df <- rMATS_df[rowSums(rMATS_df[,grep("psi", colnames(rMATS_df))]) > 0,]
+  #
+  stats_out <- do.call(rbind, parallel::mclapply(1:nrow(rMATS_df), mc.cores = 8, function(x){
+    # stats_out <- do.call(rbind, lapply(1:nrow(rMATS_df), function(x){
+    cR <- rMATS_df[x,]
+    cont.cR <- cR[,unlist(lapply(control_group, function(y) grep(y, colnames(cR)))), drop = T]
+    test.cR <- cR[,unlist(lapply(test_group, function(y) grep(y, colnames(cR)))), drop = T]
+
+
+
+
+
+    ## cooks d
+    cont.psi <- as.numeric(cont.cR[grep("psi", names(cont.cR))])
+    test.psi <- as.numeric(test.cR[grep("psi", names(test.cR))])
+
+
+    model <- lm(c(cont.psi, test.psi) ~ c(rep(0, length(cont.psi)), rep(1, length(test.psi))))
+    influence <- as.numeric(cooks.distance(model))
+    if (outlier_threshold == "4/n") {
+      usable <- which(influence <= 4/length(sample_types_sorted))
+    } else if (outlier_threshold == "4/mean") {
+      usable <- which(influence <= 4/mean(influence))
+    } else if (outlier_threshold == "1") {
+      usable <- which(influence <= 1)
+    } else {
+      usable <- which(influence <= outlier_threshold)
+    }
+
+    useIndices_cont <- usable[usable <= length(cont.psi)]
+    useIndices_test <- usable[usable > length(test.psi)] - length(cont.psi)
+    ol_init <- paste(c(control_group, test_group)[usable], collapse = "#")
+    outliers <- ifelse(ol_init == "", "none", ol_init)
+
+
+    cont.SJC.noOut <- as.numeric(cont.cR[grep("SJC", names(cont.cR))])[useIndices_cont]
+    cont.IJC.noOut <- as.numeric(cont.cR[grep("IJC", names(cont.cR))])[useIndices_cont]
+    cont.psi.noOut <- as.numeric(cont.cR[grep("psi", names(cont.cR))])[useIndices_cont]
+
+    mean.cont.psi.noOut <- mean(cont.psi.noOut)
+    mean.cont.IJC.noOut <- mean(cont.IJC.noOut)
+    mean.cont.SJC.noOut <- mean(cont.SJC.noOut)
+
+    test.SJC.noOut <- as.numeric(test.cR[grep("SJC", names(test.cR))])[useIndices_test]
+    test.IJC.noOut <- as.numeric(test.cR[grep("IJC", names(test.cR))])[useIndices_test]
+    test.psi.noOut <- as.numeric(test.cR[grep("psi", names(test.cR))])[useIndices_test]
+
+    mean.test.psi.noOut <- mean(test.psi.noOut)
+    mean.test.IJC.noOut <- mean(test.IJC.noOut)
+    mean.test.SJC.noOut <- mean(test.SJC.noOut)
+
+
+    delta.psi <- mean.test.psi.noOut - mean.cont.psi.noOut
+    if ((sum(cont.psi != 0) >= .333*length(control_group)) |
+        (sum(test.psi != 0) >= .333*length(test_group))) {
+
+      data <- data.frame(
+        counts = c(cont.IJC.noOut, cont.SJC.noOut, test.IJC.noOut, test.SJC.noOut),
+        success = c(rep(1, length(cont.IJC.noOut)), rep(0, length(cont.SJC.noOut)),
+                    rep(1, length(test.IJC.noOut)), rep(0, length(test.SJC.noOut))),  # 1 for inclusion, 0 for skipping
+        condition = rep(c(rep("cont", length(cont.IJC.noOut)), rep("test", length(test.IJC.noOut))), each = 2)
+      )
+      data$counts <- as.factor(data$count)
+
+      # Fit the null model (assuming same Psi for both conditions)
+      null_model <- glm(counts ~ success, family = binomial(link = "logit"), data = data)
+
+      # Fit the alternative model (allowing different Psi for each condition)
+      alt_model <- glm(counts ~ success * condition, family = binomial(link = "logit"), data = data)
+
+      # Compute the likelihood ratio test statistic
+      lrt_stat <- -2 * (logLik(null_model) - logLik(alt_model))
+
+      # Degrees of freedom for the test (difference in number of parameters)
+      df <- length(coef(alt_model)) - length(coef(null_model))
+
+      # Compute the p-value
+      p_value <- pchisq(lrt_stat, df = df, lower.tail = FALSE)
+    } else {
+      p_value <- -1
+
+    }
+    print(x)
+    stats_info <- data.frame(t(c(p_value, delta.psi, influence, c(cont.psi, test.psi),
+                                 mean.cont.psi.noOut, mean.test.psi.noOut,
+                                 mean.cont.IJC.noOut, mean.cont.SJC.noOut,
+                                 mean.test.IJC.noOut, mean.test.SJC.noOut,
+                                 outliers)))
+    colnames(stats_info) <- c("p.val", "delta.psi",
+                              paste0(unlist(lapply(sample_types_sorted, "[[", 1)),
+                                     "_cooks_d"),
+                              paste0(unlist(lapply(sample_types_sorted, "[[", 1)),
+                                     "_psi"),
+                              "control_average_psi", "test_average_psi",
+                              "control_average_IJC", "control_average_SJC",
+                              "test_average_IJC", "test_average_SJC", "outlier")
+
+
+    stats_info
+
+  }
+  ))
+  stats_out <- stats_out %>% mutate_at(colnames(stats_out)[-ncol(stats_out)], as.numeric)
+  stats_out$p.adj <- p.adjust(stats_out$p.val, method = "fdr")
+  stats_out <- stats_out %>% dplyr::relocate(p.adj)
+  stats_out$p.adj[stats_out$p.adj < 0] <- -1
+
+  return(stats_out)
+}
+
+
+extract_rMATS <- function(ex_t = "SE", frM.list, sample_ids, cores) {
+  all.names <- c()
+  rM.vals <- parallel::mclapply(1:length(frM.list), mc.cores = cores, function(i) {
+
+
+    temp <- frM.list[[i]]
+
+    if (ex_t == "SE") {
+      temp <- temp %>% dplyr::select('GeneID', "chr", "strand", "exonStart_0base", "exonEnd", "upstreamES", "upstreamEE", "downstreamES", "downstreamEE", "IncLevel1", "IJC_SAMPLE_1", "SJC_SAMPLE_1")
+      temp$id <- paste(temp$GeneID, temp$chr, temp$strand, temp$exonStart_0base, temp$exonEnd, temp$upstreamES,
+                       temp$upstreamEE, temp$downstreamES, temp$downstreamEE,sep = ";")
+
+    } else if (ex_t == "A3SS" | ex_t == "A5SS") {
+      temp <- temp %>% dplyr::select('GeneID', "chr", "strand", "longExonStart_0base", "longExonEnd", "shortES", "shortEE", "flankingES", "flankingEE", "IncLevel1", "IncLevel2")
+      temp$id <- paste(temp$GeneID, temp$chr, temp$strand, temp$longExonStart_0base, temp$longExonEnd, temp$shortES,
+                       temp$shortEE, temp$flankingES, temp$flankingEE,sep = ";")
+
+    } else if (ex_t == "MXE") {
+      temp <- temp %>% dplyr::select('GeneID', "chr", "strand", "X1stExonStart_0base", "X1stExonEnd", "X2ndExonStart_0base", "X2ndExonEnd", "upstreamES", "upstreamEE", "downstreamES", "downstreamEE", "IncLevel1", "IncLevel2")
+      temp$id <- paste(temp$GeneID, temp$chr, temp$strand, temp$X1stExonStart_0base, temp$X1stExonEnd, temp$X2ndExonStart_0base, temp$X2ndExonEnd,temp$upstreamES,
+                       temp$upstreamEE, temp$downstreamES, temp$downstreamEE,sep = ";")
+
+    } else if (ex_t == "RI") {
+      temp <- temp %>% dplyr::select('GeneID', "chr", "strand", "riExonStart_0base", "riExonEnd", "upstreamES", "upstreamEE", "downstreamES", "downstreamEE", "IncLevel1", "IncLevel2")
+      temp$id <- paste(temp$GeneID, temp$chr, temp$strand, temp$riExonStart_0base, temp$riExonEnd, temp$upstreamES,
+                       temp$upstreamEE, temp$downstreamES, temp$downstreamEE,sep = ";")
+    }
+
+    if (!(length(temp$IncLevel1) == sum(is.na(temp$IncLevel1)))) {
+      temp <- temp %>% dplyr::select(id, IncLevel1, IJC_SAMPLE_1, SJC_SAMPLE_1)
+    } else {
+      temp <- temp %>% dplyr::select(id, IncLevel2, IJC_SAMPLE_1, SJC_SAMPLE_1)
+    }
+    colnames(temp)[2:4] <- c("psi",  "IJC", "SJC")
+    temp <- temp[!(is.na(temp$psi)),]
+    temp <- temp %>% dplyr::arrange(id)
+    temp <- temp[!duplicated(temp$id),]
+    temp
+
+  })
+
+
+
+
+  ids <- unique(unlist(lapply(rM.vals, function(x) x$id)))
+  inco <- data.frame(id = ids, psi = NA, IJC = NA, SJC = NA)
+  try2 <- parallel::mclapply(1:length(rM.vals), mc.cores = cores, function(i) {
+    hm <- rM.vals[[i]]
+    try <- rbind(hm, inco)
+    try <- try[!(duplicated(try$id)),] %>% dplyr::arrange(id)
+    colnames(try)[2:4] <- paste(sample_ids[i], "_", c("psi", "IJC", "SJC"), sep="")
+    try
+  })
+  comb.df <- do.call(cbind, try2)
+  rM.comb <- comb.df[-c(seq(5, length(colnames(comb.df)), by = 4))]
+  rM.comb[is.na(rM.comb)] <- 0
+
+  return(rM.comb)
+}
+
+

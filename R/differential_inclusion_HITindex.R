@@ -2,7 +2,7 @@
 ## It compares splicing event inclusion levels between test and control groups and identifies significant differences using statistical tests.
 
 
-differential_inclusion <- function(test_names, control_names, cores = 2, outlier_threshold = c("4/n", "4/mean", "1", 1)[1]) {
+differential_inclusion_HITindex <- function(test_names, control_names, cores = 2, outlier_threshold = c("4/n", "4/mean", "1", 1)[1]) {
   sample_types <- list()
 
   # Categorize each sample name as 'test' or 'control'
