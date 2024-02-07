@@ -247,7 +247,7 @@ init_ddi <- function(pdir, output_location, ppidm_class = c("Gold", "Silver", "B
   pfam_in <- pfam_in %>% dplyr::relocate(transcriptID)
 
   # Extract the gene ID from the first column
-  pfam_in$geneID <- unlist(lapply(strsplit(unlist(lapply(strsplit(bgtsv$V1,
+  pfam_in$geneID <- unlist(lapply(strsplit(unlist(lapply(strsplit(pfam_in$V1,
                                                                   split = "#"), "[[", 2)), split = ";"), "[[", 1))
 
   # Make a copy of pfam_in before filtering for Pfam domains only
