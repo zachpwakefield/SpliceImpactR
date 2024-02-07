@@ -2,7 +2,8 @@
 ## It compares splicing event inclusion levels between test and control groups and identifies significant differences using statistical tests.
 
 
-differential_inclusion_HITindex <- function(test_names, control_names, cores = 2, outlier_threshold = c("4/n", "4/mean", "1", 1)[1]) {
+differential_inclusion_HITindex <- function(test_names, control_names, cores = 2,
+                                            outlier_threshold = c("4/n", "4/mean", "1", 1)[1], min_proportion_samples_per_phenotype = .333) {
   sample_types <- list()
 
   # Categorize each sample name as 'test' or 'control'
@@ -108,9 +109,9 @@ differential_inclusion_HITindex <- function(test_names, control_names, cores = 2
 
     # Compute p-values for each exon using a likelihood ratio test
     p_vals <- mclapply(unique(vals$exon), mc.cores = cores, function(x) {
-      # Only include exons present in at least 1/3 of the sample types
-      if (sum(vals$exon == x & vals$condition == 1) > .333*length(test_names) |
-          sum(vals$exon == x & vals$condition == 0) > .333*length(control_names)) {
+      # Only include exons present in at least 1/3 of each of the phenotypes
+      if (sum(vals$exon == x & vals$condition == 1) > min_proportion_samples_per_phenotype*length(test_names) |
+          sum(vals$exon == x & vals$condition == 0) > min_proportion_samples_per_phenotype*length(control_names)) {
 
         # Subset data for the current exon
         gene_exon <- unique(vals$gene[vals$exon == x])
