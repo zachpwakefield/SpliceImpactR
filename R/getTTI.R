@@ -232,3 +232,55 @@ getEnrichmentTTI <- function(current_transcript, t_impacts, fdr, transGeneProt,
               "biocarta" = list(table = bc_table, dots = bc_dots),
               "hallmark" = list(table = hm_table, dots = hm_dots)))
 }
+
+
+init_ddi <- function(pdir, output_location, ppidm_class = c("Gold", "Silver", "Bronze")[1]) {
+  pfam_in <- read.delim(paste0(pdir, '/protein_code_from_gencodev43_headerFix.txt.tsv'),
+                        header = F)
+  pfam_in$transcriptID <- unlist(lapply(strsplit(pfam_in$V1, split = "#"),
+                                        "[[", 1))
+  pfam_in <- pfam_in %>% dplyr::relocate(transcriptID)
+  pfam_in$geneID <- unlist(lapply(strsplit(unlist(lapply(strsplit(bgtsv$V1,
+                                                                  split = "#"), "[[", 2)), split = ";"), "[[", 1))
+  pfam_in_i <- pfam_in
+  pfam_in <- pfam_in %>% dplyr::filter(V4 %in% c("Pfam"))
+  gt_df <- pfam_in_i %>% dplyr::select(transcriptID, geneID)
+  gt_df <- gt_df[!duplicated(gt_df), ]
+
+  d_transcripts <- lapply(unique(pfam_in$V5), function(x) {
+    unique(pfam_in$transcriptID[pfam_in$V5 == x])
+  })
+  names(d_transcripts) <- unique(pfam_in$V5)
+  d_transcripts <- d_transcripts[!duplicated(d_transcripts)]
+
+  pdm1 <- readr::read_csv(paste(pdir, "/PPIDM_FullSortedDataset_84K_GSB.csv",
+                                sep = ""))
+  d6 <- pdm1[pdm1$CLASS %in% ppidm_class, c(1, 2)]
+
+  colnames(d6) <- c("n1", "n2")
+  tti_dup <- do.call(rbind, parallel::mclapply(1:length(d6$n1), function(x) {
+    if (sum(names(d_transcripts) == d6$n1[x]) > 0 & sum(names(d_transcripts) ==
+                                                        d6$n2[x]) > 0) {
+      a <- d_transcripts[names(d_transcripts) == d6$n1[x]][[1]]
+      b <- d_transcripts[names(d_transcripts) == d6$n2[x]][[1]]
+      data.frame(tidyr::crossing(a,b))
+    }
+  }, mc.cores = 20))
+
+  list_noDups <- mclapply(1:nrow(tti_dup), mc.cores = 20, function(x) {
+    sort(as.character(tti_dup[x,]))
+  })
+  list_noDuplicates <- list_noDups[!duplicated(list_noDups)]
+  tti_noDups <- data.frame(a = unlist(lapply(list_noDuplicates, "[[", 1)),
+                           b = unlist(lapply(list_noDuplicates, "[[", 2)))
+
+
+  g <- igraph::graph_from_edgelist(as.matrix(tti_noDups), directed = F)
+  write_graph(
+    ge,
+    paste(output_location, 'tti_igraph_edgelist_gold_removeDups'),
+    format = "ncol"
+  )
+
+  return(g = g)
+}
