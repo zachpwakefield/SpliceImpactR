@@ -234,53 +234,82 @@ getEnrichmentTTI <- function(current_transcript, t_impacts, fdr, transGeneProt,
 }
 
 
-init_ddi <- function(pdir, output_location, ppidm_class = c("Gold", "Silver", "Bronze")[1]) {
+# Initiate the TTI network using this function. This can be very time consuming
+init_ddi <- function(pdir, output_location, ppidm_class = c("Gold", "Silver", "Bronze")[1], removeDups = T) {
+  # Read in the protein coding data from the package directory
   pfam_in <- read.delim(paste0(pdir, '/protein_code_from_gencodev43_headerFix.txt.tsv'),
                         header = F)
+
+  # Extract the transcript ID from the first column
   pfam_in$transcriptID <- unlist(lapply(strsplit(pfam_in$V1, split = "#"),
                                         "[[", 1))
+  # Relocate the transcriptID column to the first position
   pfam_in <- pfam_in %>% dplyr::relocate(transcriptID)
+
+  # Extract the gene ID from the first column
   pfam_in$geneID <- unlist(lapply(strsplit(unlist(lapply(strsplit(bgtsv$V1,
                                                                   split = "#"), "[[", 2)), split = ";"), "[[", 1))
+
+  # Make a copy of pfam_in before filtering for Pfam domains only
   pfam_in_i <- pfam_in
   pfam_in <- pfam_in %>% dplyr::filter(V4 %in% c("Pfam"))
+
+  # Select and deduplicate transcriptID and geneID pairs
   gt_df <- pfam_in_i %>% dplyr::select(transcriptID, geneID)
   gt_df <- gt_df[!duplicated(gt_df), ]
 
+  # Create a list of transcripts associated with each unique domain (V5)
   d_transcripts <- lapply(unique(pfam_in$V5), function(x) {
     unique(pfam_in$transcriptID[pfam_in$V5 == x])
   })
+
+  # Name the list elements with the unique domain names
   names(d_transcripts) <- unique(pfam_in$V5)
+
+  # Remove duplicate list elements
   d_transcripts <- d_transcripts[!duplicated(d_transcripts)]
 
+
+  # Read in the protein-protein interaction domain mapping (PPIDM) dataset
   pdm1 <- readr::read_csv(paste(pdir, "/PPIDM_FullSortedDataset_84K_GSB.csv",
                                 sep = ""))
+
+  # Filter interactions based on the specified PPIDM class (e.g., Gold, Silver, Bronze)
   d6 <- pdm1[pdm1$CLASS %in% ppidm_class, c(1, 2)]
 
+  # Rename columns for clarity
   colnames(d6) <- c("n1", "n2")
-  tti_dup <- do.call(rbind, parallel::mclapply(1:length(d6$n1), function(x) {
+
+  # Generate a dataframe of transcript pairs from the filtered PPIDM interactions
+  tti <- do.call(rbind, parallel::mclapply(1:length(d6$n1), function(x) {
+    # Check if both interacting proteins are in the domain-transcript list
     if (sum(names(d_transcripts) == d6$n1[x]) > 0 & sum(names(d_transcripts) ==
                                                         d6$n2[x]) > 0) {
       a <- d_transcripts[names(d_transcripts) == d6$n1[x]][[1]]
       b <- d_transcripts[names(d_transcripts) == d6$n2[x]][[1]]
-      data.frame(tidyr::crossing(a,b))
+      data.frame(tidyr::crossing(a,b)) # Create all combinations of transcripts for the interacting proteins
     }
   }, mc.cores = 20))
 
-  list_noDups <- mclapply(1:nrow(tti_dup), mc.cores = 20, function(x) {
-    sort(as.character(tti_dup[x,]))
-  })
-  list_noDuplicates <- list_noDups[!duplicated(list_noDups)]
-  tti_noDups <- data.frame(a = unlist(lapply(list_noDuplicates, "[[", 1)),
-                           b = unlist(lapply(list_noDuplicates, "[[", 2)))
+  # If removeDups == T (F would save time), sort out duplicated rows through sorting rows
+  if (removeDups) {
+    # Sort and deduplicate the transcript pairs [This can be time consuming]
+    list_noDups <- mclapply(1:nrow(tti), mc.cores = 20, function(x) {
+      sort(as.character(tti[x,]))
+    })
+    list_noDuplicates <- list_noDups[!duplicated(list_noDups)]
+    tti <- data.frame(a = unlist(lapply(list_noDuplicates, "[[", 1)),
+                             b = unlist(lapply(list_noDuplicates, "[[", 2)))
+  }
+  # Create an undirected graph from the deduplicated transcript pairs
+  g <- igraph::graph_from_edgelist(as.matrix(tti), directed = F)
 
-
-  g <- igraph::graph_from_edgelist(as.matrix(tti_noDups), directed = F)
+  # Write the graph edgelist to a file
   write_graph(
     ge,
-    paste(output_location, 'tti_igraph_edgelist_gold_removeDups'),
+    paste(output_location, 'tti_igraph_edgelist_', paste(ppidm_class, collapse = ""), '_removeDups'),
     format = "ncol"
   )
 
-  return(g = g)
+  return(g)
 }
