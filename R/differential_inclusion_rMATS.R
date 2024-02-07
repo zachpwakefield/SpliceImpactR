@@ -1,4 +1,4 @@
-differential_inclusion_rMATS <- function(control_names, test_names, ex_t = "SE", cores, outlier_threshold) {
+differential_inclusion_rMATS <- function(control_names, test_names, et = "SE", cores, outlier_threshold) {
 
   sample_types <- list()
 
@@ -17,7 +17,7 @@ differential_inclusion_rMATS <- function(control_names, test_names, ex_t = "SE",
   # Load PSI values for each sample and splicing event type
   load_output <- lapply(sample_types_sorted, function(x) read.table(paste0(x[1], paste0(".", et, "PSI")), header = T, sep = '\t'))
 
-  rMATS_df <- extract_rMATS(ex_t = "SE", frM.list = load_output,
+  rMATS_df <- extract_rMATS(et = "SE", frM.list = load_output,
                             sample_ids = unlist(lapply(sample_types_sorted, "[[", 1)),
                             cores)
 
@@ -132,29 +132,29 @@ differential_inclusion_rMATS <- function(control_names, test_names, ex_t = "SE",
 }
 
 
-extract_rMATS <- function(ex_t = "SE", frM.list, sample_ids, cores) {
+extract_rMATS <- function(et = "SE", frM.list, sample_ids, cores) {
   all.names <- c()
   rM.vals <- parallel::mclapply(1:length(frM.list), mc.cores = cores, function(i) {
 
 
     temp <- frM.list[[i]]
 
-    if (ex_t == "SE") {
+    if (et == "SE") {
       temp <- temp %>% dplyr::select('GeneID', "chr", "strand", "exonStart_0base", "exonEnd", "upstreamES", "upstreamEE", "downstreamES", "downstreamEE", "IncLevel1", "IJC_SAMPLE_1", "SJC_SAMPLE_1")
       temp$id <- paste(temp$GeneID, temp$chr, temp$strand, temp$exonStart_0base, temp$exonEnd, temp$upstreamES,
                        temp$upstreamEE, temp$downstreamES, temp$downstreamEE,sep = ";")
 
-    } else if (ex_t == "A3SS" | ex_t == "A5SS") {
+    } else if (et == "A3SS" | et == "A5SS") {
       temp <- temp %>% dplyr::select('GeneID', "chr", "strand", "longExonStart_0base", "longExonEnd", "shortES", "shortEE", "flankingES", "flankingEE", "IncLevel1", "IncLevel2")
       temp$id <- paste(temp$GeneID, temp$chr, temp$strand, temp$longExonStart_0base, temp$longExonEnd, temp$shortES,
                        temp$shortEE, temp$flankingES, temp$flankingEE,sep = ";")
 
-    } else if (ex_t == "MXE") {
+    } else if (et == "MXE") {
       temp <- temp %>% dplyr::select('GeneID', "chr", "strand", "X1stExonStart_0base", "X1stExonEnd", "X2ndExonStart_0base", "X2ndExonEnd", "upstreamES", "upstreamEE", "downstreamES", "downstreamEE", "IncLevel1", "IncLevel2")
       temp$id <- paste(temp$GeneID, temp$chr, temp$strand, temp$X1stExonStart_0base, temp$X1stExonEnd, temp$X2ndExonStart_0base, temp$X2ndExonEnd,temp$upstreamES,
                        temp$upstreamEE, temp$downstreamES, temp$downstreamEE,sep = ";")
 
-    } else if (ex_t == "RI") {
+    } else if (et == "RI") {
       temp <- temp %>% dplyr::select('GeneID', "chr", "strand", "riExonStart_0base", "riExonEnd", "upstreamES", "upstreamEE", "downstreamES", "downstreamEE", "IncLevel1", "IncLevel2")
       temp$id <- paste(temp$GeneID, temp$chr, temp$strand, temp$riExonStart_0base, temp$riExonEnd, temp$upstreamES,
                        temp$upstreamEE, temp$downstreamES, temp$downstreamEE,sep = ";")
