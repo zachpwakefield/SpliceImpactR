@@ -1,4 +1,4 @@
-getTTI <- function(paired_foreground, pdir = pdir, steps = 1, max_vertices_for_viz = 5000, fdr = .05, plot_bool = T, write_igraphs = T, ddi = "Gold", ddi_type = "pdm", output_location = output_location) {
+getTTI <- function(paired_foreground, pdir = pdir, steps = 1, max_vertices_for_viz = 5000, fdr = .05, plot_bool = T, ppidm_class = c("Gold", "Silver", "Bronze")[1], write_igraphs = T, ddi = "Gold", ddi_type = "pdm", output_location = output_location) {
   # Create a directory for storing plots if plot_bool is TRUE
   if (plot_bool) {
     system(paste0("mkdir ", output_location, "tti"))
@@ -7,10 +7,8 @@ getTTI <- function(paired_foreground, pdir = pdir, steps = 1, max_vertices_for_v
   # Read the transcript-gene-protein mapping data for current genome
   tgp <- read.csv(paste0(pdir, '/gencodev42_transcriptGeneProtein.csv'))
 
-  # Combine edgelists from multiple files into a single dataframe, with a conditional regarding which edgelist is selected
-  edgeList <- do.call(rbind, lapply(paste0("edgeList_", 1:23, ".txt"), function(x) {
-    read.table(paste0(pdir, x), sep = " ", row.names = NULL)
-  }))
+  # Read edgelist output from initTTI -- using the ppidm class used previously
+  edgeList <- read.table(paste0(output_location,  "tti_igraph_edgelist_", paste(ppidm_class, collapse = ""), "_removeDups"), sep = " ", row.names = NULL)
 
   # Convert the edgelist to a matrix format
   edgeList_Matrix <- matrix(c(edgeList$V1, edgeList$V2), ncol = 2)
