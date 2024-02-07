@@ -18,7 +18,7 @@ differential_inclusion_rMATS <- function(control_names, test_names, et = "SE", c
   load_output <- lapply(sample_types_sorted, function(x) read.table(paste0(x[1], paste0(".", et, "PSI")), header = T, sep = '\t'))
 
   # Extract and process rMATS data from loaded PSI values
-  rMATS_df <- extract_rMATS(et = "SE", frM.list = load_output,
+  rMATS_df <- extract_rMATS(et = et, frM.list = load_output,
                             sample_ids = unlist(lapply(sample_types_sorted, "[[", 1)),
                             cores = cores)
 
