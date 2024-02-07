@@ -123,7 +123,7 @@ differential_inclusion_rMATS <- function(control_names, test_names, et = "SE", c
 
   }
   ))
-  stats_out <- stats_out %>% mutate_at(colnames(stats_out)[-ncol(stats_out)], as.numeric)
+  stats_out <- stats_out %>% dplyr::mutate_at(colnames(stats_out)[-ncol(stats_out)], as.numeric)
   stats_out$p.adj <- p.adjust(stats_out$p.val, method = "fdr")
   stats_out <- stats_out %>% dplyr::relocate(p.adj)
   stats_out$p.adj[stats_out$p.adj < 0] <- -1

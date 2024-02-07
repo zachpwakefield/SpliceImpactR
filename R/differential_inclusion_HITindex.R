@@ -109,7 +109,8 @@ differential_inclusion_HITindex <- function(test_names, control_names, cores = 2
     # Compute p-values for each exon using a likelihood ratio test
     p_vals <- mclapply(unique(vals$exon), mc.cores = cores, function(x) {
       # Only include exons present in at least 1/3 of the sample types
-      if (sum(vals$exon == x) > (.33*length(sample_types_sorted))) {
+      if (sum(vals$exon == x & vals$condition == 1) > .333*length(test_names) |
+          sum(vals$exon == x & vals$condition == 0) > .333*length(control_names)) {
 
         # Subset data for the current exon
         gene_exon <- unique(vals$gene[vals$exon == x])
