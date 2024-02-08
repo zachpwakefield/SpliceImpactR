@@ -6,7 +6,7 @@ lfc <- function(de_df, numCont, numExp, exon_type, cores = 8, test_names, contro
   lfc <- list()  # Initialize list to store log fold changes
   col <- list()  # Initialize list to store colors for visualization
 
-  # Quick way to reference psi columns
+  # Quick way to reference psi columns in forloop
   searchers <- colnames(de_df)
   searchers[grepl("_psi", colnames(de_df))] <- gsub("_psi", "", searchers[grepl("_psi", colnames(de_df))])
 
