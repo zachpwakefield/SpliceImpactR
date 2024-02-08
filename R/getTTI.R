@@ -91,8 +91,16 @@ getTTI <- function(paired_foreground, pdir = pdir, steps = 1, max_vertices_for_v
                               paired_foreground$transcript[seq(2, length(paired_foreground$transcript), by=2)], ';',
                               paired_foreground$gene[seq(1, length(paired_foreground$transcript), by=2)], sep = "")
 
+
+  results <- data.frame(transcript1 = paired_foreground$transcript[seq(1, length(paired_foreground$transcript), by=2)],
+                        transcript2 = paired_foreground$transcript[seq(2, length(paired_foreground$transcript), by=2)],
+                        gene = paired_foreground$gene[seq(1, length(paired_foreground$transcript), by=2)],
+                        transcript1_setdiff = unlist(lapply(internal_loop, function(yy) {length(yy[[1]])})),
+                        transcript2_setdiff = unlist(lapply(internal_loop, function(yy) {length(yy[[1]])}))
+                        )
   # Return the list of differences
-  return(differences)
+  return(list(differences = differences,
+              results = results))
 }
 
 
@@ -205,7 +213,7 @@ getEnrichmentTTI <- function(current_transcript, t_impacts, fdr, transGeneProt,
   hm_dots <- hypeR::hyp_dots(hm_table, fdr = fdr, title = "Hallmark Enrichment", merge = TRUE)
 
   # If plot_bool is TRUE, save the plots to a PDF file
-  if (plot_bool == T) {
+  if (plot_bool) {
     pdf(paste0(output_location, "tti/", current_transcript, '_unique_tti_', steps, '_steps_enrichment.pdf'))
     print(cc_dots)
     print(mf_dots)
