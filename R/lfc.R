@@ -6,11 +6,13 @@ lfc <- function(de_df, numCont, numExp, exon_type, cores = 8, test_names, contro
   lfc <- list()  # Initialize list to store log fold changes
   col <- list()  # Initialize list to store colors for visualization
 
+  # Quick way to reference psi columns
+  searchers <- colnames(de_df)
+  searchers[grepl("_psi", colnames(de_df))] <- gsub("_psi", "", searchers[grepl("_psi", colnames(de_df))])
+
   # Calculate log fold change for each exon
   lfc <- mclapply(1:length(de_df$gene), mc.cores = cores, function(i) {
     # Identify outliers in the dataset
-    searchers <- colnames(de_df)
-    searchers[grepl("_psi", colnames(de_df))] <- gsub("_psi", "", searchers[grepl("_psi", colnames(de_df))])
     outlier <- which(unlist(lapply(searchers, function(x) grepl(x, de_df$outlier[i]))))
 
     # Define control and experimental groups, excluding outliers
