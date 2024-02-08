@@ -109,12 +109,14 @@ differential_inclusion_rMATS <- function(control_names, test_names, et = "SE", c
 
     }
     print(x)
-    stats_info <- data.frame(t(c(p_value, delta.psi, influence, c(cont.psi, test.psi),
+
+    strsplit(rMATS_df$id[x], split = "[.]")[[1]][1]
+    stats_info <- data.frame(t(c(rMATS_df$id[x], p_value, delta.psi, influence, c(cont.psi, test.psi),
                                  mean.cont.psi.noOut, mean.test.psi.noOut,
                                  mean.cont.IJC.noOut, mean.cont.SJC.noOut,
                                  mean.test.IJC.noOut, mean.test.SJC.noOut,
                                  outliers)))
-    colnames(stats_info) <- c("p.val", "delta.psi",
+    colnames(stats_info) <- c("id", "p.val", "delta.psi",
                               paste0(unlist(lapply(sample_types_sorted, "[[", 1)),
                                      "_cooks_d"),
                               paste0(unlist(lapply(sample_types_sorted, "[[", 1)),
@@ -131,7 +133,7 @@ differential_inclusion_rMATS <- function(control_names, test_names, et = "SE", c
   ))
 
   # Convert columns to numeric, adjust p-values for multiple testing, and reorder columns
-  stats_out <- stats_out %>% dplyr::mutate_at(colnames(stats_out)[-ncol(stats_out)], as.numeric)
+  stats_out <- stats_out %>% dplyr::mutate_at(colnames(stats_out)[-c(1, ncol(stats_out))], as.numeric)
   stats_out$p.adj <- p.adjust(stats_out$p.val, method = "fdr")
   stats_out <- stats_out %>% dplyr::relocate(p.adj)
   stats_out$p.adj[stats_out$p.adj < 0] <- -1
@@ -150,8 +152,9 @@ extract_rMATS <- function(et = "SE", frM.list, sample_ids, cores) {
     # Select columns based on the event type and create a unique identifier for each event
     if (et == "SE") {
       temp <- temp %>% dplyr::select('GeneID', "chr", "strand", "exonStart_0base", "exonEnd", "upstreamES", "upstreamEE", "downstreamES", "downstreamEE", "IncLevel1", "IJC_SAMPLE_1", "SJC_SAMPLE_1")
-      temp$id <- paste(temp$GeneID, temp$chr, temp$strand, temp$exonStart_0base, temp$exonEnd, temp$upstreamES,
-                       temp$upstreamEE, temp$downstreamES, temp$downstreamEE,sep = ";")
+      temp$id <- paste0(temp$GeneID, "#", temp$chr, ":", temp$exonStart_0base, "-", temp$exonEnd, "#",
+                       temp$strand, ";", temp$upstreamES, "-", temp$upstreamEE, ";",
+                       temp$downstreamES, "-", temp$downstreamEE)
 
     } else if (et == "A3SS" | et == "A5SS") {
       temp <- temp %>% dplyr::select('GeneID', "chr", "strand", "longExonStart_0base", "longExonEnd", "shortES", "shortEE", "flankingES", "flankingEE", "IncLevel1", "IncLevel2")
@@ -204,6 +207,6 @@ extract_rMATS <- function(et = "SE", frM.list, sample_ids, cores) {
 
   return(rM.comb) # Return the combined and processed dataframe
 }
-}
+
 
 
