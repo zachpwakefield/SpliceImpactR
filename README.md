@@ -21,20 +21,51 @@ devtools::install("zachpwakefield/SpliceImpactR")
 ## Usage
 ```r
 library(SpliceImpactR)
+```
 
-output_location <- "/projectnb/evolution/zwakefield/proteinImpacts/feb6_7/"
+Make an output directory for the pipeline along with identifying the package directory
+```r
+output_location <- ## Directory for output
 system(paste0("mkdir ",  output_location))
 pdir <- system.file(package="domainEnrichment")
+```
 
-sample_sheet <- read_csv('/projectnb2/evolution/zwakefield/tcga/metadata/tcga_data/complete_sample_sheet.csv')
-tumor <- sample_sheet$File.ID[sample_sheet$Project.ID == "TCGA-BRCA" & sample_sheet$Sample.Type == "Primary Tumor"][1:5]
-control <- sample_sheet$File.ID[sample_sheet$Project.ID == "TCGA-BRCA" & sample_sheet$Sample.Type == "Solid Tissue Normal"][1:5]
+SpliceImpactR requires files organized in a particular way:
+```
+sample_name/
+  sample_name.AFEPSI
+  sample_name.ALEPSI
+  sample_name.exon
+  sample_name.SEPSI
+  ...
+```
+In order to accomplish this, there is the function organizeSamples(). This works if your files are currently organized as such:
+```
+sample_name/
+  rmats/
+    sample_name.AFEPSI
+    sample_name.ALEPSI
+    sample_name.exon
+  hit/
+    SE.MATS.JC.txt
+    ...
+```
 
-organizeSamples(paste0('/projectnb2/evolution/zwakefield/tcga/runs/', c(tumor, control), '/'), cores = 2)
+```
+test <- ## Test sample names
+control <- ## Control sample names
 
+organizeSamples(paste0('/projectnb2/evolution/zwakefield/tcga/runs/', c(test, control), '/'), cores = 2)
+```
+
+Load paths for your test and control groups
+eg: output_location/sample_name/sample_name
+```
 test_group <- paste0(output_location, 'data/', tumor, '/', tumor)
 control_group <- paste0(output_location, 'data/', control, '/', control)
-
+```
+Identify the differentially included exons through differential_inclusion_rMATS or differential_inclusion_HITindex:
+```
 diSE <- domainEnrichment::differential_inclusion_rMATS(test_names = test_group, control_names = control_group, et = "SE", cores = 8, outlier_threshold = "4/n", min_proportion_samples_per_phenotype = .333)
 diHIT <- domainEnrichment::differential_inclusion(test_names = test_group, control_names = control_group, cores = 16, outlier_threshold = "4/n")
 
