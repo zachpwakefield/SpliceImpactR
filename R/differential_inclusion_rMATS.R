@@ -115,7 +115,7 @@ differential_inclusion_rMATS <- function(control_names, test_names, et = "SE", c
     strsplit(rMATS_df$id[x], split = "#")[[1]][3]
     stats_info <- data.frame(t(c(strsplit(rMATS_df$id[x], split = "#")[[1]][1],
                                  strsplit(rMATS_df$id[x], split = "#")[[1]][2],
-                                 type = "SE"
+                                 type = "SE",
                                  delta.psi, p_value,
                                  mean.cont.psi.noOut, mean.test.psi.noOut, outliers,
                                  mean.cont.IJC.noOut, mean.cont.SJC.noOut,
