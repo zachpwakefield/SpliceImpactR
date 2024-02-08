@@ -1,6 +1,13 @@
 # SpliceImpactR
 SpliceImpactR is an R package designed for bioinformatics researchers interested in studying the impact of alternative splicing on protein structure and function. It provides tools for analyzing RNA-seq data to identify splicing events and predict their consequences on the resulting protein products.
 
+Further, SpliceImpactR uses a linear model and a generalized linear model to identify differentially included AFE/ALE and SE, respectively. These results are then matched up to annotations using jaccard index matching and associated with a specific transcript. Analyses are performed both on a paired and a global level -- paired analysis involves idenfitied "exon swaps": where each phenotype shows a significant usage of different exons from the same gene. Global analysis looks at overall changes across phenotypes, such as domain enrichment in significantly differentially included exons. The matched transcripts are analyzed on various different levels:
+1. Primary Sequence
+2. Domain Content
+3. Transcript-Transcript Interactions
+
+   
+
 ## Features
 Identification of alternative splicing events from RNA-seq data.
 Analysis of the potential impact of splicing events on protein structure.
