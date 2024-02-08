@@ -32,19 +32,20 @@ getForeground <- function(input, test_names, control_names, thresh, fdr, mOverla
   bed <- bedifyForeground(matched, outname = output_location, cores = cores)
   print("done bed-ifying...")
 
-  ## extract unqiue transcript names as trans and all trancript names as possT
+  ## extract uniqiue transcript names as trans and all trancript names as possT
   trans <- unlist(lapply(strsplit(unique(bed$name), "#"), "[[", 1))
   possT <- unlist(lapply(strsplit(bed$name, "#"), "[[", 1))
 
-
+  print("Finding annotated proteins...")
   ## Find annotated proteins for transcripts if possible
-  protCode <- unlist(parallel::mclapply(trans, mc.cores = 8, function(x) {
-    rc <- c_trans[which(c_trans == x)+1]
-    if (length(rc) > 0) {
-      rc[1]
-    } else {"none"}
-  }))
+  protCode <- unlist(parallel::mclapply(trans, mc.cores = cores, function(x) {
 
+    c_trans[which(c_trans == x)[1]+1]
+
+  }))
+  protCode[is.na(protCode)]<- "none"
+
+  print("Making output data...")
   ## Make dataframe proBed for output of matched transcripts with protein code
   proBed <- data.frame(id = unique(bed$name),
                        strand = unlist(lapply(unique(bed$name), function(x) unique(bed$strand[bed$name == x][1]))),

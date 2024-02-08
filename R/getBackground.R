@@ -1,7 +1,7 @@
 getBackground <- function(input, mOverlap, cores, nC, nE, exon_type, pdir, output_location) {
   ## extract all first exons and create combined data.frame with gene, location
   files <- paste(input, unlist(lapply(input, function(x) list.files(x)[grep('[.]exon', list.files(x))])), sep = "")
-  cat(files)
+
   if (exon_type == "AFE") {
     lim <- c("first")
   } else if (exon_type == "ALE") {
@@ -39,14 +39,16 @@ getBackground <- function(input, mOverlap, cores, nC, nE, exon_type, pdir, outpu
   possT <- unlist(lapply(strsplit(bed$name, "#"), "[[", 1))
 
 
+  print("Finding annotated proteins...")
   ## Find annotated proteins for transcripts if possible
-  protCode <- unlist(parallel::mclapply(trans, mc.cores = 8, function(x) {
-    rc <- c_trans[which(c_trans == x)+1]
-    if (length(rc) > 0) {
-      rc[1]
-    } else {"none"}
-  }))
+  protCode <- unlist(parallel::mclapply(trans, mc.cores = cores, function(x) {
 
+    c_trans[which(c_trans == x)[1]+1]
+
+  }))
+  protCode[is.na(protCode)]<- "none"
+
+  print("Making output data...")
   proBed <- data.frame(id = unique(bed$name), strand = unlist(lapply(unique(bed$name), function(x) unique(bed$strand[bed$name == x][1]))),
                        prot = protCode) %>%
     tidyr::separate(id, c("transcript", "id"), "#") %>%
