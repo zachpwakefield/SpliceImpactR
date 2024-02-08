@@ -2,23 +2,19 @@
 ## It filters based on exon type, excludes outliers, and categorizes results based on significance and fold change direction.
 
 
-lfc <- function(de_df, numCont, numExp, exon_type, cores = 8) {
-  # Filter the dataframe for the specified exon type and relevant columns
-  de_df <- de_df[de_df$type == exon_type,c(1:11, seq(12, ncol(de_df), by = 3), seq(13, ncol(de_df), by = 3), seq(14, ncol(de_df), by = 3))]
-  samps <- colnames(de_df)
-
+lfc <- function(de_df, numCont, numExp, exon_type, cores = 8, test_names, control_names) {
   lfc <- list()  # Initialize list to store log fold changes
   col <- list()  # Initialize list to store colors for visualization
 
-  # Calculate log fold change for each gene
+  # Calculate log fold change for each exon
   lfc <- mclapply(1:length(de_df$gene), mc.cores = cores, function(i) {
     # Identify outliers in the dataset
-    outlier <- which(unlist(lapply(samps, function(x) grepl(x, de_df$outlier[i]))))+11
+    outlier <- which(unlist(lapply(colnames(de_df), function(x) grepl(x, de_df$outlier[i]))))
 
     # Define control and experimental groups, excluding outliers
-    cont <- c(12:(12-1+numCont))
+    cont <- which(grepl("psi", colnames(de_df)) & grepl(paste0(control_names, collapse = "|"), colnames(de_df)))
     cont <- cont[!(cont %in% outlier)]
-    exp <- c((numCont+11+1):(12-1+numCont+numExp))
+    exp <- which(grepl("psi", colnames(de_df)) & grepl(paste0(test_names, collapse = "|"), colnames(de_df)))
     exp <- exp[!(exp %in% outlier)]
 
 

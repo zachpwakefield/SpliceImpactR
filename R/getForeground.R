@@ -1,8 +1,9 @@
-getForeground <- function(input, thresh, fdr, mOverlap, nC, nE, exon_type, pdir, output_location, cores) {
+getForeground <- function(input, test_names, control_names, thresh, fdr, mOverlap, nC, nE, exon_type, pdir, output_location, cores) {
 
   ## If using foreground set, read in diExon file and extract differentially included exons using lfc()
   df <- input
-  df.l <- lfc(df, numCont = nC, numExp = nE, exon_type = exon_type, cores = cores)
+  df.l <- lfc(df, numCont = nC, numExp = nE, exon_type = exon_type,
+              cores = cores, test_names = test_names, control_names = control_names)
 
   ## Filter df.l for paired analysis
   bdf.l <- df.l[abs(df.l$delta.psi) >= thresh & df.l$p.adj <= fdr,]
@@ -54,6 +55,7 @@ getForeground <- function(input, thresh, fdr, mOverlap, nC, nE, exon_type, pdir,
     tidyr::separate("id", c("gene", "chr"), ";") %>%
     tidyr::separate('chr', c('chr', 'coords'), ':') %>%
     tidyr::separate('coords', c('start', 'stop'), '-')
+
 
   ## Make fasta file with id & strand in first line and protein code
   proFast <- c()

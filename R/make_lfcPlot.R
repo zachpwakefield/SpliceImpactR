@@ -1,6 +1,6 @@
-make_lfcPlot <- function(lfc_df, location = system.file(package="domainEnrichment"), num_thresh = 30) {
+make_lfcPlot <- function(lfc_df, pdir, num_thresh = 30) {
   # Load the gene reference conversion table
-  hg38.conv <- readRDS(paste0(location, "/hg38_geneRef_conv.RDS"))
+  hg38.conv <- readRDS(paste0(pdir, "/hg38_geneRef_conv.RDS"))
 
   # Map Ensembl IDs in the lfc_df to HGNC symbols using the conversion table
 

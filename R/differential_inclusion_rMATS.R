@@ -115,20 +115,21 @@ differential_inclusion_rMATS <- function(control_names, test_names, et = "SE", c
     strsplit(rMATS_df$id[x], split = "#")[[1]][3]
     stats_info <- data.frame(t(c(strsplit(rMATS_df$id[x], split = "#")[[1]][1],
                                  strsplit(rMATS_df$id[x], split = "#")[[1]][2],
-                                 strsplit(rMATS_df$id[x], split = "#")[[1]][3],
-                                 p_value, delta.psi, influence, c(cont.psi, test.psi),
-                                 mean.cont.psi.noOut, mean.test.psi.noOut,
+                                 type = "SE"
+                                 delta.psi, p_value,
+                                 mean.cont.psi.noOut, mean.test.psi.noOut, outliers,
                                  mean.cont.IJC.noOut, mean.cont.SJC.noOut,
                                  mean.test.IJC.noOut, mean.test.SJC.noOut,
-                                 outliers)))
-    colnames(stats_info) <- c("gene", "exon", "add_inf", "p.val", "delta.psi",
-                              paste0(unlist(lapply(sample_types_sorted, "[[", 1)),
-                                     "_cooks_d"),
-                              paste0(unlist(lapply(sample_types_sorted, "[[", 1)),
-                                     "_psi"),
-                              "control_average_psi", "test_average_psi",
+                                 strsplit(rMATS_df$id[x], split = "#")[[1]][3],
+                                 influence, c(cont.psi, test.psi))))
+    colnames(stats_info) <- c("gene", "exon", "type", "delta.psi", "p.val",
+                              "control_average_psi", "test_average_psi", "outlier",
                               "control_average_IJC", "control_average_SJC",
-                              "test_average_IJC", "test_average_SJC", "outlier")
+                              "test_average_IJC", "test_average_SJC", "add_inf",
+                              paste0(unlist(lapply(sample_types_sorted, "[[", 1)),
+                                                                                       "_cooks_d"),
+                              paste0(unlist(lapply(sample_types_sorted, "[[", 1)),
+                                     "_psi"))
 
 
     # Return a data frame with statistical results for each row analyzed
@@ -140,7 +141,7 @@ differential_inclusion_rMATS <- function(control_names, test_names, et = "SE", c
   # Convert columns to numeric, adjust p-values for multiple testing, and reorder columns
   stats_out <- stats_out %>% dplyr::mutate_at(colnames(stats_out)[c(-1, -2, -3, -c(ncol(stats_out)))], as.numeric)
   stats_out$p.adj <- p.adjust(stats_out$p.val, method = "fdr")
-  stats_out <- stats_out %>% dplyr::relocate(p.adj)
+  stats_out <- stats_out %>% dplyr::relocate(p.adj, .after = p.val)
   stats_out$p.adj[stats_out$p.adj < 0] <- -1
 
   return(stats_out)

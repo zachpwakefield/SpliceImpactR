@@ -80,6 +80,7 @@ getTranscriptForeground <- function(gtf = gtf, redExon = redExon, ex_type = exon
   out_matched$input_id <- paste(redExon$geneR, ";", redExon$chr, ":", redExon$start, "-", redExon$stop, sep = "")[unlist(rowOuts) != 0]
   out_matched$delta.psi <- redExon$delta.psi[unlist(rowOuts) != 0]
   out_matched$p.adj <- redExon$p.adj[unlist(rowOuts) != 0]
+
   matched <- out_matched %>% dplyr::relocate(input_id)
 
   return(matched = matched) # Return the matched data
