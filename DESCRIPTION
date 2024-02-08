@@ -1,4 +1,4 @@
-Package: domainEnrichment
+Package: SpliceImpactR
 Type: Package
 Title: Identifies enriched domains from differentially included exons
 Version: 0.1.0
