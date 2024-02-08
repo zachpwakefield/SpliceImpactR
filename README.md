@@ -1,2 +1,8 @@
-# asDomainEnrichment
-domain enrichment
+# SpliceImpactR
+SpliceImpactR is an R package designed for bioinformatics researchers interested in studying the impact of alternative splicing on protein structure and function. It provides tools for analyzing RNA-seq data to identify splicing events and predict their consequences on the resulting protein products.
+
+## Features
+Identification of alternative splicing events from RNA-seq data.
+Analysis of the potential impact of splicing events on protein structure.
+Functional annotation of spliced isoforms to predict their biological impact.
+Integration with existing bioinformatics tools and databases for comprehensive analysis.
