@@ -1,7 +1,7 @@
 # SpliceImpactR
 
 <p align="center">
-<img src="./inst/main_equation.png" width="100%" height="100%">
+<img src="./inst/ " width="100%" height="100%">
 </p>
 
 
