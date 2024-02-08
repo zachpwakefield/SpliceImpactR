@@ -6,7 +6,7 @@ getBackground <- function(input, mOverlap, cores, nC, nE, exon_type, pdir, outpu
     lim <- c("first")
   } else if (exon_type == "ALE") {
     lim <- c("last")
-  } else if (exon_type == "SE") {
+  } else if (!(exon_type %in% c("AFE", "ALE"))) {
     lim <- c("internal")
   }
   first_exons <- unique(unlist(lapply(files, function(x) {

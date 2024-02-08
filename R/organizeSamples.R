@@ -30,6 +30,42 @@ organizeSamples <- function(samples, cores = 1) {
              sample, '.SEPSI')
     )
 
+    # Define the directory containing splicing event files (SE.MATS.JC.txt)
+    a5ss_dir <- paste0(y, 'rmats/', "A5SS.MATS.JC.txt")
+
+    # Copy the splicing event file to the sample directory, renaming it with a '.SEPSI' suffix
+    system(
+      paste0("cp ", a5ss_dir, " ", output_location, 'data/', sample, '/',
+             sample, '.A5SSPSI')
+    )
+
+    # Define the directory containing splicing event files (SE.MATS.JC.txt)
+    a3ss_dir <- paste0(y, 'rmats/', "A3SS.MATS.JC.txt")
+
+    # Copy the splicing event file to the sample directory, renaming it with a '.SEPSI' suffix
+    system(
+      paste0("cp ", a3ss_dir, " ", output_location, 'data/', sample, '/',
+             sample, '.A3SSPSI')
+    )
+
+    # Define the directory containing splicing event files (SE.MATS.JC.txt)
+    mxe_dir <- paste0(y, 'rmats/', "MXE.MATS.JC.txt")
+
+    # Copy the splicing event file to the sample directory, renaming it with a '.SEPSI' suffix
+    system(
+      paste0("cp ", mxe_dir, " ", output_location, 'data/', sample, '/',
+             sample, '.MXEPSI')
+    )
+
+    # Define the directory containing splicing event files (SE.MATS.JC.txt)
+    ri_dir <- paste0(y, 'rmats/', "RI.MATS.JC.txt")
+
+    # Copy the splicing event file to the sample directory, renaming it with a '.SEPSI' suffix
+    system(
+      paste0("cp ", ri_dir, " ", output_location, 'data/', sample, '/',
+             sample, '.RIPSI')
+    )
+
     # Define the directory containing hit files and copy specific types of hit files to the sample directory
     hit_dir <- paste0(y, 'hit/')
 

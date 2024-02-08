@@ -19,7 +19,11 @@ getTranscriptForeground <- function(gtf = gtf, redExon = redExon, ex_type = exon
     lim <- switch(ex_type,
                   "AFE" = "first",
                   "ALE" = "last",
-                  "SE" = "internal")
+                  "SE" = "internal",
+                  "A5SS" = "internal",
+                  "A3SS" = "internal",
+                  "MXE" = "internal",
+                  "RI" = "internal")
 
     # Filter the GTF data for the current gene and exon type
     gtf_min <- gtf[gtf$geneID == redExon$geneR[i] & gtf$type == "exon" & gtf$classification %in% lim,]
@@ -106,7 +110,11 @@ getTranscriptBackground <- function(gtf = gtf, redExon = redExon, ex_type = exon
     lim <- switch(ex_type,
                   "AFE" = "first",
                   "ALE" = "last",
-                  "SE" = "internal")
+                  "SE" = "internal",
+                  "A5SS" = "internal",
+                  "A3SS" = "internal",
+                  "MXE" = "internal",
+                  "RI" = "internal")
 
     gtf_min <- gtf[gtf$geneID == redExon$geneR[i] & gtf$type == "exon" & gtf$classification %in% lim,]
 
