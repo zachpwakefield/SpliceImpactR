@@ -139,7 +139,7 @@ differential_inclusion_rMATS <- function(control_names, test_names, et = "SE", c
   ))
 
   # Convert columns to numeric, adjust p-values for multiple testing, and reorder columns
-  stats_out <- stats_out %>% dplyr::mutate_at(colnames(stats_out)[c(-1, -2, -3, -c(ncol(stats_out)))], as.numeric)
+  stats_out <- stats_out %>% dplyr::mutate_at(colnames(stats_out)[c(-1, -2, -3, -8, -13)], as.numeric)
   stats_out$p.adj <- p.adjust(stats_out$p.val, method = "fdr")
   stats_out <- stats_out %>% dplyr::relocate(p.adj, .after = p.val)
   stats_out$p.adj[stats_out$p.adj < 0] <- -1
