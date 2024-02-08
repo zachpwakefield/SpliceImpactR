@@ -37,7 +37,7 @@ getTTI <- function(paired_foreground, pdir = pdir, steps = 1, max_vertices_for_v
       eg <- igraph::make_ego_graph(g, order = 1, nodes = paired_foreground$transcript[c(tr, tr+1)],
                                    mode = c("all", "out", "in")[1], mindist = 0)
       # Optionally write the ego graphs to files
-      if (write_graphs) {
+      if (write_igraphs) {
         system(paste0("mkdir ", output_location, "tti/transcript_igraph_edgelists"))
 
         igraph::write_graph(eg[[1]], paste0(output_location, "tti/transcript_igraph_edgelists/", paired_foreground$transcript[tr], "_igraph"),
