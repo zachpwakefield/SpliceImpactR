@@ -56,11 +56,11 @@ getTTI <- function(paired_foreground, pdir = pdir, steps = 1, max_vertices_for_v
       if (length(graph1_setDiff) > 0 | length(graph2_setDiff) > 0) {
 
         # Get iGraph plots for the transcripts
-        tti_igraph <- getTTIiGraphPlot(ttt[c(tr, tr+1)], full_graph = g, steps = 1, max_vertices_for_viz = 5000, plot_bool = T)
+        tti_igraph <- getTTIiGraphPlot(paired_foreground$transcript[c(tr, tr+1)], full_graph = g, steps = 1, max_vertices_for_viz = 5000, plot_bool = T)
 
         # Perform enrichment analysis for unique vertices
         internal_loop <- lapply(list(graph1_setDiff, graph2_setDiff), function(x) {
-          if (sum(ttt[c(tr, tr+1)] %in% x[[2]]) > 0 & length(x[[2]]) == 1) {
+          if (sum(paired_foreground$transcript[c(tr, tr+1)] %in% x[[2]]) > 0 & length(x[[2]]) == 1) {
             list(0, NA, NA)
           } else {
             if (length(x[[2]]) > 0) {
