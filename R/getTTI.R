@@ -1,4 +1,6 @@
-getTTI <- function(paired_foreground, pdir = pdir, steps = 1, max_vertices_for_viz = 5000, fdr = .05, plot_bool = T, ppidm_class = c("Gold", "Silver", "Bronze")[1], write_igraphs = T, ddi = "Gold", ddi_type = "pdm", output_location = output_location) {
+getTTI <- function(paired_foreground, pdir = pdir, steps = 1, max_vertices_for_viz = 5000,
+                   fdr = .05, plot_bool = T, ppidm_class = c("Gold", "Silver", "Bronze")[1],
+                   write_igraphs = T, ddi = "Gold", ddi_type = "pdm", output_location = output_location) {
   # Create a directory for storing plots if plot_bool is TRUE
   if (plot_bool) {
     system(paste0("mkdir ", output_location, "tti"))
