@@ -13,11 +13,11 @@ SpliceImpactR first identifies differentially included exons across the input ph
 This model is an R implementation of this HIT Index [statistical model](https://github.com/fiszbein-lab/HIT_Index_Stat_Analysis-/tree/main), written by Xingpei Zhang and Zachary Wakefield. The linear regression model for differetnial exon usage is adepted from [Anders et al.](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3460195/) (2012). It assumes that the average between upstream and downstream spliced junction reads for an exon can be regressed by a log-linear model. The statistical model uses χ2 likelihood ratio test to compare a reduce model with a full model and test on whether phenotype has an influence on difference between spliced junction reads which is a direct estimator for PSI values according to [Fiszbein et al.](https://pubmed.ncbi.nlm.nih.gov/35044812/) (2022).
 
 <p align="center">
-<img src="./readme/main_equation.png" width="100%" height="100%">
+<img src="./inst/main_equation.png" width="100%" height="100%">
 </p>
 
 <p align="center">
-<img src="./readme/test_equation.png" width="100%" height="100%">
+<img src="./inst/test_equation.png" width="100%" height="100%">
 </p>
 ## rMATS Statistical Method
 
