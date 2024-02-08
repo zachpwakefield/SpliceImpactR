@@ -9,7 +9,9 @@ lfc <- function(de_df, numCont, numExp, exon_type, cores = 8, test_names, contro
   # Calculate log fold change for each exon
   lfc <- mclapply(1:length(de_df$gene), mc.cores = cores, function(i) {
     # Identify outliers in the dataset
-    outlier <- which(unlist(lapply(colnames(de_df), function(x) grepl(x, de_df$outlier[i]))))
+    searchers <- colnames(de_df)
+    searchers[grepl("_psi", colnames(de_df))] <- gsub("_psi", "", searchers[grepl("_psi", colnames(de_df))])
+    outlier <- which(unlist(lapply(searchers, function(x) grepl(x, de_df$outlier[i]))))
 
     # Define control and experimental groups, excluding outliers
     cont <- which(grepl("psi", colnames(de_df)) & grepl(paste0(control_names, collapse = "|"), colnames(de_df)))
