@@ -7,6 +7,7 @@ matchAlignType <- function(proBed, protCode) {
   alignType <- c()     # Stores type of alignment (onePC, Match, PartialMatch, FrameShift)
 
 
+  system(paste0("mkdir ", output_location, "pairedAlignments"))
   # Iterate through protein codes in pairs
   for (i in seq(from=1,to=(length(protCode)-1), by=2)) {
 
@@ -57,12 +58,12 @@ matchAlignType <- function(proBed, protCode) {
       # Determine alignment type based on length criteria
       if (nchar(paste(strsplit(msa::msaConsensusSequence(protAlign[[i]]), split = "\\?|\\.|!")[[1]][nchar(strsplit(msa::msaConsensusSequence(protAlign[[i]]), split = "\\?|\\.|!")[[1]]) > (.1*minPc)], collapse = "")) > .2*minPc)  {
         alignType <- c(alignType, "PartialMatch")
-        # msaPrettyPrint(msa(Biostrings::AAStringSet(c(protCode[i], protCode[i+1])), verbose = FALSE), askForOverwrite=FALSE
-        # , file = paste(out_dir, "prettyAlignments/", proBed$transcript[i], "_", proBed$transcript[i+1], "_pm_prettyAlignment.pdf", sep = ""), output = "pdf")
+        msaPrettyPrint(msa(Biostrings::AAStringSet(c(protCode[i], protCode[i+1])), verbose = FALSE), askForOverwrite=FALSE
+        , file = paste(output_location, "pairedAlignments/", proBed$transcript[i], "_", proBed$transcript[i+1], "_pm_Alignment.pdf", sep = ""), output = "pdf")
       } else {
         alignType <- c(alignType, "FrameShift")
-        # msaPrettyPrint(msa(Biostrings::AAStringSet(c(protCode[i], protCode[i+1])), verbose = FALSE), askForOverwrite=FALSE
-        # , file = paste(out_dir, "prettyAlignments/", proBed$transcript[i], "_", proBed$transcript[i+1], "_fs_prettyAlignment.pdf", sep = ""), output = "pdf")
+        msaPrettyPrint(msa(Biostrings::AAStringSet(c(protCode[i], protCode[i+1])), verbose = FALSE), askForOverwrite=FALSE
+        , file = paste(output_location, "pairedAlignments/", proBed$transcript[i], "_", proBed$transcript[i+1], "_fs_Alignment.pdf", sep = ""), output = "pdf")
       }
     }
   }
