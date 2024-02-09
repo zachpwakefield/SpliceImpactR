@@ -1,4 +1,4 @@
-differential_inclusion_rMATS <- function(control_names, test_names, et = "SE", cores, outlier_threshold, min_proportion_samples_per_phenotype = .333) {
+differential_inclusion_rMATS <- function(control_names, test_names, et, cores, outlier_threshold, min_proportion_samples_per_phenotype = .333) {
 
   sample_types <- list()
 
@@ -163,20 +163,22 @@ extract_rMATS <- function(et = "SE", frM.list, sample_ids, cores) {
                        temp$downstreamES, "-", temp$downstreamEE)
 
     } else if (et == "A3SS" | et == "A5SS") {
-      temp <- temp %>% dplyr::select('GeneID', "chr", "strand", "longExonStart_0base", "longExonEnd", "shortES", "shortEE", "flankingES", "flankingEE", "IncLevel1", "IncLevel2")
+      temp <- temp %>% dplyr::select('GeneID', "chr", "strand", "longExonStart_0base", "longExonEnd", "shortES", "shortEE", "flankingES", "flankingEE", "IncLevel1", "IncLevel2", "IJC_SAMPLE_1", "SJC_SAMPLE_1")
       temp$id <- paste0(temp$GeneID, "#", temp$chr, ":", temp$longExonStart_0base, "-", temp$longExonEnd, "#",
                         temp$strand, ";", temp$shortES, "-", temp$shortEE, ";",
                         temp$flankingES, "-", temp$flankingEE)
 
     } else if (et == "MXE") {
-      temp <- temp %>% dplyr::select('GeneID', "chr", "strand", "X1stExonStart_0base", "X1stExonEnd", "X2ndExonStart_0base", "X2ndExonEnd", "upstreamES", "upstreamEE", "downstreamES", "downstreamEE", "IncLevel1", "IncLevel2")
+      temp <- temp %>% dplyr::select('GeneID', "chr", "strand", "X1stExonStart_0base", "X1stExonEnd", "X2ndExonStart_0base", "X2ndExonEnd", "upstreamES", "upstreamEE",
+                                     "downstreamES", "downstreamEE", "IncLevel1", "IncLevel2", "IJC_SAMPLE_1", "SJC_SAMPLE_1")
       temp$id <- paste0(temp$GeneID, "#", temp$chr, ":", temp$X1stExonStart_0base, "-", temp$X1stExonEnd, "#",
                         temp$strand, ";", temp$X2ndExonStart_0base, "-", temp$X2ndExonEnd, ";",
                         temp$upstreamES, "-", temp$upstreamEE, ";",
                         temp$downstreamES, "-", temp$downstreamEE)
 
     } else if (et == "RI") {
-      temp <- temp %>% dplyr::select('GeneID', "chr", "strand", "riExonStart_0base", "riExonEnd", "upstreamES", "upstreamEE", "downstreamES", "downstreamEE", "IncLevel1", "IncLevel2")
+      temp <- temp %>% dplyr::select('GeneID', "chr", "strand", "riExonStart_0base", "riExonEnd", "upstreamES", "upstreamEE", "downstreamES", "downstreamEE", "IncLevel1",
+                                     "IncLevel2", "IJC_SAMPLE_1", "SJC_SAMPLE_1")
       temp$id <- paste0(temp$GeneID, "#", temp$chr, ":", temp$riExonStart_0base, "-", temp$riExonEnd, "#",
                         temp$strand, ";", temp$upstreamES, "-", temp$upstreamEE, ";",
                         temp$downstreamES, "-", temp$downstreamEE)
