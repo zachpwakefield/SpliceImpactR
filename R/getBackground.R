@@ -56,12 +56,15 @@ getBackground <- function(input, mOverlap, cores, nC, nE, exon_type, pdir, outpu
     tidyr::separate('chr', c('chr', 'coords'), ':') %>%
     tidyr::separate('coords', c('start', 'stop'), '-')
 
+  print("Making fasta...")
   ## Make fasta file with id & strand in first line and protein code
-  proFast <- c()
-  for (i in 1:length(proBed[,1])) {
-    proFast <- c(proFast, paste(">", proBed$transcript[i], "#", proBed$gene[i], ";", proBed$chr[i], ":", proBed$start[i], "-", proBed$stop[i], ";", proBed$strand[i], sep = ""),
-                 proBed$prot[i])
-  }
+
+  proFast <- unlist(parallel::mclapply(1:length(proBed[,1]), mc.cores = cores, function(i) {
+    c(paste(">", proBed$transcript[i], "#", proBed$gene[i], ";", proBed$chr[i], ":",
+          proBed$start[i], "-", proBed$stop[i], ";", proBed$strand[i], sep = ""),
+    proBed$prot[i])
+
+  }))
 
 
   write_csv(proBed, paste0(output_location, "bgoutBed.csv"))

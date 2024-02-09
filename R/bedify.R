@@ -35,7 +35,7 @@ bedifyForeground <- function(matched = matched, outname = outname, cores = 8) {
 }
 
 
-bedifyBackground <- function(matched = matched, outname = outname, cores = 8) {
+bedifyBackground <- function(matched = matched, outname = outname, cores) {
 
   # Extract necessary columns from the 'matched' dataframe
   tID <- matched$transcriptID
