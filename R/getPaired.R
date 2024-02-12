@@ -91,4 +91,4 @@ getPaired <- function(foreground) {
     return(list(exon_pairs = exon_pairs_df, paired_proBed = combined_rows_df_expanded, gdf=gdf, gdf2=gdf2))
   }
 }
-}
+
