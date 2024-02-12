@@ -108,20 +108,17 @@ differential_inclusion_rMATS <- function(control_names, test_names, et, cores, o
       p_value <- -1
 
     }
-    print(x)
 
-    strsplit(rMATS_df$id[x], split = "#")[[1]][1]
-    strsplit(rMATS_df$id[x], split = "#")[[1]][2]
-    strsplit(rMATS_df$id[x], split = "#")[[1]][3]
     stats_info <- data.frame(t(c(strsplit(rMATS_df$id[x], split = "#")[[1]][1],
                                  strsplit(rMATS_df$id[x], split = "#")[[1]][2],
-                                 type = "SE",
+                                 type = et,
                                  delta.psi, p_value,
                                  mean.cont.psi.noOut, mean.test.psi.noOut, outliers,
                                  mean.cont.IJC.noOut, mean.cont.SJC.noOut,
                                  mean.test.IJC.noOut, mean.test.SJC.noOut,
                                  strsplit(rMATS_df$id[x], split = "#")[[1]][3],
-                                 influence, c(cont.psi, test.psi))))
+                                 influence, c(cont.psi, test.psi))),
+                             )
     colnames(stats_info) <- c("gene", "exon", "type", "delta.psi", "p.val",
                               "control_average_psi", "test_average_psi", "outlier",
                               "control_average_IJC", "control_average_SJC",
