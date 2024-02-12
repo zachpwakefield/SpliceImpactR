@@ -5,11 +5,13 @@ bedifyForeground <- function(matched, outname, cores) {
     # Efficiently filter for relevant rows
     bed <- gtf[gtf$transcriptID == matched$transcriptID[i] & gtf$type == "exon", ]
     bed <- bed %>%
-      dplyr::select(chr, start, stop, transcriptID, geneID, strand, delta.psi, p.adj) %>%
+      dplyr::select(chr, start, stop, transcriptID, geneID, strand) %>%
       dplyr::mutate(
         eiID = matched$input_id[i],
         score = 0,
-        name = paste(transcriptID, "#", matched$input_id[i], sep = "")
+        name = paste(transcriptID, "#", matched$input_id[i], sep = ""),
+        delta.psi = matched$delta.psi[i],
+        p.adj = matched$p.adj[i],
       )
 
     # Adjust chromStart based on strand to adhere to BED format (0-based) conventions

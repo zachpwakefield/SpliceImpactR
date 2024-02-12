@@ -70,8 +70,8 @@ getTranscriptForeground <- function(gtf = gtf, redExon = redExon, ex_type = exon
   matched <- out_matched %>% dplyr::relocate(input_id)
 
   # Add additional information to the matched data for further foreground analysis
-  out_matched$delta.psi <- redExon$delta.psi[results != 0]
-  out_matched$p.adj <- redExon$p.adj[results != 0]
+  matched$delta.psi <- redExon$delta.psi[results != 0]
+  matched$p.adj <- redExon$p.adj[results != 0]
 
 
   return(matched = matched) # Return the matched data
