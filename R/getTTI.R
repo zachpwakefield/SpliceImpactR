@@ -42,9 +42,9 @@ getTTI <- function(paired_foreground, pdir = pdir, steps = 1, max_vertices_for_v
       if (write_igraphs) {
         system(paste0("mkdir ", output_location, "tti/transcript_igraph_edgelists"))
 
-        igraph::write_graph(eg[[1]], paste0(output_location, "tti/transcript_igraph_edgelists/", paired_foreground$transcript[tr], "_igraph"),
+        igraph::write_graph(eg[[1]], paste0(output_location, "tti/transcript_igraph_edgelists/", paired_foreground$gene[tr], paired_foreground$transcript[tr], "_igraph"),
                             format = "ncol")
-        igraph::write_graph(eg[[2]], paste0(output_location, "tti/transcript_igraph_edgelists/", paired_foreground$transcript[tr+1], "_igraph"),
+        igraph::write_graph(eg[[2]], paste0(output_location, "tti/transcript_igraph_edgelists/", paired_foreground$gene[tr+1], paired_foreground$transcript[tr+1], "_igraph"),
                             format = "ncol")
       }
 
@@ -53,10 +53,17 @@ getTTI <- function(paired_foreground, pdir = pdir, steps = 1, max_vertices_for_v
       graph2_setDiff <- list(paired_foreground$transcript[tr+1], setdiff(igraph::V(eg[[2]])$name, igraph::V(eg[[1]])$name))
 
       # Perform further analysis if there are unique vertices
-      if (length(graph1_setDiff) > 0 | length(graph2_setDiff) > 0) {
+      if (length(graph1_setDiff[[2]]) > 0 | length(graph2_setDiff[[2]]) > 0) {
+
+
+        # Check whether difference between graphs is just the original seed/transcript -- if not, get TTI plots for output
+        g1_check <- !(graph1_setDiff[[1]] %in% graph1_setDiff[[2]] & length(graph1_setDiff[[2]]) == 1)
+        g2_check <- !(graph2_setDiff[[1]] %in% graph2_setDiff[[2]] & length(graph2_setDiff[[2]]) == 1)
 
         # Get iGraph plots for the transcripts
-        tti_igraph <- getTTIiGraphPlot(paired_foreground$transcript[c(tr, tr+1)], full_graph = g, steps = 1, max_vertices_for_viz = 5000, plot_bool = T)
+        if (g1_check | g1_check) {
+          tti_igraph <- getTTIiGraphPlot(paired_foreground$transcript[c(tr, tr+1)], full_graph = g, steps = 1, max_vertices_for_viz = 5000, plot_bool = T)
+        }
 
         # Perform enrichment analysis for unique vertices
         internal_loop <- lapply(list(graph1_setDiff, graph2_setDiff), function(x) {
