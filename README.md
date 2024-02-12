@@ -1,7 +1,7 @@
 # SpliceImpactR
 
 <p align="center">
-<img src="./inst/Screenshot 2024-02-08 at 3.27.19 PM.png" width="180" height="180">
+<img src="./inst/Screenshot 2024-02-12 at 1.53.27 PM.png" width="180" height="180">
 <img src="./inst/Screenshot 2024-02-08 at 3.27.19 PM.png" width="180" height="180">
 </p>
 
