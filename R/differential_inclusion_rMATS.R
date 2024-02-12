@@ -117,7 +117,7 @@ differential_inclusion_rMATS <- function(control_names, test_names, et, cores, o
                                  mean.cont.IJC.noOut, mean.cont.SJC.noOut,
                                  mean.test.IJC.noOut, mean.test.SJC.noOut,
                                  strsplit(rMATS_df$id[x], split = "#")[[1]][3],
-                                 influence, c(cont.psi, test.psi))),
+                                 influence, c(cont.psi, test.psi)))
                              )
     colnames(stats_info) <- c("gene", "exon", "type", "delta.psi", "p.val",
                               "control_average_psi", "test_average_psi", "outlier",
