@@ -168,6 +168,22 @@ extract_rMATS <- function(et = "SE", frM.list, sample_ids, cores) {
     } else if (et == "MXE") {
       temp <- temp %>% dplyr::select('GeneID', "chr", "strand", "X1stExonStart_0base", "X1stExonEnd", "X2ndExonStart_0base", "X2ndExonEnd", "upstreamES", "upstreamEE",
                                      "downstreamES", "downstreamEE", "IncLevel1", "IncLevel2", "IJC_SAMPLE_1", "SJC_SAMPLE_1")
+
+      correct_temp <- do.call(rbind, lapply(1:nrow(temp), function(x)
+             data.frame(sc_X1start = ifelse(temp$strand[x] == "+", temp$X1stExonStart_0base[x], temp$X2ndExonStart_0base[x]),
+                                       sc_X1end = ifelse(temp$strand[x] == "+", temp$X1stExonEnd[x], temp$X2ndExonEnd[x]),
+                                       sc_X2start = ifelse(temp$strand[x] == "+", temp$X2ndExonStart_0base[x], temp$X1stExonStart_0base[x]),
+                                       sc_X2end = ifelse(temp$strand[x] == "+", temp$X2ndExonEnd[x], temp$X1stExonEnd[x])
+                                         )
+
+
+             )
+             )
+      temp$X1stExonStart_0base <- correct_temp$sc_X1start
+      temp$X1stExonEnd <- correct_temp$sc_X1end
+      temp$X2ndExonStart_0base <- correct_temp$sc_X2start
+      temp$X2ndExonEnd <- correct_temp$sc_X2end
+
       temp$id <- paste0(temp$GeneID, "#", temp$chr, ":", temp$X1stExonStart_0base, "-", temp$X1stExonEnd, "#",
                         temp$strand, ";", temp$X2ndExonStart_0base, "-", temp$X2ndExonEnd, ";",
                         temp$upstreamES, "-", temp$upstreamEE, ";",

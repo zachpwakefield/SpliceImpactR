@@ -1,5 +1,4 @@
 matchAlignType <- function(proBed, protCode) {
-  setwd(paste0(output_location, "pairedAlignments/"))
 
   # Initialize variables for storing alignment and matching information
   protAlign <- list()  # Stores alignment results
@@ -9,6 +8,7 @@ matchAlignType <- function(proBed, protCode) {
 
 
   system(paste0("mkdir ", output_location, "pairedAlignments"))
+  setwd(paste0(output_location, "pairedAlignments/"))
   # Iterate through protein codes in pairs
   for (i in seq(from=1,to=(length(protCode)-1), by=2)) {
 
