@@ -4,7 +4,7 @@ getTTI <- function(paired_foreground, pdir = pdir, steps = 1, max_vertices_for_v
   # Create a directory for storing plots if plot_bool is TRUE
   if (plot_bool) {
     system(paste0("mkdir ", output_location, "tti"))
-    if (write_graphs) {
+    if (write_igraphs) {
       system(paste0("mkdir ", output_location, "tti/transcript_igraph_edgelists"))
     }
   }
