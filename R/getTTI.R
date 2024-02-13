@@ -102,8 +102,8 @@ getTTI <- function(paired_foreground, pdir = pdir, steps = 1, max_vertices_for_v
   results <- data.frame(transcript1 = paired_foreground$transcript[seq(1, length(paired_foreground$transcript), by=2)],
                         transcript2 = paired_foreground$transcript[seq(2, length(paired_foreground$transcript), by=2)],
                         gene = paired_foreground$gene[seq(1, length(paired_foreground$transcript), by=2)],
-                        transcript1_setdiff = unlist(lapply(internal_loop, function(yy) {length(yy[[1]])})),
-                        transcript2_setdiff = unlist(lapply(internal_loop, function(yy) {length(yy[[1]])}))
+                        transcript1_setdiff = unlist(lapply(differences, function(yy) {length(yy[[1]])})),
+                        transcript2_setdiff = unlist(lapply(differences, function(yy) {length(yy[[1]])}))
                         )
   # Return the list of differences
   return(list(differences = differences,
