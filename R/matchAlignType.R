@@ -1,5 +1,6 @@
 matchAlignType <- function(proBed, protCode) {
   setwd(paste0(output_location, "pairedAlignments/"))
+
   # Initialize variables for storing alignment and matching information
   protAlign <- list()  # Stores alignment results
   protC <- c()         # Stores protein category (PC, nonPC, Same, Different)

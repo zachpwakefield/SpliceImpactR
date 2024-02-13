@@ -4,6 +4,9 @@ getTTI <- function(paired_foreground, pdir = pdir, steps = 1, max_vertices_for_v
   # Create a directory for storing plots if plot_bool is TRUE
   if (plot_bool) {
     system(paste0("mkdir ", output_location, "tti"))
+    if (write_graphs) {
+      system(paste0("mkdir ", output_location, "tti/transcript_igraph_edgelists"))
+    }
   }
 
   # Read the transcript-gene-protein mapping data for current genome
@@ -40,11 +43,10 @@ getTTI <- function(paired_foreground, pdir = pdir, steps = 1, max_vertices_for_v
                                    mode = c("all", "out", "in")[1], mindist = 0)
       # Optionally write the ego graphs to files
       if (write_igraphs) {
-        system(paste0("mkdir ", output_location, "tti/transcript_igraph_edgelists"))
 
-        igraph::write_graph(eg[[1]], paste0(output_location, "tti/transcript_igraph_edgelists/", paired_foreground$gene[tr], paired_foreground$transcript[tr], "_igraph"),
+        igraph::write_graph(eg[[1]], paste0(output_location, "tti/transcript_igraph_edgelists/", paired_foreground$gene[tr], "_", paired_foreground$transcript[tr], "_igraph"),
                             format = "ncol")
-        igraph::write_graph(eg[[2]], paste0(output_location, "tti/transcript_igraph_edgelists/", paired_foreground$gene[tr+1], paired_foreground$transcript[tr+1], "_igraph"),
+        igraph::write_graph(eg[[2]], paste0(output_location, "tti/transcript_igraph_edgelists/", paired_foreground$gene[tr+1], "_", paired_foreground$transcript[tr+1], "_igraph"),
                             format = "ncol")
       }
 
@@ -62,7 +64,7 @@ getTTI <- function(paired_foreground, pdir = pdir, steps = 1, max_vertices_for_v
 
         # Get iGraph plots for the transcripts
         if (g1_check | g1_check) {
-          tti_igraph <- getTTIiGraphPlot(paired_foreground$transcript[c(tr, tr+1)], full_graph = g, steps = 1, max_vertices_for_viz = 5000, plot_bool = T)
+          tti_igraph <- getTTIiGraphPlot(paired_foreground$transcript[c(tr, tr+1)], paired_foreground$gene[tr], full_graph = g, steps = 1, max_vertices_for_viz = 5000, plot_bool = T)
         }
 
         # Perform enrichment analysis for unique vertices
@@ -112,7 +114,7 @@ getTTI <- function(paired_foreground, pdir = pdir, steps = 1, max_vertices_for_v
 
 
 
-getTTIiGraphPlot <- function(paired_transcript, steps, full_graph, max_vertices_for_viz, plot_bool) {
+getTTIiGraphPlot <- function(paired_transcript, gene, steps, full_graph, max_vertices_for_viz, plot_bool) {
   # Create ego graphs for each of the paired transcripts
   eg <- igraph::make_ego_graph(
     full_graph,  # The full graph from which ego graphs are derived
@@ -171,7 +173,7 @@ getTTIiGraphPlot <- function(paired_transcript, steps, full_graph, max_vertices_
       dev.off()
     } else {print("number of vertices exceeds max vertices for plotting set (max_vertices_for_viz)")}
     if (length(igraph::V(e2g)) <= max_vertices_for_viz) {
-      pdf(paste0(output_location, "tti/", paired_transcript[2], "_", steps, 'steps_tti_graph.pdf'))
+      pdf(paste0(output_location, "tti/", gene, "_", paired_transcript[2], "_", steps, 'steps_tti_graph.pdf'))
       print(igraph::plot.igraph(e2g,vertex.size=3,vertex.label=NA,main=paired_transcript[2],
                                 layout=igraph::layout.fruchterman.reingold(e2g, niter=10000)))
       dev.off()
