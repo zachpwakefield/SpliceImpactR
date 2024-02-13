@@ -63,7 +63,7 @@ getTTI <- function(paired_foreground, pdir = pdir, steps = 1, max_vertices_for_v
         g2_check <- !(graph2_setDiff[[1]] %in% graph2_setDiff[[2]] & length(graph2_setDiff[[2]]) == 1)
 
         # Get iGraph plots for the transcripts
-        if (g1_check | g1_check) {
+        if (g1_check | g2_check) {
           tti_igraph <- getTTIiGraphPlot(paired_foreground$transcript[c(tr, tr+1)], paired_foreground$gene[tr], full_graph = g, steps = 1, max_vertices_for_viz = 5000, plot_bool = T)
         }
 
@@ -104,8 +104,8 @@ getTTI <- function(paired_foreground, pdir = pdir, steps = 1, max_vertices_for_v
   results <- data.frame(transcript1 = paired_foreground$transcript[seq(1, length(paired_foreground$transcript), by=2)],
                         transcript2 = paired_foreground$transcript[seq(2, length(paired_foreground$transcript), by=2)],
                         gene = paired_foreground$gene[seq(1, length(paired_foreground$transcript), by=2)],
-                        transcript1_setdiff = unlist(lapply(differences, function(yy) {length(yy[[1]])})),
-                        transcript2_setdiff = unlist(lapply(differences, function(yy) {length(yy[[1]])}))
+                        transcript1_setdiff = as.numeric(lapply(lapply(differences, function(yy) {unlist(lapply(yy, function(yy2) {length(yy2[[1]])}))}), "[[", 1)),
+                        transcript2_setdiff = as.numeric(lapply(lapply(differences, function(yy) {unlist(lapply(yy, function(yy2) {length(yy2[[1]])}))}), "[[", 2))
                         )
   # Return the list of differences
   return(list(differences = differences,
