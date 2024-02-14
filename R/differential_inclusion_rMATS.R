@@ -257,7 +257,7 @@ paired_rMATS_helper <- function(df, type) {
                control_average_SJC = c(df$control_average_SJC[x], df$control_average_IJC[x]),
                test_average_IJC = c(df$test_average_IJC[x], df$test_average_SJC[x]),
                test_average_SJC = c(df$test_average_SJC[x], df$test_average_IJC[x]),
-               add_inf = c(paste0(swapped_exon[x], ";prim", x), paste0(df$exon[x], ";sec", x)))
+               add_inf = c(paste0(swapped_exon[x], ";prim;", x), paste0(df$exon[x], ";sec;", x)))
     i_df[1,15:ncol(df)] <- as.numeric(df[x,15:ncol(df)])
     adjust_2ndExon_psi <- as.numeric(df[x,15:ncol(df)])
     adjust_2ndExon_psi[((.5*length(adjust_2ndExon_psi))+1):length(adjust_2ndExon_psi)] <- 1-(adjust_2ndExon_psi[((.5*length(adjust_2ndExon_psi))+1):length(adjust_2ndExon_psi)])
