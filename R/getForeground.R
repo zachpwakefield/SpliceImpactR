@@ -17,7 +17,8 @@ getForeground <- function(input, test_names, control_names, thresh, fdr, mOverla
                         start = as.numeric(sapply(strsplit(sapply(strsplit(bdf.l$exon, split = ":"), "[[", 2), split = "[-]"), "[[", 1)),
                         stop = as.numeric(sapply(strsplit(sapply(strsplit(bdf.l$exon, split = ":"), "[[", 2), split = "[-]"), "[[", 2)),
                         delta.psi = bdf.l$delta.psi,
-                        p.adj = bdf.l$p.adj
+                        p.adj = bdf.l$p.adj,
+                        add_inf = bdf.l$add_inf
   )
 
 
@@ -51,7 +52,8 @@ getForeground <- function(input, test_names, control_names, thresh, fdr, mOverla
                        strand = unlist(lapply(unique(bed$name), function(x) unique(bed$strand[bed$name == x][1]))),
                        prot = protCode,
                        delta.psi = unlist(lapply(unique(bed$name), function(x) unique(bed$delta.psi[bed$name == x][1]))),
-                       p.adj = unlist(lapply(unique(bed$name), function(x) unique(bed$p.adj[bed$name == x][1])))) %>%
+                       p.adj = unlist(lapply(unique(bed$name), function(x) unique(bed$p.adj[bed$name == x][1]))),
+                       add_inf = unlist(lapply(unique(bed$name), function(x) unique(bed$add_inf[bed$name == x][1])))) %>%
     tidyr::separate(id, c("transcript", "id"), "#") %>%
     tidyr::separate("id", c("gene", "chr"), ";") %>%
     tidyr::separate('chr', c('chr', 'coords'), ':') %>%

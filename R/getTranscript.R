@@ -72,6 +72,7 @@ getTranscriptForeground <- function(gtf = gtf, redExon = redExon, ex_type = exon
   # Add additional information to the matched data for further foreground analysis
   matched$delta.psi <- redExon$delta.psi[results != 0]
   matched$p.adj <- redExon$p.adj[results != 0]
+  matched$add_inf <- redExon$add_inf[results != 0]
 
 
   return(matched = matched) # Return the matched data

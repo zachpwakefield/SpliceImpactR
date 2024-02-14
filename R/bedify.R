@@ -12,12 +12,13 @@ bedifyForeground <- function(matched, outname, cores) {
         name = paste(transcriptID, "#", matched$input_id[i], sep = ""),
         delta.psi = matched$delta.psi[i],
         p.adj = matched$p.adj[i],
+        add_inf = matched$add_inf[i]
       )
 
     # Adjust chromStart based on strand to adhere to BED format (0-based) conventions
     bed <- bed %>%
       dplyr::mutate(chromStart = ifelse(strand == "+", as.integer(start) - 1, as.integer(stop) + 1)) %>%
-      dplyr::select(chrom = chr, chromStart, chromEnd = stop, name, score, strand, delta.psi, p.adj)
+      dplyr::select(chrom = chr, chromStart, chromEnd = stop, name, score, strand, delta.psi, p.adj, add_inf)
 
     return(bed)
   }
