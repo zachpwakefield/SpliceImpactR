@@ -54,18 +54,17 @@ getTTI <- function(paired_foreground, pdir = pdir, steps = 1, max_vertices_for_v
       graph1_setDiff <- list(paired_foreground$transcript[tr], setdiff(igraph::V(eg[[1]])$name, igraph::V(eg[[2]])$name))
       graph2_setDiff <- list(paired_foreground$transcript[tr+1], setdiff(igraph::V(eg[[2]])$name, igraph::V(eg[[1]])$name))
 
+      # Check whether difference between graphs is just the original seed/transcript -- if not, get TTI plots for output
+      g1_check <- !(graph1_setDiff[[1]] %in% graph1_setDiff[[2]] & length(graph1_setDiff[[2]]) == 1)
+      g2_check <- !(graph2_setDiff[[1]] %in% graph2_setDiff[[2]] & length(graph2_setDiff[[2]]) == 1)
+
       # Perform further analysis if there are unique vertices
-      if (length(graph1_setDiff[[2]]) > 0 | length(graph2_setDiff[[2]]) > 0) {
-
-
-        # Check whether difference between graphs is just the original seed/transcript -- if not, get TTI plots for output
-        g1_check <- !(graph1_setDiff[[1]] %in% graph1_setDiff[[2]] & length(graph1_setDiff[[2]]) == 1)
-        g2_check <- !(graph2_setDiff[[1]] %in% graph2_setDiff[[2]] & length(graph2_setDiff[[2]]) == 1)
+      if ((length(graph1_setDiff[[2]]) > 0 | length(graph2_setDiff[[2]]) > 0) & (g1_check | g2_check)) {
 
         # Get iGraph plots for the transcripts
-        if (g1_check | g2_check) {
-          tti_igraph <- getTTIiGraphPlot(paired_foreground$transcript[c(tr, tr+1)], paired_foreground$gene[tr], full_graph = g, steps = 1, max_vertices_for_viz = 5000, plot_bool = T)
-        }
+        # if (g1_check | g2_check) {
+        tti_igraph <- getTTIiGraphPlot(paired_foreground$transcript[c(tr, tr+1)], gene = paired_foreground$gene[tr], full_graph = g, steps = 1, max_vertices_for_viz = 5000, plot_bool = T)
+        # }
 
         # Perform enrichment analysis for unique vertices
         internal_loop <- lapply(list(graph1_setDiff, graph2_setDiff), function(x) {
@@ -167,7 +166,7 @@ getTTIiGraphPlot <- function(paired_transcript, gene, steps, full_graph, max_ver
   # Plot the ego graphs if plot_bool is TRUE and the number of vertices is within the specified limit
   if (plot_bool) {
     if (length(igraph::V(e1g)) <= max_vertices_for_viz) {
-      pdf(paste0(output_location, "tti/", paired_transcript[1], "_", steps, 'steps_tti_graph.pdf'))
+      pdf(paste0(output_location, "tti/", gene, "_", paired_transcript[1], "_", steps, 'steps_tti_graph.pdf'))
       print(igraph::plot.igraph(e1g,vertex.size=3,vertex.label=NA,main=paired_transcript[1],
                                 layout=igraph::layout.fruchterman.reingold(e1g, niter=10000)))
       dev.off()
