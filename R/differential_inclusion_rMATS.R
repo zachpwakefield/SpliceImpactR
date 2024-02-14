@@ -263,6 +263,7 @@ paired_rMATS_helper <- function(df, type) {
     adjust_2ndExon_psi[((.5*length(adjust_2ndExon_psi))+1):length(adjust_2ndExon_psi)] <- 1-(adjust_2ndExon_psi[((.5*length(adjust_2ndExon_psi))+1):length(adjust_2ndExon_psi)])
     i_df[2,15:ncol(df)] <- adjust_2ndExon_psi
     colnames(i_df) <- colnames(df)
+    i_df
     }))
 
   return(mod_df)
