@@ -141,6 +141,11 @@ differential_inclusion_rMATS <- function(control_names, test_names, et, cores, o
   stats_out <- stats_out %>% dplyr::relocate(p.adj, .after = p.val)
   stats_out$p.adj[stats_out$p.adj < 0] <- -1
 
+
+  if (et == "A5SS" | et == "A3SS" | et == "MXE") {
+    # extract paired results for naturally paired output
+
+  }
   return(stats_out)
 }
 
@@ -235,4 +240,31 @@ extract_rMATS <- function(et = "SE", frM.list, sample_ids, cores) {
 }
 
 
+paired_rMATS_helper <- function(df, type) {
+
+  swapped_exon <- paste0(unlist(lapply(strsplit(df$exon, split = ":"), "[[", 1)), ":", unlist(lapply(strsplit(df$add_inf, split = ";"), "[[", 2)))
+  do.call(rbind, lapply(1:nrow(df), function(x) {
+    i_df <- data.frame(gene = c(df$gene[x], df$gene[x]),
+               exon = c(df$exon[x], swaped_exon[x]),
+               type = c(df$type[x], df$type[x]),
+               delta.psi = c(df$delta.psi[x], -1*(df$delta.psi[x])),
+               p.val = c(df$p.val[x], df$p.val[x]),
+               p.adj = c(df$p.adj[x], df$p.adj[x]),
+               control_average_psi = c(df$control_average_psi[x], 1-df$control_average_psi[x]),
+               test_average_psi = c(df$test_average_psi[x], 1-df$test_average_psi[x]),
+               outlier = c(df$outlier[x], df$outlier[x]),
+               control_average_IJC = c(df$control_average_IJC[x], df$control_average_SJC[x]),
+               control_average_SJC = c(df$control_average_SJC[x], df$control_average_IJC[x]),
+               test_average_IJC = c(df$test_average_IJC[x], df$test_average_SJC[x]),
+               test_average_SJC = c(df$test_average_SJC[x], df$test_average_IJC[x]),
+               add_inf = c(paste0(swaped_exon[x], ";prim", x), paste0(df$exon[x], ";sec", x)))
+    i_df[1,15:ncol(df)] <- as.numeric(df[x,15:ncol(df)])
+    adjust_2ndExon_psi <- as.numeric(df[x,15:ncol(df)])
+    adjust_2ndExon_psi[((.5*length(adjust_2ndExon_psi))+1):length(adjust_2ndExon_psi)] <- 1-(adjust_2ndExon_psi[((.5*length(adjust_2ndExon_psi))+1):length(adjust_2ndExon_psi)])
+    i_df[2,15:ncol(df)] <- adjust_2ndExon_psi
+    colnames(i_df) <- colnames(df)
+    }))
+
+
+}
 
