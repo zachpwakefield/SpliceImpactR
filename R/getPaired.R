@@ -1,7 +1,12 @@
-getPaired <- function(foreground) {
+getPaired <- function(foreground, et) {
   # Create a unique identifier for each exon
   foreground <- foreground %>%
     dplyr::mutate(exon_id = paste0(chr, ":", start, "-", stop))
+
+  # incorporate pair number into gene name for the pairing process
+  foreground$gene <- paste0(foreground$gene,
+                            ifelse(unique(foreground$add_inf) == "", "#",
+                               paste0("#", unlist(lapply(strsplit(foreground$add_inf, split = ";"), "[[", 10)))))
 
   # Split the data into positive and negative delta.psi, and filter out genes with only positive or only negative delta.psi
   pos_exons <- foreground %>% dplyr::filter(delta.psi > 0)
@@ -21,6 +26,11 @@ getPaired <- function(foreground) {
   for (gene_select in valid_genes) {
     pos <- pos_exons %>% dplyr::filter(gene == gene_select)
     neg <- neg_exons %>% dplyr::filter(gene == gene_select)
+
+    # Account for paired-by-nature alternatively splicing events
+    if (et %in% c("A5SS", "A3SS", "MXE")) {
+      prepaired_helper()
+    }
 
     # Create all possible combinations of positive and negative exons for the gene
     combos <- expand.grid(pos_exon_id = pos$exon_id, neg_exon_id = neg$exon_id)
@@ -84,6 +94,10 @@ getPaired <- function(foreground) {
                                 bins = 20) + ggplot2::geom_density(ggplot2::aes(y=.0005*ggplot2::after_stat(count)), color = 'black', fill = "coral2", bw = .1, alpha = .3) +
         ggplot2::scale_fill_manual(values=c('noPC' = "azure4", 'Match' = "#E69F00", 'onePC' = "#56B4E9", 'FrameShift' = "pink", 'PartialMatch' = "deeppink4")) +
         ggplot2::theme_classic() + ggplot2::xlab("Alignment Score") + ggplot2::ylab("Fraction"))
+
+    # remove pair number from gene name after the pairing process
+    exon_pairs_df$gene <- unlist(lapply(strsplit(exon_pairs_df$gene, split = "#"), "[[", 1))
+    combined_rows_df_expanded$gene <- unlist(lapply(strsplit(combined_rows_df_expanded$gene, split = "#"), "[[", 1))
 
     # Return the combined dataframe of exon pairs with their corresponding rows from the input dataframe
     # exon_pairs is minimal information
