@@ -2,9 +2,9 @@ getBackground <- function(input, mOverlap, cores, nC, nE, exon_type, pdir, outpu
   ## extract all first exons and create combined data.frame with gene, location
   files <- paste(input, unlist(lapply(input, function(x) list.files(x)[grep('[.]exon', list.files(x))])), sep = "")
 
-  if (exon_type == "AFE") {
+  if (exon_type == "AFE" | exon_type == "HFE") {
     lim <- c("first")
-  } else if (exon_type == "ALE") {
+  } else if (exon_type == "ALE" | exon_type == "HLE") {
     lim <- c("last")
   } else if (!(exon_type %in% c("AFE", "ALE"))) {
     lim <- c("internal")
