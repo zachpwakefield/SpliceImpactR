@@ -1,63 +1,64 @@
 bedifyForeground <- function(matched, outname, cores) {
 
-  # Function to process each transcriptID and construct BED rows
-  processTranscriptID_fg <- function(i) {
-    # Efficiently filter for relevant rows
-    bed <- gtf[gtf$transcriptID == matched$transcriptID[i] & gtf$type == "exon", ]
-    bed <- bed %>%
-      dplyr::select(chr, start, stop, transcriptID, geneID, strand) %>%
-      dplyr::mutate(
-        eiID = matched$input_id[i],
-        score = 0,
-        name = paste(transcriptID, "#", matched$input_id[i], sep = ""),
-        delta.psi = matched$delta.psi[i],
-        p.adj = matched$p.adj[i],
-        add_inf = matched$add_inf[i]
-      )
+  # Ensure gtf is filtered for "exon" type entries and select relevant columns upfront
+  gtf_exons_limited <- gtf %>%
+    filter(type == "exon") %>%
+    select(start, stop, transcriptID)
 
-    # Adjust chromStart based on strand to adhere to BED format (0-based) conventions
-    bed <- bed %>%
-      dplyr::mutate(chromStart = ifelse(strand == "+", as.integer(start) - 1, as.integer(stop) + 1)) %>%
-      dplyr::select(chrom = chr, chromStart, chromEnd = stop, name, score, strand, delta.psi, p.adj, add_inf)
+  # Creat a carbon copy of matched with changed column names to avoid ".x" and ".y"
+  matched_carbon <- matched %>%
+    dplyr::rename(matchedStart = start) %>%
+    dplyr::rename(matchedStop = stop)
 
-    return(bed)
-  }
+  # Left join matched data with gtf_exons based on transcriptID
+  bed <- left_join(matched_carbon, gtf_exons_limited, by = "transcriptID")
 
-  toBed <- parallel::mclapply(1:nrow(matched), processTranscriptID_fg, mc.cores = cores)
+  # Manipulate into BED format
+  bed <- bed %>%
+    mutate(
+      score = 0,
+      name = paste(transcriptID, "#", input_id, sep = ""),
+      chromStart = ifelse(strand == "+", bed$start - 1, bed$start),
+      chrom = bed$chr,
+      chromEnd =ifelse(strand == "+", bed$stop, bed$stop + 1)
+    ) %>%
+    select(
+      chrom, chromStart, chromEnd, name, score, strand,
+      delta.psi, p.adj, add_inf = add_inf
+    )
 
-  # Combine all BED rows into one dataframe
-  toBed <- do.call(rbind, toBed)
-
-  return(toBed)
+  return(bed)
 }
 
 
 bedifyBackground <- function(matched, outname, cores) {
 
-  # Function to process each transcriptID and construct BED rows
-  processTranscriptID_bg <- function(i) {
-    # Efficiently filter for relevant rows
-    bed <- gtf[gtf$transcriptID == matched$transcriptID[i] & gtf$type == "exon", ]
-    bed <- bed %>%
-      dplyr::select(chr, start, stop, transcriptID, geneID, strand) %>%
-      dplyr::mutate(
-        eiID = matched$input_id[i],
-        score = 0,
-        name = paste(transcriptID, "#", matched$input_id[i], sep = "")
-      )
+  # Ensure gtf is filtered for "exon" type entries and select relevant columns upfront
+  gtf_exons_limited <- gtf %>%
+    filter(type == "exon") %>%
+    select(start, stop, transcriptID)
 
-    # Adjust chromStart based on strand to adhere to BED format (0-based) conventions
-    bed <- bed %>%
-      dplyr::mutate(chromStart = ifelse(strand == "+", as.integer(start) - 1, as.integer(stop) + 1)) %>%
-      dplyr::select(chrom = chr, chromStart, chromEnd = stop, name, score, strand)
+  # Creat a carbon copy of matched with changed column names to avoid ".x" and ".y"
+  matched_carbon <- matched %>%
+    dplyr::rename(matchedStart = start) %>%
+    dplyr::rename(matchedStop = stop)
 
-    return(bed)
-  }
+  # Left join matched data with gtf_exons based on transcriptID
+  bed <- left_join(matched_carbon, gtf_exons_limited, by = "transcriptID")
 
-  toBed <- parallel::mclapply(1:nrow(matched), processTranscriptID_bg, mc.cores = cores)
+  # Manipulate into BED format
+  bed <- bed %>%
+    mutate(
+      score = 0,
+      name = paste(transcriptID, "#", input_id, sep = ""),
+      chromStart = ifelse(strand == "+", bed$start - 1, bed$start),
+      chrom = bed$chr,
+      chromEnd =ifelse(strand == "+", bed$stop, bed$stop + 1)
+    ) %>%
+    select(
+      chrom, chromStart, chromEnd, name, score, strand,
+      add_inf = add_inf
+    )
 
-  # Combine all BED rows into one dataframe
-  toBed <- do.call(rbind, toBed)
-
-  return(toBed)
+  return(bed)
 }

@@ -34,38 +34,48 @@ getForeground <- function(input, test_names, control_names, thresh, fdr, mOverla
   print("done bed-ifying...")
 
   ## extract uniqiue transcript names as trans and all trancript names as possT
-  trans <- unlist(lapply(strsplit(unique(bed$name), "#"), "[[", 1))
-  possT <- unlist(lapply(strsplit(bed$name, "#"), "[[", 1))
+  trans2 <- str_extract(unique(bed$name), "^[^#]*")
+
+  # For all names
+  possT2 <- str_extract(bed$name, "^[^#]*")
 
   print("Finding annotated proteins...")
   ## Find annotated proteins for transcripts if possible
-  protCode <- unlist(parallel::mclapply(trans, mc.cores = cores, function(x) {
 
-    c_trans[which(c_trans == x)[1]+1]
 
-  }))
+  protCode <- c_trans[match(trans, c_trans) + 1]
   protCode[is.na(protCode)]<- "none"
 
   print("Making output data...")
   ## Make dataframe proBed for output of matched transcripts with protein code
-  proBed <- data.frame(id = unique(bed$name),
-                       strand = unlist(lapply(unique(bed$name), function(x) unique(bed$strand[bed$name == x][1]))),
-                       prot = protCode,
-                       delta.psi = unlist(lapply(unique(bed$name), function(x) unique(bed$delta.psi[bed$name == x][1]))),
-                       p.adj = unlist(lapply(unique(bed$name), function(x) unique(bed$p.adj[bed$name == x][1]))),
-                       add_inf = unlist(lapply(unique(bed$name), function(x) unique(bed$add_inf[bed$name == x][1])))) %>%
-    tidyr::separate(id, c("transcript", "id"), "#") %>%
-    tidyr::separate("id", c("gene", "chr"), ";") %>%
-    tidyr::separate('chr', c('chr', 'coords'), ':') %>%
-    tidyr::separate('coords', c('start', 'stop'), '-')
+  bed_summary <- bed %>%
+    group_by(name) %>%
+    summarise(strand = first(strand),
+              delta.psi = first(delta.psi),
+              p.adj = first(p.adj),
+              add_inf = first(add_inf),
+              .groups = 'drop')
+
+  # Assuming 'protCode' is already defined and in the correct order for the unique 'bed$name'
+  # If 'protCode' needs to be matched by 'bed$name', ensure that step is handled accordingly
+
+  # Create the initial 'proBed' data frame without the need for 'lapply' or 'unique'
+  proBed <- bed_summary %>%
+    mutate(prot = protCode) %>%
+    separate(name, c("transcript", "id"), "#") %>%
+    separate(id, c("gene", "chr"), ";") %>%
+    separate(chr, c("chr", "coords"), ':') %>%
+    separate(coords, c("start", "stop"), '-')
 
 
-  ## Make fasta file with id & strand in first line and protein code
-  proFast <- c()
-  for (i in 1:length(proBed[,1])) {
-    proFast <- c(proFast, paste(">", proBed$transcript[i], "#", proBed$gene[i], ";", proBed$chr[i], ":", proBed$start[i], "-", proBed$stop[i], ";", proBed$strand[i], sep = ""),
-                 proBed$prot[i])
-  }
+  # Create the FASTA headers using vectorized paste function
+  fasta_headers <- paste0(">", proBed$transcript, "#", proBed$gene, ";", proBed$chr, ":", proBed$start, "-", proBed$stop, ";", proBed$strand)
+
+  # Assuming 'proBed$prot' contains the protein sequences
+  fasta_sequences <- proBed$prot
+
+  # Interleave headers and sequences
+  proFast2 <- paste(rbind(fasta_headers, fasta_sequences))
 
   write_csv(proBed, paste0(output_location, "fgoutBed.csv"))
   write_lines(proFast, paste0(output_location, "fgoutFast.fa"))
