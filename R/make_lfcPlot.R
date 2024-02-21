@@ -1,9 +1,7 @@
 make_dPsiPlot <- function(dpsi_df, pdir, num_thresh = 30) {
-  # Load the gene reference conversion table
-  hg38.conv <- readr::read_csv('/projectnb2/evolution/zwakefield/proteinImpacts/gencodev42_transcriptGeneProtein.csv')
 
   # Map Ensembl IDs in the lfc_df to HGNC symbols using the conversion table
-  gene_id_to_name <- setNames(hg38.conv$gene_name, hg38.conv$gene_id)
+  gene_id_to_name <- setNames(gtf$geneName, gtf$geneID)
 
   # Assuming the gene format is "GENEID.something"
   gene_ids <- sapply(strsplit(dpsi_df$gene, "\\."), `[`, 1)
