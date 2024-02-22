@@ -87,6 +87,10 @@ getForeground <- function(input, test_names, control_names, thresh, fdr, mOverla
   write_csv(df.l,  paste0(output_location, "fglfc.csv"))
   write_csv(bed,  paste0(output_location, "fgexonBed.csv"))
 
+  pdf(paste0(output_location, "delta_psi_plot.pdf"))
+  print(lfcPlot)
+  dev.off()
+
 
   return(list(proBed = proBed,
               proFast = proFast,
