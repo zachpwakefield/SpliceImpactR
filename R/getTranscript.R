@@ -11,11 +11,12 @@ getTranscriptForeground <- function(gtf = gtf, redExon = redExon, ex_type = exon
   results <- matcher(ex_type = ex_type, cores = cores, redExon = redExon,  minOverlap=minOverlap)
 
   # Double for convenience if not AFE/ALE
-  if (ex_type %in% c("AFE", "ALE")) {
-    compliment_redExon <- redExon
-  } else {
-    compliment_redExon <- redExon[rep(1:nrow(redExon), each = 2),]
-  }
+  compliment_redExon <- redExon
+  # if (ex_type %in% c("AFE", "ALE")) {
+  #   compliment_redExon <- redExon
+  # } else {
+  #   compliment_redExon <- redExon[rep(1:nrow(redExon), each = 2),]
+  # }
 
   # Filter out 0s and ensure results are unique to minimize redundant operations
   valid_results <- results[results != 0]
