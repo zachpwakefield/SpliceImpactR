@@ -1,4 +1,4 @@
-matcher <- function(ex_type, background = F, cores) {
+matcher <- function(ex_type, background = F, cores, redExon = redExon) {
 
   gtf_transcripts <- gtf[gtf$classification == 'transcript',]
   gtf_exons <- gtf[!(gtf$classification %in% c('gene', 'transcript')),]
@@ -11,24 +11,24 @@ matcher <- function(ex_type, background = F, cores) {
 
   if (ex_type %in% c("AFE", "ALE") | background) {
     results <- unlist(parallel::mclapply(1:nrow(redExon), mc.cores = cores, function(i) {
-      HITmatcher(i)
+      HITmatcher(i, redExon = redExon)
     }))
   } else if (ex_type %in% c("A5SS", "A3SS")) {
     results <- unlist(parallel::mclapply(1:nrow(redExon), mc.cores = cores, function(i) {
-      ASmatcher(i)
+      ASmatcher(i, redExon = redExon)
     }))
   } else if (ex_type %in% c("MXE")) {
     results <- unlist(parallel::mclapply(1:nrow(redExon), mc.cores = cores, function(i) {
-      MXmatcher(i)
+      MXmatcher(i, redExon = redExon)
     }))
   } else if (ex_type %in% c("SE")) {
     results <- unlist(parallel::mclapply(1:nrow(redExon), mc.cores = cores, function(i) {
-      SEmatcher(i)
+      SEmatcher(i, redExon = redExon)
     }))
   }
   return(results)
 }
-HITmatcher <- function(i) {
+HITmatcher <- function(i, redExon = redExon) {
   # Initiate geneR, start, stop
   geneR <- redExon$geneR[i]
   start <- redExon$start[i]
@@ -74,7 +74,7 @@ HITmatcher <- function(i) {
   } else {return(0)}
 }
 
-SEmatcher <- function(i, below_thresh = .2) {
+SEmatcher <- function(i, below_thresh = .2, redExon = redExon) {
 
   # Initiate geneR, start, stop
   geneR <- redExon$geneR[i]
@@ -166,7 +166,7 @@ SEmatcher <- function(i, below_thresh = .2) {
   }
 }
 
-MXmatcher <- function(i, below_thresh = .2) {
+MXmatcher <- function(i, below_thresh = .2, redExon = redExon) {
 
   # Initiate geneR, start, stop
   geneR <- redExon$geneR[i]
@@ -260,7 +260,7 @@ MXmatcher <- function(i, below_thresh = .2) {
   }
 }
 
-ASmatcher <- function(i, below_thresh = .2) {
+ASmatcher <- function(i, below_thresh = .2, redExon = redExon) {
 
   # Function to calculate Jaccard-like index more efficiently
   calculate_jaccard_like <- function(start1, stop1, start2, stop2) {

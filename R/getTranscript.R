@@ -8,7 +8,7 @@ getTranscriptForeground <- function(gtf = gtf, redExon = redExon, ex_type = exon
   print(paste("searching for ", ex_type, "...", sep = ""))
 
   # Parallel computation for each exon in redExon using multiple cores
-  results <- matcher(ex_type = ex_type, cores = cores)
+  results <- matcher(ex_type = ex_type, cores = cores, redExon = redExon)
 
   # Double for convenience if not AFE/ALE
   compliment_redExon <- redExon[rep(1:nrow(redExon), each = ifelse(ex_type %in% c("AFE", "ALE"), 1, 2)),]
@@ -44,7 +44,7 @@ getTranscriptBackground <- function(gtf = gtf, redExon = redExon, ex_type = exon
   print(paste("searching for ", ex_type, "...", sep = ""))
 
   # Parallel computation for each exon in redExon using multiple cores
-  results <- matcher(ex_type = ex_type, background = T, cores = cores)
+  results <- matcher(ex_type = ex_type, background = T, cores = cores, redExon = redExon)
 
   # Double for convenience if not AFE/ALE
   compliment_redExon <- redExon[rep(1:nrow(redExon), each = ifelse(ex_type %in% c("AFE", "ALE"), 1, 2)),]
