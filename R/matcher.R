@@ -22,7 +22,7 @@ matcher <- function(ex_type, background = F, cores, redExon = redExon, minOverla
       HITmatcher(i, redExon = redExon, gtf_filtered=gtf_filtered, minOverlap = minOverlap)
     }))
   } else if (ex_type %in% c("A5SS", "A3SS")) {
-    results <- unlist(lapply(1:nrow(redExon), function(i) {
+    results <- unlist(lapply(seq(1, nrow(redExon), by = 2), function(i) {
       ASmatcher2(i, redExon = redExon, minOverlap = minOverlap,
                  gtf_transcripts = gtf_transcripts,
                  gtf_exons = gtf_exons,
@@ -30,7 +30,7 @@ matcher <- function(ex_type, background = F, cores, redExon = redExon, minOverla
                  transcript_starts = transcript_starts)
     }))
   } else if (ex_type %in% c("MXE")) {
-    results <- unlist(parallel::mclapply(1:nrow(redExon), mc.cores = cores, function(i) {
+    results <- unlist(parallel::mclapply(seq(1, nrow(redExon), by = 2), mc.cores = cores, function(i) {
       MXmatcher(i, redExon = redExon, minOverlap = minOverlap,
                 gtf_transcripts = gtf_transcripts,
                 gtf_exons = gtf_exons,
@@ -38,7 +38,7 @@ matcher <- function(ex_type, background = F, cores, redExon = redExon, minOverla
                 transcript_starts = transcript_starts)
     }))
   } else if (ex_type %in% c("SE")) {
-    results <- unlist(parallel::mclapply(1:nrow(redExon), mc.cores = cores, function(i) {
+    results <- unlist(parallel::mclapply(seq(1, nrow(redExon), by = 2), mc.cores = cores, function(i) {
       SEmatcher(i, redExon = redExon, minOverlap = minOverlap,
                 gtf_transcripts = gtf_transcripts,
                 gtf_exons = gtf_exons,

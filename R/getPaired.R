@@ -6,7 +6,7 @@ getPaired <- function(foreground, et) {
   # incorporate pair number into gene name for the pairing process
   foreground$gene <- paste0(foreground$gene,
                             ifelse(unique(foreground$add_inf) == "", "#",
-                               paste0("#", unlist(lapply(strsplit(foreground$add_inf, split = ";"), "[[", 10)))))
+                               paste0("#", unlist(lapply(strsplit(foreground$add_inf, split = ";"), "[[", 3)))))
 
   # Split the data into positive and negative delta.psi, and filter out genes with only positive or only negative delta.psi
   pos_exons <- foreground %>% dplyr::filter(delta.psi > 0)
@@ -27,10 +27,6 @@ getPaired <- function(foreground, et) {
     pos <- pos_exons %>% dplyr::filter(gene == gene_select)
     neg <- neg_exons %>% dplyr::filter(gene == gene_select)
 
-    # Account for paired-by-nature alternatively splicing events
-    if (et %in% c("A5SS", "A3SS", "MXE")) {
-      prepaired_helper()
-    }
 
     # Create all possible combinations of positive and negative exons for the gene
     combos <- expand.grid(pos_exon_id = pos$exon_id, neg_exon_id = neg$exon_id)
