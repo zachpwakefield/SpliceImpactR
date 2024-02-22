@@ -2,14 +2,14 @@ getForeground <- function(input, test_names, control_names, thresh, fdr, mOverla
 
   ## If using foreground set, read in diExon file and extract differentially included exons using lfc()
   df <- input
-  df.l <- lfc(df, numCont = nC, numExp = nE, exon_type = exon_type,
+  df.l <- diff_info(df, numCont = nC, numExp = nE, exon_type = exon_type,
               cores = cores, test_names = test_names, control_names = control_names)
 
   ## Filter df.l for paired analysis
   bdf.l <- df.l[abs(df.l$delta.psi) >= thresh & df.l$p.adj <= fdr,]
 
   ## Make volcano plot with make_lfcPlot()
-  lfcPlot <- make_lfcPlot(df.l, pdir = pdir)
+  lfcPlot <- make_dPsiPlot(df.l, pdir = pdir)
 
   ## Make data.frame with gene, location of each exon on total foreground
   redExon <- data.frame(geneR = unlist(lapply(strsplit(bdf.l$gene, split = "[.]"), "[[", 1)),

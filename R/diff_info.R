@@ -1,4 +1,4 @@
-diff_info <- function(de_df, numCont, numExp, exon_type, cores = 8, test_names, control_names, color_thresh) {
+diff_info <- function(de_df, numCont, numExp, exon_type, cores = 8, test_names, control_names, color_thresh = .5) {
   col <- list()  # Initialize list to store colors for visualization
 
   # Filter out non-significant and NA adjusted p-values
