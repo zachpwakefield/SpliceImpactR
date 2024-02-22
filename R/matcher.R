@@ -22,16 +22,28 @@ matcher <- function(ex_type, background = F, cores, redExon = redExon, minOverla
       HITmatcher(i, redExon = redExon, gtf_filtered=gtf_filtered, minOverlap = minOverlap)
     }))
   } else if (ex_type %in% c("A5SS", "A3SS")) {
-    results <- unlist(parallel::mclapply(1:nrow(redExon), mc.cores = cores, function(i) {
-      ASmatcher(i, redExon = redExon, minOverlap = minOverlap)
+    results <- unlist(lapply(1:nrow(redExon), function(i) {
+      ASmatcher2(i, redExon = redExon, minOverlap = minOverlap,
+                 gtf_transcripts = gtf_transcripts,
+                 gtf_exons = gtf_exons,
+                 protein_coding_transcripts = protein_coding_transcripts,
+                 transcript_starts = transcript_starts)
     }))
   } else if (ex_type %in% c("MXE")) {
     results <- unlist(parallel::mclapply(1:nrow(redExon), mc.cores = cores, function(i) {
-      MXmatcher(i, redExon = redExon, minOverlap = minOverlap)
+      MXmatcher(i, redExon = redExon, minOverlap = minOverlap,
+                gtf_transcripts = gtf_transcripts,
+                gtf_exons = gtf_exons,
+                protein_coding_transcripts = protein_coding_transcripts,
+                transcript_starts = transcript_starts)
     }))
   } else if (ex_type %in% c("SE")) {
     results <- unlist(parallel::mclapply(1:nrow(redExon), mc.cores = cores, function(i) {
-      SEmatcher(i, redExon = redExon, minOverlap = minOverlap)
+      SEmatcher(i, redExon = redExon, minOverlap = minOverlap,
+                gtf_transcripts = gtf_transcripts,
+                gtf_exons = gtf_exons,
+                protein_coding_transcripts = protein_coding_transcripts,
+                transcript_starts = transcript_starts)
     }))
   }
   return(results)
@@ -83,7 +95,11 @@ HITmatcher <- function(i, redExon = redExon, gtf_filtered=gtf_filtered, minOverl
   } else {return(0)}
 }
 
-SEmatcher <- function(i, below_thresh = .2, redExon = redExon) {
+SEmatcher <- function(i, below_thresh = .2, redExon = redExon, minOverlap = minOverlap,
+                      gtf_transcripts = gtf_transcripts,
+                      gtf_exons = gtf_exons,
+                      protein_coding_transcripts = protein_coding_transcripts,
+                      transcript_starts = transcript_starts) {
 
   # Initiate geneR, start, stop
   geneR <- redExon$geneR[i]
@@ -175,7 +191,11 @@ SEmatcher <- function(i, below_thresh = .2, redExon = redExon) {
   }
 }
 
-MXmatcher <- function(i, below_thresh = .2, redExon = redExon) {
+MXmatcher <- function(i, below_thresh = .2, redExon = redExon, minOverlap = minOverlap,
+                      gtf_transcripts = gtf_transcripts,
+                      gtf_exons = gtf_exons,
+                      protein_coding_transcripts = protein_coding_transcripts,
+                      transcript_starts = transcript_starts) {
 
   # Initiate geneR, start, stop
   geneR <- redExon$geneR[i]
@@ -269,7 +289,11 @@ MXmatcher <- function(i, below_thresh = .2, redExon = redExon) {
   }
 }
 
-ASmatcher <- function(i, below_thresh = .2, redExon = redExon) {
+ASmatcher <- function(i, below_thresh = .2, redExon = redExon, minOverlap = minOverlap,
+                      gtf_transcripts = gtf_transcripts,
+                      gtf_exons = gtf_exons,
+                      protein_coding_transcripts = protein_coding_transcripts,
+                      transcript_starts = transcript_starts) {
 
   # Function to calculate Jaccard-like index more efficiently
   calculate_jaccard_like <- function(start1, stop1, start2, stop2) {
