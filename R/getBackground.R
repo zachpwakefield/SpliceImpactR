@@ -34,7 +34,7 @@ getBackground <- function(input, mOverlap, cores, nC, nE, exon_type, pdir, outpu
   bed <- bedifyBackground(matched, outname = output_location, cores = cores)
   print("done bed-ifying...")
 
-  ## extract uniqiue transcript names as trans and all trancript names as possT
+  ## extract unique transcript names as trans and all transcript names as possT
   trans <- str_extract(unique(bed$name), "^[^#]*")
 
   # For all names
