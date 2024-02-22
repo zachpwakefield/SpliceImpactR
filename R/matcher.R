@@ -10,8 +10,15 @@ matcher <- function(ex_type, background = F, cores, redExon = redExon) {
   transcript_starts <- setNames(gtf$start[gtf$classification == 'transcript'], gtf$transcriptID[gtf$classification == 'transcript'])
 
   if (ex_type %in% c("AFE", "ALE") | background) {
+    if (ex_type == "AFE") {
+      lim <- "first"
+    } else if (ex_type == "ALE") {
+      lim <- "last"} else {
+        lim <- "internal"
+      }
+    gtf_filtered <- gtf[gtf$classification == lim,]
     results <- unlist(parallel::mclapply(1:nrow(redExon), mc.cores = cores, function(i) {
-      HITmatcher(i, redExon = redExon)
+      HITmatcher(i, redExon = redExon, gtf_filtered = gtf_filtered)
     }))
   } else if (ex_type %in% c("A5SS", "A3SS")) {
     results <- unlist(parallel::mclapply(1:nrow(redExon), mc.cores = cores, function(i) {
@@ -28,7 +35,8 @@ matcher <- function(ex_type, background = F, cores, redExon = redExon) {
   }
   return(results)
 }
-HITmatcher <- function(i, redExon = redExon) {
+HITmatcher <- function(i, redExon = redExon, gtf_filtered = gtf_filtered) {
+
   # Initiate geneR, start, stop
   geneR <- redExon$geneR[i]
   start <- redExon$start[i]

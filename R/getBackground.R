@@ -35,10 +35,10 @@ getBackground <- function(input, mOverlap, cores, nC, nE, exon_type, pdir, outpu
   print("done bed-ifying...")
 
   ## extract uniqiue transcript names as trans and all trancript names as possT
-  trans2 <- str_extract(unique(bed$name), "^[^#]*")
+  trans <- str_extract(unique(bed$name), "^[^#]*")
 
   # For all names
-  possT2 <- str_extract(bed$name, "^[^#]*")
+  possT <- str_extract(bed$name, "^[^#]*")
 
 
   print("Finding annotated proteins...")
@@ -51,7 +51,7 @@ getBackground <- function(input, mOverlap, cores, nC, nE, exon_type, pdir, outpu
   bed_summary <- bed %>%
     dplyr::group_by(name) %>%
     dplyr::summarise(strand = dplyr::first(strand),
-              .groups = 'drop')
+                     .groups = 'drop')
 
   # Assuming 'protCode' is already defined and in the correct order for the unique 'bed$name'
   # If 'protCode' needs to be matched by 'bed$name', ensure that step is handled accordingly
@@ -71,7 +71,7 @@ getBackground <- function(input, mOverlap, cores, nC, nE, exon_type, pdir, outpu
   fasta_sequences <- proBed$prot
 
   # Interleave headers and sequences
-  proFast2 <- paste(rbind(fasta_headers, fasta_sequences))
+  proFast <- paste(rbind(fasta_headers, fasta_sequences))
 
 
   write_csv(proBed, paste0(output_location, "bgoutBed.csv"))
