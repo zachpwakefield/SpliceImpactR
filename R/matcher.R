@@ -1,4 +1,4 @@
-matcher <- function(ex_type, background = F) {
+matcher <- function(ex_type, background = F, cores) {
 
   gtf_transcripts <- gtf[gtf$classification == 'transcript',]
   gtf_exons <- gtf[!(gtf$classification %in% c('gene', 'transcript')),]
