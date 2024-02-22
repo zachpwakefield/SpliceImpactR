@@ -56,8 +56,7 @@ bedifyBackground <- function(matched, outname, cores) {
       chromEnd =ifelse(strand == "+", bed$stop, bed$stop + 1)
     ) %>%
     dplyr::select(
-      chrom, chromStart, chromEnd, name, score, strand,
-      add_inf = add_inf
+      chrom, chromStart, chromEnd, name, score, strand
     )
 
   return(bed)
