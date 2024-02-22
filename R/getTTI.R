@@ -18,14 +18,17 @@ getTTI <- function(paired_foreground, background, pdir = pdir, steps = 1, max_ve
   # Convert the edgelist to a matrix format
   edgeList_Matrix <- matrix(c(edgeList$V1, edgeList$V2), ncol = 2)
 
-  # Extract genes present in the control and test groups
-  genes_in_sample <- unlist(lapply(strsplit(unique(unlist(lapply(c(control_group, test_group), function(f) {
-    exon_df <- read.delim(paste0(f, '.exon'))
-    unique(exon_df$gene)
-  }))), split = "[.]"), "[[", 1))
+  # # Extract genes present in the control and test groups
+  # genes_in_sample <- unlist(lapply(strsplit(unique(unlist(lapply(c(control_group, test_group), function(f) {
+  #   exon_df <- read.delim(paste0(f, '.exon'))
+  #   unique(exon_df$gene)
+  # }))), split = "[.]"), "[[", 1))
+
+  # # Filter for transcripts in the sample
+  # possible_transcripts <- tgp$transcript_id[tgp$gene_id %in% genes_in_sample]
 
   # Filter for transcripts in the sample
-  possible_transcripts <- tgp$transcript_id[tgp$gene_id %in% genes_in_sample]
+  possible_transcripts <- tgp$transcript_id[tgp$gene_id %in% background$transcript]
 
   # Reduce the edgelist to include only edges between possible transcripts
   el_reduce <- edgeList_Matrix[(edgeList_Matrix[,1] %in% possible_transcripts & edgeList_Matrix[,2] %in% possible_transcripts),]
