@@ -65,8 +65,8 @@ getPaired <- function(foreground, et) {
     # Combine all rows into a single data frame
     combined_rows_df <- do.call(rbind, combined_rows)
     combined_rows_df_expanded <- do.call(rbind, lapply(1:nrow(combined_rows_df), function(x) {
-      rbind(foreground[foreground$exon_id == combined_rows_df$pos_exon_id[x],],
-            foreground[foreground$exon_id == combined_rows_df$neg_exon_id[x],])
+      rbind(foreground[foreground$exon_id == combined_rows_df$pos_exon_id[x] & foreground$add_inf == combined_rows_df$add_inf.pos[x],],
+            foreground[foreground$exon_id == combined_rows_df$neg_exon_id[x] & foreground$add_inf == combined_rows_df$add_inf.neg[x],])
     }))
 
     # Use matchAlignType to identify protein alignment score and type
