@@ -28,7 +28,9 @@ getTTI <- function(paired_foreground, background, pdir = pdir, steps = 1, max_ve
   # possible_transcripts <- tgp$transcript_id[tgp$gene_id %in% genes_in_sample]
 
   # Filter for transcripts in the sample
-  possible_transcripts <- tgp$transcript_id[tgp$gene_id %in% background$transcript]
+  genes_in_sample <- background$gene
+  possible_transcripts <- tgp$transcript_id[tgp$transcript_id %in% background$transcript]
+
 
   # Reduce the edgelist to include only edges between possible transcripts
   el_reduce <- edgeList_Matrix[(edgeList_Matrix[,1] %in% possible_transcripts & edgeList_Matrix[,2] %in% possible_transcripts),]
@@ -42,7 +44,7 @@ getTTI <- function(paired_foreground, background, pdir = pdir, steps = 1, max_ve
     # Check if both transcripts in the pair are in the graph
     if (sum(paired_foreground$transcript[c(tr, tr+1)] %in% igraph::V(g)$name) == 2) {
       # Generate ego graphs for the transcripts
-      eg <- igraph::make_ego_graph(g, order = 1, nodes = paired_foreground$transcript[c(tr, tr+1)],
+      eg <- igraph::make_ego_graph(g, order = steps, nodes = paired_foreground$transcript[c(tr, tr+1)],
                                    mode = c("all", "out", "in")[1], mindist = 0)
       # Optionally write the ego graphs to files
       if (write_igraphs) {
@@ -66,7 +68,7 @@ getTTI <- function(paired_foreground, background, pdir = pdir, steps = 1, max_ve
 
         # Get iGraph plots for the transcripts
         # if (g1_check | g2_check) {
-        tti_igraph <- getTTIiGraphPlot(paired_foreground$transcript[c(tr, tr+1)], gene = paired_foreground$gene[tr], full_graph = g, steps = 1, max_vertices_for_viz = 5000, plot_bool = T)
+        tti_igraph <- getTTIiGraphPlot(paired_foreground$transcript[c(tr, tr+1)], gene = paired_foreground$gene[tr], full_graph = g, steps = steps, max_vertices_for_viz = max_vertices_for_viz, plot_bool = T)
         # }
 
         # Perform enrichment analysis for unique vertices
@@ -254,7 +256,7 @@ getEnrichmentTTI <- function(current_transcript, t_impacts, fdr, transGeneProt,
 
 
 # Initiate the TTI network using this function. This can be very time consuming
-init_ddi <- function(pdir, output_location, ppidm_class = c("Gold", "Silver", "Bronze")[1], removeDups = T) {
+init_ddi <- function(pdir, output_location, ppidm_class = c("Gold_Standard", "Gold", "Silver", "Bronze")[1], removeDups = T) {
   # Read in the protein coding data from the package directory
   pfam_in <- read.delim(paste0(pdir, '/protein_code_from_gencodev43_headerFix.txt.tsv'),
                         header = F)
@@ -294,7 +296,16 @@ init_ddi <- function(pdir, output_location, ppidm_class = c("Gold", "Silver", "B
                                 sep = ""))
 
   # Filter interactions based on the specified PPIDM class (e.g., Gold, Silver, Bronze)
-  d6 <- pdm1[pdm1$CLASS %in% ppidm_class, c(1, 2)]
+  if ("Gold_Standard" == ppidm_class) {
+    d6 <- pdm1[pdm1$IN_GOLDSTANDARD == "yes",]
+  } else if ("Gold_Standard" %in% ppidm_class) {
+    d6 <- pdm1[pdm1$IN_GOLDSTANDARD == "yes",]
+    d6 <- pdm1[pdm1$CLASS %in% ppidm_class, c(1, 2)]
+  } else {
+    d6 <- pdm1[pdm1$CLASS %in% ppidm_class, c(1, 2)]
+  }
+
+
 
   # Rename columns for clarity
   colnames(d6) <- c("n1", "n2")
