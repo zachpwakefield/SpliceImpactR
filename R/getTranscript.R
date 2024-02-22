@@ -23,13 +23,13 @@ getTranscriptForeground <- function(gtf = gtf, redExon = redExon, ex_type = exon
   out_matched <- gtf[match(valid_results, gtf$rownum), ]
 
   # Add additional information to the matched data for further analysis
-  out_matched$input_id <- paste(redExon$geneR, ";", redExon$chr, ":", redExon$start, "-", redExon$stop, sep = "")[results != 0]
+  out_matched$input_id <- paste(compliment_redExon$geneR, ";", compliment_redExon$chr, ":", compliment_redExon$start, "-", compliment_redExon$stop, sep = "")[results != 0]
   matched <- out_matched %>% dplyr::relocate(input_id)
 
   # Add additional information to the matched data for further foreground analysis
-  matched$delta.psi <- redExon$delta.psi[results != 0]
-  matched$p.adj <- redExon$p.adj[results != 0]
-  matched$add_inf <- redExon$add_inf[results != 0]
+  matched$delta.psi <- compliment_redExon$delta.psi[results != 0]
+  matched$p.adj <- compliment_redExon$p.adj[results != 0]
+  matched$add_inf <- compliment_redExon$add_inf[results != 0]
 
 
   return(matched = matched) # Return the matched data
@@ -59,11 +59,11 @@ getTranscriptBackground <- function(gtf = gtf, redExon = redExon, ex_type = exon
   out_matched <- gtf[match(valid_results, gtf$rownum), ]
 
   # Add additional information to the matched data for further analysis
-  out_matched$input_id <- paste(redExon$geneR, ";", redExon$chr, ":", redExon$start, "-", redExon$stop, sep = "")[results != 0]
+  out_matched$input_id <- paste(compliment_redExon$geneR, ";", compliment_redExon$chr, ":", compliment_redExon$start, "-", compliment_redExon$stop, sep = "")[results != 0]
   matched <- out_matched %>% dplyr::relocate(input_id)
 
   # Add additional information to the matched data for further foreground analysis
-  matched$add_inf <- redExon$add_inf[results != 0]
+  matched$add_inf <- compliment_redExon$add_inf[results != 0]
 
 
   return(matched = matched) # Return the matched data
