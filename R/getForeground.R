@@ -34,10 +34,10 @@ getForeground <- function(input, test_names, control_names, thresh, fdr, mOverla
   print("done bed-ifying...")
 
   ## extract uniqiue transcript names as trans and all trancript names as possT
-  trans2 <- str_extract(unique(bed$name), "^[^#]*")
+  trans <- str_extract(unique(bed$name), "^[^#]*")
 
   # For all names
-  possT2 <- str_extract(bed$name, "^[^#]*")
+  possT <- str_extract(bed$name, "^[^#]*")
 
   print("Finding annotated proteins...")
   ## Find annotated proteins for transcripts if possible
@@ -46,22 +46,23 @@ getForeground <- function(input, test_names, control_names, thresh, fdr, mOverla
   protCode <- c_trans[match(trans, c_trans) + 1]
   protCode[is.na(protCode)]<- "none"
 
+  merger <- data.frame(name = unique(bed$name),
+                       prot = protCode)
+
   print("Making output data...")
   ## Make dataframe proBed for output of matched transcripts with protein code
   bed_summary <- bed %>%
     dplyr::group_by(name) %>%
     dplyr::summarise(strand = dplyr::first(strand),
-              delta.psi = dplyr::first(delta.psi),
-              p.adj = dplyr::first(p.adj),
-              add_inf = dplyr::first(add_inf),
-              .groups = 'drop')
+                     .groups = 'drop')
+
+
 
   # Assuming 'protCode' is already defined and in the correct order for the unique 'bed$name'
   # If 'protCode' needs to be matched by 'bed$name', ensure that step is handled accordingly
 
   # Create the initial 'proBed' data frame without the need for 'lapply' or 'unique'
-  proBed <- bed_summary %>%
-    dplyr::mutate(prot = protCode) %>%
+  proBed <- bed_summary %>% dplyr::left_join(merger, by='name') %>%
     tidyr::separate(name, c("transcript", "id"), "#") %>%
     tidyr::separate(id, c("gene", "chr"), ";") %>%
     tidyr::separate(chr, c("chr", "coords"), ':') %>%
@@ -75,7 +76,7 @@ getForeground <- function(input, test_names, control_names, thresh, fdr, mOverla
   fasta_sequences <- proBed$prot
 
   # Interleave headers and sequences
-  proFast2 <- paste(rbind(fasta_headers, fasta_sequences))
+  proFast <- paste(rbind(fasta_headers, fasta_sequences))
 
   write_csv(proBed, paste0(output_location, "fgoutBed.csv"))
   write_lines(proFast, paste0(output_location, "fgoutFast.fa"))
