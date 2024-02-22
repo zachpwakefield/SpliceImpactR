@@ -46,6 +46,9 @@ getBackground <- function(input, mOverlap, cores, nC, nE, exon_type, pdir, outpu
   protCode <- c_trans[match(trans, c_trans) + 1]
   protCode[is.na(protCode)]<- "none"
 
+  merger <- data.frame(name = unique(bed$name),
+                       prot = protCode)
+
   print("Making output data...")
   ## Make dataframe proBed for output of matched transcripts with protein code
   bed_summary <- bed %>%
@@ -53,12 +56,13 @@ getBackground <- function(input, mOverlap, cores, nC, nE, exon_type, pdir, outpu
     dplyr::summarise(strand = dplyr::first(strand),
                      .groups = 'drop')
 
+
+
   # Assuming 'protCode' is already defined and in the correct order for the unique 'bed$name'
   # If 'protCode' needs to be matched by 'bed$name', ensure that step is handled accordingly
 
   # Create the initial 'proBed' data frame without the need for 'lapply' or 'unique'
-  proBed <- bed_summary %>%
-    dplyr::mutate(prot = protCode) %>%
+  proBed <- bed_summary %>% dplyr::left_join(merger, by='name') %>%
     tidyr::separate(name, c("transcript", "id"), "#") %>%
     tidyr::separate(id, c("gene", "chr"), ";") %>%
     tidyr::separate(chr, c("chr", "coords"), ':') %>%
