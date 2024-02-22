@@ -49,11 +49,11 @@ getForeground <- function(input, test_names, control_names, thresh, fdr, mOverla
   print("Making output data...")
   ## Make dataframe proBed for output of matched transcripts with protein code
   bed_summary <- bed %>%
-    group_by(name) %>%
-    summarise(strand = first(strand),
-              delta.psi = first(delta.psi),
-              p.adj = first(p.adj),
-              add_inf = first(add_inf),
+    dplyr::group_by(name) %>%
+    dplyr::summarise(strand = dplyr::first(strand),
+              delta.psi = dplyr::first(delta.psi),
+              p.adj = dplyr::first(p.adj),
+              add_inf = dplyr::first(add_inf),
               .groups = 'drop')
 
   # Assuming 'protCode' is already defined and in the correct order for the unique 'bed$name'
@@ -61,11 +61,11 @@ getForeground <- function(input, test_names, control_names, thresh, fdr, mOverla
 
   # Create the initial 'proBed' data frame without the need for 'lapply' or 'unique'
   proBed <- bed_summary %>%
-    mutate(prot = protCode) %>%
-    separate(name, c("transcript", "id"), "#") %>%
-    separate(id, c("gene", "chr"), ";") %>%
-    separate(chr, c("chr", "coords"), ':') %>%
-    separate(coords, c("start", "stop"), '-')
+    dplyr::mutate(prot = protCode) %>%
+    tidyr::separate(name, c("transcript", "id"), "#") %>%
+    tidyr::separate(id, c("gene", "chr"), ";") %>%
+    tidyr::separate(chr, c("chr", "coords"), ':') %>%
+    tidyr::separate(coords, c("start", "stop"), '-')
 
 
   # Create the FASTA headers using vectorized paste function
