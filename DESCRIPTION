@@ -29,4 +29,5 @@ Imports:
   parallel, 
   igraph, 
   biomaRt, 
-  hypeR
+  hypeR,
+  rtracklayer
