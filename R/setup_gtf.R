@@ -19,7 +19,7 @@ setup_gtf <- function(gtf_location) {
   }
 
 
-  fl_exons <- mclapply(1:(length(transcript_indices)-1), mc.cores = 8, function(x) {
+  fl_exons <- parallel::mclapply(1:(length(transcript_indices)-1), mc.cores = 8, function(x) {
     min_gtf <- pcgtf[((transcript_indices[x]+1):(transcript_indices[x+1]-1)),]
     s <- min_gtf$rowname[ifelse("start_codon" %in% min_gtf$type,
                                 which(overlap(min_gtf$start[min_gtf$type == "start_codon"], min_gtf$end[min_gtf$type == "start_codon"],
@@ -39,7 +39,7 @@ setup_gtf <- function(gtf_location) {
   pcgtf$classification[pcgtf$rowname %in% unlist(lapply(fl_exons, "[[", 2))] <- "last"
   pcgtf$classification[pcgtf$rowname %in% intersect(unlist(lapply(fl_exons, "[[", 1)), unlist(lapply(fl_exons, "[[", 2)))] <- "first/last"
 
-  hybrid_first_extract <- unlist(unlist(mclapply(1:(length(gene_indices)-1), mc.cores = 8, function(x) {
+  hybrid_first_extract <- unlist(unlist(parallel::mclapply(1:(length(gene_indices)-1), mc.cores = 8, function(x) {
     tr_in_gene <- pcgtf[(gene_indices[x]+1):(gene_indices[x+1]-1),]
     if (sum(tr_in_gene$type == 'transcript') > 1) {
       lapply(unique(tr_in_gene$transcript_id), function(y) {
@@ -53,7 +53,7 @@ setup_gtf <- function(gtf_location) {
     } else {return(NA)}
   }), recursive = F), recursive = F)
 
-  hybrid_last_extract <- unlist(unlist(mclapply(1:(length(gene_indices)-1), mc.cores = 8, function(x) {
+  hybrid_last_extract <- unlist(unlist(parallel::mclapply(1:(length(gene_indices)-1), mc.cores = 8, function(x) {
     tr_in_gene <- pcgtf[(gene_indices[x]+1):(gene_indices[x+1]-1),]
     if (sum(tr_in_gene$type == 'transcript') > 1) {
       lapply(unique(tr_in_gene$transcript_id), function(y) {

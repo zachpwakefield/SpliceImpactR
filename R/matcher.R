@@ -1,4 +1,4 @@
-matcher <- function(ex_type) {
+matcher <- function(ex_type, background = F) {
 
   gtf_transcripts <- gtf[gtf$classification == 'transcript',]
   gtf_exons <- gtf[!(gtf$classification %in% c('gene', 'transcript')),]
@@ -9,7 +9,7 @@ matcher <- function(ex_type) {
   # Pre-compute a lookup for start positions of all transcripts in gtf
   transcript_starts <- setNames(gtf$start[gtf$classification == 'transcript'], gtf$transcriptID[gtf$classification == 'transcript'])
 
-  if (ex_type %in% c("AFE", "ALE")) {
+  if (ex_type %in% c("AFE", "ALE") | background) {
     results <- unlist(parallel::mclapply(1:nrow(redExon), mc.cores = cores, function(i) {
       HITmatcher(i)
     }))
