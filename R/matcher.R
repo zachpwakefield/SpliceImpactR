@@ -13,29 +13,30 @@ matcher <- function(ex_type, background = F, cores, redExon = redExon) {
     if (ex_type == "AFE") {
       lim <- "first"
     } else if (ex_type == "ALE") {
-      lim <- "last"} else {
-        lim <- "internal"
-      }
+      lim <- "last"
+    } else {
+      lim <- "internal"
+    }
     gtf_filtered <- gtf[gtf$classification == lim,]
     results <- unlist(parallel::mclapply(1:nrow(redExon), mc.cores = cores, function(i) {
-      HITmatcher(i, redExon = redExon, gtf_filtered = gtf_filtered)
+      HITmatcher(i, redExon = redExon, gtf_filtered=gtf_filtered, minOverlap = minOverlap)
     }))
   } else if (ex_type %in% c("A5SS", "A3SS")) {
     results <- unlist(parallel::mclapply(1:nrow(redExon), mc.cores = cores, function(i) {
-      ASmatcher(i, redExon = redExon)
+      ASmatcher(i, redExon = redExon, minOverlap = minOverlap)
     }))
   } else if (ex_type %in% c("MXE")) {
     results <- unlist(parallel::mclapply(1:nrow(redExon), mc.cores = cores, function(i) {
-      MXmatcher(i, redExon = redExon)
+      MXmatcher(i, redExon = redExon, minOverlap = minOverlap)
     }))
   } else if (ex_type %in% c("SE")) {
     results <- unlist(parallel::mclapply(1:nrow(redExon), mc.cores = cores, function(i) {
-      SEmatcher(i, redExon = redExon)
+      SEmatcher(i, redExon = redExon, minOverlap = minOverlap)
     }))
   }
   return(results)
 }
-HITmatcher <- function(i, redExon = redExon, gtf_filtered = gtf_filtered) {
+HITmatcher <- function(i, redExon = redExon, gtf_filtered=gtf_filtered, minOverlap) {
 
   # Initiate geneR, start, stop
   geneR <- redExon$geneR[i]
