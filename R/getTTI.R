@@ -28,7 +28,7 @@ getTTI <- function(paired_foreground, background, pdir = pdir, steps = 1, max_ve
   # possible_transcripts <- tgp$transcript_id[tgp$gene_id %in% genes_in_sample]
 
   # Filter for transcripts in the sample
-  genes_in_sample <- background$gene
+  genes_in_sample <- unique(background$gene)
   possible_transcripts <- tgp$transcript_id[tgp$transcript_id %in% background$transcript]
 
 
