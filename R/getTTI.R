@@ -1,6 +1,6 @@
 getTTI <- function(paired_foreground, background, pdir = pdir, steps = 1, max_vertices_for_viz = 5000,
                    fdr = .05, plot_bool = T, ppidm_class = c("Gold", "Silver", "Bronze")[1],
-                   write_igraphs = T, ddi = "Gold", ddi_type = "pdm", output_location = output_location) {
+                   write_igraphs = T, ddi = "Gold", output_location = output_location, tti_location = output_location) {
   # Create a directory for storing plots if plot_bool is TRUE
   if (plot_bool) {
     system(paste0("mkdir ", output_location, "tti"))
@@ -264,7 +264,7 @@ getEnrichmentTTI <- function(current_transcript, t_impacts, fdr, transGeneProt,
 
 
 # Initiate the TTI network using this function. This can be very time consuming
-init_ddi <- function(pdir, output_location, ppidm_class = c("Gold_Standard", "Gold", "Silver", "Bronze")[1], removeDups = T) {
+init_ddi <- function(pdir, output_location, ppidm_class = c("Gold_Standard", "Gold", "Silver", "Bronze")[1], removeDups = T, cores = 10) {
   # Read in the protein coding data from the package directory
   pfam_in <- read.delim(paste0(pdir, '/protein_code_from_gencodev43_headerFix.txt.tsv'),
                         header = F)
@@ -327,12 +327,12 @@ init_ddi <- function(pdir, output_location, ppidm_class = c("Gold_Standard", "Go
       b <- d_transcripts[names(d_transcripts) == d6$n2[x]][[1]]
       data.frame(tidyr::crossing(a,b)) # Create all combinations of transcripts for the interacting proteins
     }
-  }, mc.cores = 20))
+  }, mc.cores = cores))
 
   # If removeDups == T (F would save time), sort out duplicated rows through sorting rows
   if (removeDups) {
     # Sort and deduplicate the transcript pairs [This can be time consuming]
-    list_noDups <- mclapply(1:nrow(tti), mc.cores = 20, function(x) {
+    list_noDups <- mclapply(1:nrow(tti), mc.cores = cores, function(x) {
       sort(as.character(tti[x,]))
     })
     list_noDuplicates <- list_noDups[!duplicated(list_noDups)]
