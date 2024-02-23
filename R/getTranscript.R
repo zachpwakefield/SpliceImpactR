@@ -12,10 +12,13 @@ getTranscriptForeground <- function(gtf = gtf, redExon = redExon, ex_type = exon
 
   # Double for convenience if not AFE/ALE
   compliment_redExon <- redExon
-  # if (ex_type %in% c("AFE", "ALE")) {
+  # if (ex_type != "SE") {
   #   compliment_redExon <- redExon
   # } else {
   #   compliment_redExon <- redExon[rep(1:nrow(redExon), each = 2),]
+  #   add_inf_extension <- rep(1:nrow(redExon), each = 2)
+  #
+  #   compliment_redExon$add_inf <- paste0(compliment_redExon$add_inf, rep(c("inclusion;", ";exclusion"), nrow(redExon)))
   # }
 
   # Filter out 0s and ensure results are unique to minimize redundant operations

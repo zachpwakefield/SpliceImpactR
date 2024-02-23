@@ -6,7 +6,7 @@ getPaired <- function(foreground, et) {
   # incorporate pair number into gene name for the pairing process
   foreground$gene <- paste0(foreground$gene,
                             ifelse(unique(foreground$add_inf) == "none", "#",
-                               paste0("#", unlist(lapply(strsplit(foreground$add_inf, split = ";"), "[[", 3)))))
+                               paste0("#", sub(".*;", "", foreground$add_inf))))
 
   # Split the data into positive and negative delta.psi, and filter out genes with only positive or only negative delta.psi
   pos_exons <- foreground %>% dplyr::filter(delta.psi > 0)
