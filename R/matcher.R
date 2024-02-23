@@ -19,7 +19,8 @@ matcher <- function(ex_type, background = F, cores, redExon = redExon, minOverla
     }
     gtf_filtered <- gtf[gtf$classification == lim,]
     results <- unlist(parallel::mclapply(1:nrow(redExon), mc.cores = cores, function(i) {
-      HITmatcher(i, redExon = redExon, gtf_filtered=gtf_filtered, minOverlap = minOverlap)
+      HITmatcher(i, redExon = redExon, gtf_filtered=gtf_filtered, minOverlap = minOverlap,
+                 protein_coding_transcripts = protein_coding_transcripts)
     }))
   } else if (ex_type %in% c("A5SS", "A3SS")) {
     results <- unlist(lapply(seq(1, nrow(redExon), by = 2), function(i) {
@@ -48,7 +49,8 @@ matcher <- function(ex_type, background = F, cores, redExon = redExon, minOverla
   }
   return(results)
 }
-HITmatcher <- function(i, redExon = redExon, gtf_filtered=gtf_filtered, minOverlap) {
+HITmatcher <- function(i, redExon = redExon, gtf_filtered=gtf_filtered, minOverlap = minOverlap,
+                       protein_coding_transcripts = protein_coding_transcripts) {
 
   # Initiate geneR, start, stop
   geneR <- redExon$geneR[i]
