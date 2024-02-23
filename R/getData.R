@@ -108,6 +108,10 @@ getData <- function(output_location, fdr_use, min_sample_success, engine = c("Fu
 
     # Prepare data for plotting
     sp <- data[[x]][data[[x]]$fdr <= fdr_use & data[[x]]$sample_successes >= min_sample_success,c(1, 6)]
+    if (nrow(sp) == 0) {
+      print("Lower min_sample_success and/or increase fdr, none meet criteria")
+      return(NA)
+    }
     sp$category <- "foreground"
     colnames(sp)[2] <- c("proportion")
     pp <- data[[x]][data[[x]]$fdr <= fdr_use & data[[x]]$sample_successes >= min_sample_success,c(1, 9)]

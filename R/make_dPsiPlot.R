@@ -21,7 +21,7 @@ make_dPsiPlot <- function(dpsi_df, pdir, num_thresh = 30) {
   (deExons <- ggplot2::ggplot(dpsi_df,ggplot2:: aes(x = delta.psi, y = -log(p.adj), color = col, label = hgnc)) + ggplot2::geom_point(ggplot2::aes(shape = type), size = 2, color = dpsi_df$col) +
       ggplot2::theme_classic() + ggplot2::ylab("-Log2(FDR)") + ggplot2::xlab("Delta Psi")
     # +coord_cartesian(xlim = c(-100, 20))
-    + ggplot2::geom_text(hjust=.2, vjust=0, size = 3)
+    # + ggplot2::geom_text(hjust=.2, vjust=0, size = 3)
   )
   print("delta psi plot done!") # Print completion message
   return(deExons) # Return the ggplot2 object for the plot

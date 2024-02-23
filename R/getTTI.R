@@ -13,7 +13,7 @@ getTTI <- function(paired_foreground, background, pdir = pdir, steps = 1, max_ve
   tgp <- read.csv(paste0(pdir, '/gencodev42_transcriptGeneProtein.csv'))
 
   # Read edgelist output from initTTI -- using the ppidm class used previously
-  edgeList <- read.table(paste0(output_location,  "tti_igraph_edgelist_", paste(ppidm_class, collapse = ""), "_removeDups"), sep = " ", row.names = NULL)
+  edgeList <- read.table(paste0(tti_location,  "tti_igraph_edgelist_", paste(ppidm_class, collapse = ""), "_removeDups"), sep = " ", row.names = NULL)
 
   # Convert the edgelist to a matrix format
   edgeList_Matrix <- matrix(c(edgeList$V1, edgeList$V2), ncol = 2)
