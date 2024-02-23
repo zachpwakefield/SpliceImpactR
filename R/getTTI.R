@@ -208,22 +208,22 @@ getEnrichmentTTI <- function(current_transcript, t_impacts, fdr, transGeneProt,
   # Perform enrichment analysis using hypergeometric test for each gene set category
   # And generate dot plots for visualizing the enrichment results
   cc_table <- hypeR::hypeR(enrichment_list, GO.cc, background = length(backgroundGenes), test="hypergeometric")
-  cc_dots <- hypeR::hyp_dots(cc_table, fdr = fdr, title = "GO Cell Comp Enrichment", merge = TRUE)
+  cc_dots <- hypeR::hyp_dots(cc_table, fdr = fdr, title = "GO Cell Comp Enrichment", merge = TRUE, abrv = 150)
 
   mf_table <- hypeR::hypeR(enrichment_list, GO.mf, background = length(backgroundGenes), test="hypergeometric")
-  mf_dots <- hypeR::hyp_dots(mf_table, fdr = fdr, title = "GO Mol FXN Enrichment", merge = TRUE)
+  mf_dots <- hypeR::hyp_dots(mf_table, fdr = fdr, title = "GO Mol FXN Enrichment", merge = TRUE, abrv = 150)
 
   bp_table <- hypeR::hypeR(enrichment_list, GO.bp, background = length(backgroundGenes), test="hypergeometric")
-  bp_dots <- hypeR::hyp_dots(bp_table, fdr = fdr, title = "GO Biol Proc Enrichment", merge = TRUE)
+  bp_dots <- hypeR::hyp_dots(bp_table, fdr = fdr, title = "GO Biol Proc Enrichment", merge = TRUE, abrv = 150)
 
   kg_table <- hypeR::hypeR(enrichment_list, genesetsC2, background = length(backgroundGenes), test="hypergeometric")
-  kg_dots <- hypeR::hyp_dots(kg_table, fdr = fdr, title = "KEGG Enrichment", merge = TRUE)
+  kg_dots <- hypeR::hyp_dots(kg_table, fdr = fdr, title = "KEGG Enrichment", merge = TRUE, abrv = 150)
 
   bc_table <- hypeR::hypeR(enrichment_list, geneset_BIOCARTA, background = length(backgroundGenes), test="hypergeometric")
-  bc_dots <- hypeR::hyp_dots(bc_table, fdr = fdr, title = "Biocarta Enrichment", merge = TRUE)
+  bc_dots <- hypeR::hyp_dots(bc_table, fdr = fdr, title = "Biocarta Enrichment", merge = TRUE, abrv = 150)
 
   hm_table <- hypeR::hypeR(enrichment_list, genesetsH, background = length(backgroundGenes), test="hypergeometric")
-  hm_dots <- hypeR::hyp_dots(hm_table, fdr = fdr, title = "Hallmark Enrichment", merge = TRUE)
+  hm_dots <- hypeR::hyp_dots(hm_table, fdr = fdr, title = "Hallmark Enrichment", merge = TRUE, abrv = 150)
 
   # If plot_bool is TRUE, save the plots to a PDF file
   if (plot_bool) {
