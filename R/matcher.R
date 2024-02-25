@@ -24,7 +24,7 @@ matcher <- function(ex_type, background = F, cores, redExon = redExon, minOverla
     }))
   } else if (ex_type %in% c("A5SS", "A3SS")) {
     results <- unlist(lapply(seq(1, nrow(redExon), by = 2), function(i) {
-      ASmatcher2(i, redExon = redExon, minOverlap = minOverlap,
+      ASmatcher(i, redExon = redExon, minOverlap = minOverlap,
                  gtf_transcripts = gtf_transcripts,
                  gtf_exons = gtf_exons,
                  protein_coding_transcripts = protein_coding_transcripts,
