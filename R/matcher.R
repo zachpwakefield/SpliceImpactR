@@ -23,7 +23,7 @@ matcher <- function(ex_type, background = F, cores, redExon = redExon, minOverla
                  protein_coding_transcripts = protein_coding_transcripts)
     }))
   } else if (ex_type %in% c("A5SS", "A3SS")) {
-    results <- unlist(lapply(seq(1, nrow(redExon), by = 2), function(i) {
+    results <- unlist(parallel::mclapply(seq(1, nrow(redExon), by = 2), mc.cores = cores, function(i) {
       ASmatcher(i, redExon = redExon, minOverlap = minOverlap,
                  gtf_transcripts = gtf_transcripts,
                  gtf_exons = gtf_exons,
@@ -422,6 +422,8 @@ RImatcher <- function(i, below_thresh = .2, redExon = redExon, minOverlap = minO
                       gtf_exons = gtf_exons,
                       protein_coding_transcripts = protein_coding_transcripts,
                       transcript_starts = transcript_starts) {
+  print(i)
+
 
   # Function to calculate Jaccard-like index more efficiently
   calculate_jaccard_like <- function(start1, stop1, start2, stop2) {
@@ -439,22 +441,22 @@ RImatcher <- function(i, below_thresh = .2, redExon = redExon, minOverlap = minO
   stop <- redExon$stop[i]
 
   # Pre-process redExon$add_inf to avoid repeated calculations
-  split_add_inf <- strsplit(strsplit(example1, split = ";")[[1]][2:3], split = "-")
-  up_down <- as.numeric(unlist(strsplit(split_add_inf, split = "-")))
+  split_add_inf <- strsplit(strsplit(redExon$add_inf[i], split = ";")[[1]][2:3], split = "-")
+  up_down <- list(c(split_add_inf[[1]][1], split_add_inf[[2]][1]),
+                  c(split_add_inf[[1]][2], split_add_inf[[2]][2]))
 
   # Assign values directly without unnecessary lapply and unlist
-  up_down_start <- up_down[c(TRUE, FALSE)]
-  up_down_stop <- up_down[c(FALSE, TRUE)]
+  up_down_start <- as.numeric(up_down[c(TRUE, FALSE)][[1]])
+  up_down_stop <- as.numeric(up_down[c(FALSE, TRUE)][[1]])
 
   # intron retention location
-  ir_loc <- c(up_down_stop[which.min(up_down_stop)]+1, up_down_start[which.max(up_down_start)]-1)
+  ir_exclusion_location <- c(up_down_stop[which.min(up_down_stop)]+1, up_down_start[which.max(up_down_start)]-1)
 
 
   # Filter for computational efficiency at the beginning to minimize dataset size
   gtf_filtered <- subset(gtf_exons, geneID == geneR & chr == redExon$chr[i])
+  if (nrow(gtf_filtered) <= 1) return(c(0, 0)) # Skip if less than 2 relevant gtf entries found
 
-  # Assign values directly without unnecessary lapply and unlist
-  ir_exclusion_location <- idSS(start, stop, up_down[1], up_down[2])
 
   # Calculate Jaccard index for each gtf entry once instead of three times
   jaccard_indices <- lapply(list(c(start, stop), c(up_down_start[1], up_down_stop[1]),
