@@ -147,7 +147,11 @@ differential_inclusion_rMATS <- function(control_names, test_names, et, cores, o
     stats_out <- paired_rMATS_helper(stats_out)
   } else if (et == "SE") {
     stats_out <- stats_out[rep(1:nrow(stats_out), each = 2),]
-    stats_out$add_inf <- paste0(stats_out$add_inf, ";", c("inclusion", "exclusion"), ";", rep(1:(nrow(stats_out)/2), each = 2))
+    stats_out$add_inf <- paste0(stats_out$add_inf, ";", c("seInclusion", "seExclusion"), ";", rep(1:(nrow(stats_out)/2), each = 2))
+    stats_out$delta.psi <- stats_out$delta.psi * c(1, -1)
+  } else if (et == "RI") {
+    stats_out <- stats_out[rep(1:nrow(stats_out), each = 2),]
+    stats_out$add_inf <- paste0(stats_out$add_inf, ";", c("riInclusion", "riExclusion"), ";", rep(1:(nrow(stats_out)/2), each = 2))
     stats_out$delta.psi <- stats_out$delta.psi * c(1, -1)
   }
   return(stats_out)

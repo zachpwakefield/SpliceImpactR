@@ -31,7 +31,7 @@ setup_gtf <- function(gtf_location) {
                                               min_gtf$start, min_gtf$end) & min_gtf$type == "exon"),
                                 ifelse(strands[x] == "+", rev(which(min_gtf$type == "exon"))[1],
                                        which(min_gtf$type == "exon")[1]))]
-    i <- min_gtf$rowname[!min_gtf$rowname %in% c(s, e) & min_gtf$type == "exon"]
+    i <- min_gtf$rowname[!min_gtf$rowname %in% c(s, e) & min_gtf$type == "exon" & min_gtf$rowname %in% seq(s, e)]
     list(s, e, i)
   })
   pcgtf$classification[pcgtf$rowname %in% unlist(lapply(fl_exons, "[[", 3))] <- "internal"
@@ -84,6 +84,7 @@ setup_gtf <- function(gtf_location) {
                      transcriptID = unlist(lapply(strsplit(pcgtf$transcript_id, split = "[.]"), "[[", 1)),
                      transcriptName = pcgtf$transcript_name,
                      geneName = pcgtf$gene_name,
+                     exonID = unlist(lapply(strsplit(pcgtf$exon_id, split = "[.]"), "[[", 1)),
                      classification = pcgtf$classification,
                      rownum = pcgtf$rowname,
                      chr = pcgtf$seqnames,
