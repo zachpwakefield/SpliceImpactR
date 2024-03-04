@@ -46,6 +46,14 @@ matcher <- function(ex_type, background = F, cores, redExon = redExon, minOverla
                 protein_coding_transcripts = protein_coding_transcripts,
                 transcript_starts = transcript_starts)
     }))
+  } else if (ex_type %in% c("RI")) {
+    results <- unlist(parallel::mclapply(seq(1, nrow(redExon), by = 2), mc.cores = cores, function(i) {
+      RImatcher(i, redExon = redExon, minOverlap = minOverlap,
+                gtf_transcripts = gtf_transcripts,
+                gtf_exons = gtf_exons,
+                protein_coding_transcripts = protein_coding_transcripts,
+                transcript_starts = transcript_starts)
+    }))
   }
   return(results)
 }
@@ -374,6 +382,123 @@ ASmatcher <- function(i, below_thresh = .2, redExon = redExon, minOverlap = minO
   gtf_filtered$length_jacc <- inclusion_indices$length_jacc
 
   gtf_filtered <- subset(gtf_filtered, jaccard > minOverlap & transcriptID %in% inclusion)
+
+  if (nrow(gtf_filtered) == 0) return(c(0, 0)) # Skip if no entries found
+
+  # Order and find the best match more efficiently
+  gtf_filtered <- gtf_filtered[order(-gtf_filtered$jaccard),]
+
+
+  # Directly return results based on condition
+  if (nrow(gtf_filtered) == 1 || gtf_filtered$jaccard[1] > gtf_filtered$jaccard[2]) {
+    return(c(gtf_filtered$rownum[1], exclusion_rownum)) # Complete the logic for finding the correct rownum
+  } else if (gtf_filtered$jaccard[1] == gtf_filtered$jaccard[2]) {
+
+    gtf_min <- gtf_filtered[gtf_filtered$jaccard == max(gtf_filtered$jaccard),]
+
+    # Pre-compute the start positions for transcripts in exclusion
+    exclusion_start <- gtf_transcripts$start[gtf_transcripts$rownum == exclusion_rownum]
+
+
+    # Vectorize the calculation of start distances
+    start_distances <- abs(transcript_starts[gtf_min$transcriptID] - exclusion_start)
+
+    # Ensure start_distances is a vector if it's not due to subsetting a single element
+    start_distances <- as.numeric(start_distances)
+
+    c_gtf <- gtf_min[start_distances == min(start_distances),] %>% dplyr::arrange(desc(length_jacc))
+
+    inclusion_rownum <- c_gtf$rownum[1]
+
+    return(c(inclusion_rownum, exclusion_rownum))
+  } else {
+    return(c(0, 0))
+  }
+}
+
+
+RImatcher <- function(i, below_thresh = .2, redExon = redExon, minOverlap = minOverlap,
+                      gtf_transcripts = gtf_transcripts,
+                      gtf_exons = gtf_exons,
+                      protein_coding_transcripts = protein_coding_transcripts,
+                      transcript_starts = transcript_starts) {
+
+  # Function to calculate Jaccard-like index more efficiently
+  calculate_jaccard_like <- function(start1, stop1, start2, stop2) {
+    intersection_length <- pmax(0, pmin(stop1, stop2) - pmax(start1, start2) + 1)
+    union_length <- (stop1 - start1 + 1) + (stop2 - start2 + 1) - intersection_length
+    jaccard_index <- intersection_length / (abs(start1-stop1)+1)
+    length_jacc <- intersection_length/(abs(start2-stop2)+1)
+    return(list(jaccard_index = jaccard_index,
+                length_jacc = length_jacc))
+  }
+
+  # Initiate geneR, start, stop
+  geneR <- redExon$geneR[i]
+  start <- redExon$start[i]
+  stop <- redExon$stop[i]
+
+  # Pre-process redExon$add_inf to avoid repeated calculations
+  split_add_inf <- strsplit(strsplit(example1, split = ";")[[1]][2:3], split = "-")
+  up_down <- as.numeric(unlist(strsplit(split_add_inf, split = "-")))
+
+  # Assign values directly without unnecessary lapply and unlist
+  up_down_start <- up_down[c(TRUE, FALSE)]
+  up_down_stop <- up_down[c(FALSE, TRUE)]
+
+  # intron retention location
+  ir_loc <- c(up_down_stop[which.min(up_down_stop)]+1, up_down_start[which.max(up_down_start)]-1)
+
+
+  # Filter for computational efficiency at the beginning to minimize dataset size
+  gtf_filtered <- subset(gtf_exons, geneID == geneR & chr == redExon$chr[i])
+
+  # Assign values directly without unnecessary lapply and unlist
+  ir_exclusion_location <- idSS(start, stop, up_down[1], up_down[2])
+
+  # Calculate Jaccard index for each gtf entry once instead of three times
+  jaccard_indices <- lapply(list(c(start, stop), c(up_down_start[1], up_down_stop[1]),
+                                 c(up_down_start[2], up_down_stop[2]), c(ir_exclusion_location[1], ir_exclusion_location[2])),
+                            function(range) calculate_jaccard(range[1], range[2], gtf_filtered$start, gtf_filtered$stop))
+
+
+  # Compute intersections more efficiently
+  possible_inclusion_transcripts <- unique(gtf_filtered$transcriptID[jaccard_indices[[1]]$jaccard_index > minOverlap])
+
+  # Function to determine if all Jaccard indices for a transcript are below a threshold
+  is_below_threshold_ri <- function(transcript_id, threshold = below_thresh) {
+    jacc_indices <- jaccard_indices[[4]]$jaccard_index[gtf_filtered$transcriptID == transcript_id]
+    all(jacc_indices < threshold)
+  }
+
+  # Compute intersections more efficiently
+  possible_exclusion_transcripts <- Reduce(intersect, c(lapply(jaccard_indices[2:3],
+                                                               function(jacc) unique(gtf_filtered$transcriptID[jacc$jaccard_index > minOverlap])),
+                                                        list(gtf_filtered$transcriptID[sapply(gtf_filtered$transcriptID,
+                                                                                              function(x) is_below_threshold_ri(x, threshold = below_thresh))])))
+
+
+  # Further refine to only include those that are also in the protein coding transcripts, if necessary
+  pc_exclusion <- possible_exclusion_transcripts[possible_exclusion_transcripts %in% protein_coding_transcripts]
+
+  # Apply protein coding filter again
+  pc_inclusion <- possible_inclusion_transcripts[possible_inclusion_transcripts %in% protein_coding_transcripts]
+
+  inclusion <- ifelse(length(pc_inclusion) == 0, list(possible_inclusion_transcripts), list(pc_inclusion))[[1]]
+  exclusion <- ifelse(length(pc_exclusion) == 0, list(possible_exclusion_transcripts), list(pc_exclusion))[[1]]
+  exclusion_lengths <- unlist(lapply(exclusion, function(tid) {
+    abs(gtf_transcripts$start[gtf_transcripts$transcriptID == tid]-
+          gtf_transcripts$stop[gtf_transcripts$transcriptID == tid])
+  }))
+  exclusion_rownum <- gtf_transcripts$rownum[gtf_transcripts$transcriptID == exclusion[which.max(exclusion_lengths)] & gtf_transcripts$chr == redExon$chr[i]]
+  # Skip if no exclusion
+  if (length(exclusion) == 0) {return(c(0, 0))}
+
+  # Apply jaccard index and classification filter directly
+  gtf_filtered$jaccard <- jaccard_indices[[1]]$jaccard_index
+  gtf_filtered$length_jacc <- jaccard_indices[[1]]$length_jacc
+
+  gtf_filtered <- subset(gtf_filtered, jaccard > minOverlap & classification %in% c("first", "internal", "last") & transcriptID %in% inclusion)
 
   if (nrow(gtf_filtered) == 0) return(c(0, 0)) # Skip if no entries found
 
