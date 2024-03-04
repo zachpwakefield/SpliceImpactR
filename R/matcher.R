@@ -422,7 +422,6 @@ RImatcher <- function(i, below_thresh = .2, redExon = redExon, minOverlap = minO
                       gtf_exons = gtf_exons,
                       protein_coding_transcripts = protein_coding_transcripts,
                       transcript_starts = transcript_starts) {
-  print(i)
 
 
   # Function to calculate Jaccard-like index more efficiently
