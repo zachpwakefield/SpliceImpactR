@@ -20,11 +20,13 @@ matchAlignType <- function(proBed, protCode) {
       alignType <- c("onePC")
     } else {
       alignN <- sum(strsplit(msa::msaConsensusSequence(msa::msa(Biostrings::AAStringSet(c(df$prot[i], df$prot[i+1])))), "")[[1]] != "?")
+      longestCons <- nchar(strsplit(strsplit(msa::msaConsensusSequence(msa::msa(Biostrings::AAStringSet(c(df$prot[i], df$prot[i+1])))), "")[[1]], split = "[?]+")[[1]])
+      max(longestCons)
       pMatch <- alignN/maxPc
       if (alignN == 1.0) {
         pMatch <- 1.04
         alignType <- c("Match")
-      } else if (alignN > .3*maxPc)  {
+      } else if (longestCons > .2*maxPc)  {
         alignType <- c("PartialMatch")
         try(msaPrettyPrint(msa(Biostrings::AAStringSet(c(protCode[i], protCode[i+1])), verbose = FALSE), askForOverwrite=FALSE,
                            alFile = paste(output_location, "pairedAlignments/", proBed$transcript[i], "_", proBed$transcript[i+1], "_pm_Alignment.fasta", sep = ""),
