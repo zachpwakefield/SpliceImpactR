@@ -10,72 +10,43 @@ matchAlignType <- function(proBed, protCode) {
   system(paste0("mkdir ", output_location, "pairedAlignments"))
   setwd(paste0(output_location, "pairedAlignments/"))
   # Iterate through protein codes in pairs
-  for (i in seq(from=1,to=(length(protCode)-1), by=2)) {
-
-    # Handle cases where one or both protein codes are "none"
-    if (protCode[i] == "none" | protCode[i+1] == "none") {
-
-      # Case where the first protein code is "none" and the second is not
-      if (protCode[i] == "none" & protCode[i+1] != "none") {
-        protC <- c(protC, "nonPC", "PC")
-        protAlign[[i]] <- "none"
-        protAlign[[i]] <- "onePC"
-        alignType <- c(alignType, "onePC")
-
-        # Case where the first protein code is not "none" and the second is
-      } else if (protCode[i] != "none" & protCode[i+1] == "none") {
-        protC <- c(protC, "PC", "nonPC")
-        protAlign[[i]] <- "onePC"
-        alignType <- c(alignType, "onePC")
-
-        # Case where both protein codes are "none"
-      } else {
-        protC <- c(protC, "nonPC", "nonPC")
-        protAlign[[i]] <- "none"
-        alignType <- c(alignType, "noPC")
-      }
-      pMatch <- c(pMatch, 0) # Set match percentage to 0 for "none" cases
-
-      # Handle cases where protein codes are identical
-    } else if (protCode[i] == protCode[i+1]) {
-      protC <- c(protC, "Same", "Same")
-
-      # Perform multiple sequence alignment for identical codes
-      protAlign[[i]] <- msa::msa(Biostrings::AAStringSet(c(protCode[i], protCode[i+1])))
-      pMatch <- c(pMatch, 1.04)
-      alignType <- c(alignType, "Match")
-
-      # Handle cases where protein codes are different
+  alignmentTypes <- lapply(seq(1, nrow(df), by = 2), function(i)  {
+    pMatch <- 0
+    alignN <- 0
+    maxPc <- max(nchar(df$prot[i]), nchar(df$prot[i+1]))
+    if (df$prot[i] == "none" & df$prot[i+1] == "none") {
+      alignType <- c("noPC")
+    } else if (df$prot[i] == "none" | df$prot[i+1] == "none") {
+      alignType <- c("onePC")
     } else {
-      protC <- c(protC, "Different", "Different")
-
-      # Perform multiple sequence alignment for different codes
-      protAlign[[i]] <- msa::msa(Biostrings::AAStringSet(c(protCode[i], protCode[i+1])), verbose = FALSE)
-
-      # Calculate match percentage based on consensus sequence
-      minPc <- min(nchar(protCode[i]), nchar(protCode[i+1]))
-      pMatch <- c(pMatch, table(unlist(lapply(strsplit(msa::msaConsensusSequence(protAlign[[i]]), split = ""), function(x) x == "?")))[1]/min(nchar(protCode[i]), nchar(protCode[i+1])))
-
-      # Determine alignment type based on length criteria
-      if (nchar(paste(strsplit(msa::msaConsensusSequence(protAlign[[i]]), split = "\\?|\\.|!")[[1]][nchar(strsplit(msa::msaConsensusSequence(protAlign[[i]]), split = "\\?|\\.|!")[[1]]) > (.1*minPc)], collapse = "")) > .2*minPc)  {
-        alignType <- c(alignType, "PartialMatch")
+      alignN <- sum(strsplit(msa::msaConsensusSequence(msa::msa(Biostrings::AAStringSet(c(df$prot[i], df$prot[i+1])))), "")[[1]] != "?")
+      pMatch <- alignN/maxPc
+      if (alignN == 1.0) {
+        pMatch <- 1.04
+        alignType <- c("Match")
+      } else if (alignN > .3*maxPc)  {
+        alignType <- c("PartialMatch")
         try(msaPrettyPrint(msa(Biostrings::AAStringSet(c(protCode[i], protCode[i+1])), verbose = FALSE), askForOverwrite=FALSE,
-        alFile = paste(output_location, "pairedAlignments/", proBed$transcript[i], "_", proBed$transcript[i+1], "_pm_Alignment.fasta", sep = ""),
-        file = paste(output_location, "pairedAlignments/", proBed$transcript[i], "_", proBed$transcript[i+1], "_pm_Alignment.pdf", sep = ""), output = "pdf"))
+                           alFile = paste(output_location, "pairedAlignments/", proBed$transcript[i], "_", proBed$transcript[i+1], "_pm_Alignment.fasta", sep = ""),
+                           file = paste(output_location, "pairedAlignments/", proBed$transcript[i], "_", proBed$transcript[i+1], "_pm_Alignment.pdf", sep = ""), output = "pdf"))
       } else {
-        alignType <- c(alignType, "FrameShift")
+        alignType <- c("FrameShift")
         try(msaPrettyPrint(msa(Biostrings::AAStringSet(c(protCode[i], protCode[i+1])), verbose = FALSE), askForOverwrite=FALSE,
-        alFile = paste(output_location, "pairedAlignments/", proBed$transcript[i], "_", proBed$transcript[i+1], "_pm_Alignment.fasta", sep = ""),
-        file = paste(output_location, "pairedAlignments/", proBed$transcript[i], "_", proBed$transcript[i+1], "_fs_Alignment.pdf", sep = ""), output = "pdf"))
+                           alFile = paste(output_location, "pairedAlignments/", proBed$transcript[i], "_", proBed$transcript[i+1], "_pm_Alignment.fasta", sep = ""),
+                           file = paste(output_location, "pairedAlignments/", proBed$transcript[i], "_", proBed$transcript[i+1], "_fs_Alignment.pdf", sep = ""), output = "pdf"))
       }
     }
-  }
+    c(alignN, maxPc, pMatch, alignType)
+
+  })
+  pMatch <- unlist(lapply(alignmentTypes, "[[", 3))
+  alignType <- unlist(lapply(alignmentTypes, "[[", 4))
+
 
   # Print a table of protein categories for diagnostic purposes
-  print(table(protC))
+  print(table(alignType))
 
   # Add matching information to the 'proBed' dataframe
-  proBed$match <- protC
   proBed$prop <- rep(pMatch, each = 2)
   proBed$matchType <- rep(alignType, each = 2)
 
