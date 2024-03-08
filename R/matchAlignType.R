@@ -14,19 +14,19 @@ matchAlignType <- function(proBed, protCode) {
     pMatch <- 0
     alignN <- 0
     maxPc <- max(nchar(df$prot[i]), nchar(df$prot[i+1]))
+    minPc <- min(nchar(df$prot[i]), nchar(df$prot[i+1]))
     if (df$prot[i] == "none" & df$prot[i+1] == "none") {
       alignType <- c("noPC")
     } else if (df$prot[i] == "none" | df$prot[i+1] == "none") {
       alignType <- c("onePC")
     } else {
       alignN <- sum(strsplit(msa::msaConsensusSequence(msa::msa(Biostrings::AAStringSet(c(df$prot[i], df$prot[i+1])))), "")[[1]] != "?")
-      longestCons <- nchar(strsplit(strsplit(msa::msaConsensusSequence(msa::msa(Biostrings::AAStringSet(c(df$prot[i], df$prot[i+1])))), "")[[1]], split = "[?]+")[[1]])
-      max(longestCons)
+      longestCons <- max(nchar(strsplit(strsplit(msa::msaConsensusSequence(msa::msa(Biostrings::AAStringSet(c(df$prot[i], df$prot[i+1])))), "")[[1]], split = "[?]+")[[1]]))
       pMatch <- alignN/maxPc
       if (alignN == 1.0) {
         pMatch <- 1.04
         alignType <- c("Match")
-      } else if (longestCons > .2*maxPc)  {
+      } else if (longestCons > .2*minPc)  {
         alignType <- c("PartialMatch")
         try(msaPrettyPrint(msa(Biostrings::AAStringSet(c(protCode[i], protCode[i+1])), verbose = FALSE), askForOverwrite=FALSE,
                            alFile = paste(output_location, "pairedAlignments/", proBed$transcript[i], "_", proBed$transcript[i+1], "_pm_Alignment.fasta", sep = ""),
