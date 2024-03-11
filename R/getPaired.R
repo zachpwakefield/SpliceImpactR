@@ -1,4 +1,4 @@
-getPaired <- function(foreground, et) {
+getPaired <- function(foreground, et, nucleotides) {
   # Create a unique identifier for each exon
   foreground <- foreground %>%
     dplyr::mutate(exon_id = paste0(chr, ":", start, "-", stop))
@@ -70,7 +70,7 @@ getPaired <- function(foreground, et) {
     }))
 
     # Use matchAlignType to identify protein alignment score and type
-    c(proBed, pMatch, alignType) := matchAlignType(proBed = combined_rows_df_expanded, protCode = combined_rows_df_expanded$prot)
+    c(proBed, pMatch, alignType) := matchAlignType(proBed = combined_rows_df_expanded, protCode = combined_rows_df_expanded$prot, nucleotides)
 
     # Make dataframe for plotting in ggplot2
     gdf_df <- data.frame(dens = as.numeric(pMatch), type = alignType)
