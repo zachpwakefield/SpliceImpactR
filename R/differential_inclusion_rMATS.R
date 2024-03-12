@@ -80,7 +80,7 @@ differential_inclusion_rMATS <- function(control_names, test_names, et, cores, o
 
     # Perform statistical testing comparing control and test PSI values
     if ((sum(cont.psi != 0) >= min_proportion_samples_per_phenotype*length(control_names)) |
-        (sum(test.psi != 0) >= min_proportion_samples_per_phenotype*length(control_names))) {
+        (sum(test.psi != 0) >= min_proportion_samples_per_phenotype*length(test_names))) {
 
       data <- data.frame(
         counts = c(cont.IJC.noOut, cont.SJC.noOut, test.IJC.noOut, test.SJC.noOut),
