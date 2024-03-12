@@ -21,29 +21,50 @@ setup_gtf <- function(gtf_location) {
 
   fl_exons <- parallel::mclapply(1:(length(transcript_indices)-1), mc.cores = 8, function(x) {
     min_gtf <- pcgtf[((transcript_indices[x]+1):(transcript_indices[x+1]-1)),]
-    s <- min_gtf$rowname[ifelse("start_codon" %in% min_gtf$type,
-                                which(overlap(min_gtf$start[min_gtf$type == "start_codon"], min_gtf$end[min_gtf$type == "start_codon"],
-                                              min_gtf$start, min_gtf$end) & min_gtf$type == "exon"),
-                                ifelse(strands[x] == "+", which(min_gtf$type == "exon")[1],
-                                       rev(which(min_gtf$type == "exon"))[1]))]
-    e <- min_gtf$rowname[ifelse("stop_codon" %in% min_gtf$type,
-                                which(overlap(min_gtf$start[min_gtf$type == "stop_codon"], min_gtf$end[min_gtf$type == "stop_codon"],
-                                              min_gtf$start, min_gtf$end) & min_gtf$type == "exon"),
-                                ifelse(strands[x] == "+", rev(which(min_gtf$type == "exon"))[1],
-                                       which(min_gtf$type == "exon")[1]))]
-    i <- min_gtf$rowname[!min_gtf$rowname %in% c(s, e) & min_gtf$type == "exon" & min_gtf$rowname %in% seq(s, e)]
-    list(s, e, i)
+    if (sum(min_gtf$type == "exon") == 1) {
+      list(min_gtf$rowname[which(min_gtf$type == "exon")])
+    } else {
+      s <- min_gtf$rowname[ifelse("start_codon" %in% min_gtf$type,
+                                  which(overlap(min_gtf$start[min_gtf$type == "start_codon"], min_gtf$end[min_gtf$type == "start_codon"],
+                                                min_gtf$start, min_gtf$end) & min_gtf$type == "exon"),
+                                  which(min_gtf$type == "exon")[1])]
+      # ifelse(strands[x] == "+", which(min_gtf$type == "exon")[1],
+      #        rev(which(min_gtf$type == "exon"))[1]))]
+
+
+      e <- min_gtf$rowname[ifelse("stop_codon" %in% min_gtf$type,
+                                  which(overlap(min_gtf$start[min_gtf$type == "stop_codon"], min_gtf$end[min_gtf$type == "stop_codon"],
+                                                min_gtf$start, min_gtf$end) & min_gtf$type == "exon"),
+                                  rev(which(min_gtf$type == "exon"))[1])]
+      # ifelse(strands[x] == "+", rev(which(min_gtf$type == "exon"))[1],
+      #        which(min_gtf$type == "exon")[1]))]
+      i <- min_gtf$rowname[!min_gtf$rowname %in% c(s, e) & min_gtf$type == "exon" & min_gtf$rowname %in% seq(s+1, e-1)]
+      utr <- min_gtf$rowname[!min_gtf$rowname %in% c(i, s, e) & min_gtf$type == "exon"]
+      list(s, e, i, utr)
+    }
   })
-  pcgtf$classification[pcgtf$rowname %in% unlist(lapply(fl_exons, "[[", 3))] <- "internal"
-  pcgtf$classification[pcgtf$rowname %in% unlist(lapply(fl_exons, "[[", 1))] <- "first"
-  pcgtf$classification[pcgtf$rowname %in% unlist(lapply(fl_exons, "[[", 2))] <- "last"
-  pcgtf$classification[pcgtf$rowname %in% intersect(unlist(lapply(fl_exons, "[[", 1)), unlist(lapply(fl_exons, "[[", 2)))] <- "first/last"
+  single_exon_transcripts <- unlist(lapply(fl_exons, function(y) {
+    if (length(y) == 1) {
+      y
+    }
+  }))
+  multi_exon_transcripts <- lapply(fl_exons, function(y) {
+    if (length(y) != 1) {
+      y
+    }
+  })
+  pcgtf$classification[pcgtf$rowname %in% single_exon_transcripts] <- "single_exon"
+  pcgtf$classification[pcgtf$rowname %in% unlist(lapply(multi_exon_transcripts, "[[", 3))] <- "internal"
+  pcgtf$classification[pcgtf$rowname %in% unlist(lapply(multi_exon_transcripts, "[[", 1))] <- "first"
+  pcgtf$classification[pcgtf$rowname %in% unlist(lapply(multi_exon_transcripts, "[[", 2))] <- "last"
+  pcgtf$classification[pcgtf$rowname %in% unlist(lapply(multi_exon_transcripts, "[[", 4))] <- "UTR"
+  pcgtf$classification[pcgtf$rowname %in% intersect(unlist(lapply(multi_exon_transcripts, "[[", 1)), unlist(lapply(multi_exon_transcripts, "[[", 2)))] <- "single_exon"
 
   hybrid_first_extract <- unlist(unlist(parallel::mclapply(1:(length(gene_indices)-1), mc.cores = 8, function(x) {
     tr_in_gene <- pcgtf[(gene_indices[x]+1):(gene_indices[x+1]-1),]
     if (sum(tr_in_gene$type == 'transcript') > 1) {
       lapply(unique(tr_in_gene$transcript_id), function(y) {
-        tr_start <- tr_in_gene[(tr_in_gene$transcript_id %in% y) & tr_in_gene$classification %in% c("first/last", "first"),]
+        tr_start <- tr_in_gene[(tr_in_gene$transcript_id %in% y) & tr_in_gene$classification == "first",]
         tr_internal <- tr_in_gene[!(tr_in_gene$transcript_id %in% y) & tr_in_gene$classification == "internal",]
         over <- overlap(tr_start$start, tr_start$end, tr_internal$start, tr_internal$end)
         if (sum(over) >= 1) {
@@ -57,7 +78,7 @@ setup_gtf <- function(gtf_location) {
     tr_in_gene <- pcgtf[(gene_indices[x]+1):(gene_indices[x+1]-1),]
     if (sum(tr_in_gene$type == 'transcript') > 1) {
       lapply(unique(tr_in_gene$transcript_id), function(y) {
-        tr_start <- tr_in_gene[(tr_in_gene$transcript_id %in% y) & tr_in_gene$classification %in% c("first/last", "last"),]
+        tr_start <- tr_in_gene[(tr_in_gene$transcript_id %in% y) & tr_in_gene$classification == "last",]
         tr_internal <- tr_in_gene[!(tr_in_gene$transcript_id %in% y) & tr_in_gene$classification == "internal",]
         over <- overlap(tr_start$start, tr_start$end, tr_internal$start, tr_internal$end)
         if (sum(over) >= 1) {
@@ -96,10 +117,11 @@ setup_gtf <- function(gtf_location) {
                      gpc = as.character(pcgtf$gene_type),
                      tpc = as.character(pcgtf$transcript_type))
 
-
   ngtf$transcriptID[is.na(ngtf$transcriptID)] <- "gene"
   ngtf$transcriptName[is.na(ngtf$transcriptName)] <- "gene"
   ngtf$classification[ngtf$classification == ""] <- ngtf$type[ngtf$classification == ""]
   gtf <- ngtf[ngtf$classification %in% c("gene", "transcript", "first", "internal", "last"),]
-  return(gtf)
+  return(list(gtf = gtf,
+              hybrid_first_extract = hybrid_first_extract,
+              hybrid_last_extract = hybrid_last_extract))
 }

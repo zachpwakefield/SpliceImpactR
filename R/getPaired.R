@@ -75,19 +75,25 @@ getPaired <- function(foreground, et, nucleotides) {
     # Make dataframe for plotting in ggplot2
     gdf_df <- data.frame(dens = as.numeric(pMatch), type = alignType)
     gdf_df2 <- gdf_df[gdf_df$type != "noPC",]
-
+    gdf_df3 <- gdf_df[gdf_df$type != "noPC" & gdf_df$type != "onePC",]
 
     # Alignment plot showing distribution of different type of exon swapping
     (gdf <- ggplot2::ggplot(gdf_df, ggplot2::aes(x = dens, fill = type)) +
         ggplot2::geom_histogram(ggplot2::aes(y=ggplot2::after_stat(count)/sum(ggplot2::after_stat(count))), colour = 1,
-                                bins = 20) + ggplot2::geom_density(ggplot2::aes(y=.0005*ggplot2::after_stat(count)), color = 'black', fill = "coral2", bw = .1, alpha = .3) +
+                                bins = 20) + ggplot2::geom_density(ggplot2::aes(y=.0001*ggplot2::after_stat(count)), color = 'black', fill = "coral2", bw = .1, alpha = .3) +
         ggplot2::scale_fill_manual(values=c('noPC' = "azure4", 'Match' = "#E69F00", 'onePC' = "#56B4E9", 'FrameShift' = "pink", 'PartialMatch' = "deeppink4")) +
         ggplot2::theme_classic() + ggplot2::xlab("Alignment Score") + ggplot2::ylab("Fraction"))
 
     # Alignment plot showing distribution of different type of exon swapping
     (gdf2 <- ggplot2::ggplot(gdf_df2, ggplot2::aes(x = dens, fill = type)) +
         ggplot2::geom_histogram(ggplot2::aes(y=ggplot2::after_stat(count)/sum(ggplot2::after_stat(count))), colour = 1,
-                                bins = 20) + ggplot2::geom_density(ggplot2::aes(y=.0005*ggplot2::after_stat(count)), color = 'black', fill = "coral2", bw = .1, alpha = .3) +
+                                bins = 20) + ggplot2::geom_density(ggplot2::aes(y=.0001*ggplot2::after_stat(count)), color = 'black', fill = "coral2", bw = .1, alpha = .3) +
+        ggplot2::scale_fill_manual(values=c('noPC' = "azure4", 'Match' = "#E69F00", 'onePC' = "#56B4E9", 'FrameShift' = "pink", 'PartialMatch' = "deeppink4")) +
+        ggplot2::theme_classic() + ggplot2::xlab("Alignment Score") + ggplot2::ylab("Fraction"))
+
+    (gdf3 <- ggplot2::ggplot(gdf_df2, ggplot2::aes(x = dens, fill = type)) +
+        ggplot2::geom_histogram(ggplot2::aes(y=ggplot2::after_stat(count)/sum(ggplot2::after_stat(count))), colour = 1,
+                                bins = 20) + ggplot2::geom_density(ggplot2::aes(y=.0001*ggplot2::after_stat(count)), color = 'black', fill = "coral2", bw = .1, alpha = .3) +
         ggplot2::scale_fill_manual(values=c('noPC' = "azure4", 'Match' = "#E69F00", 'onePC' = "#56B4E9", 'FrameShift' = "pink", 'PartialMatch' = "deeppink4")) +
         ggplot2::theme_classic() + ggplot2::xlab("Alignment Score") + ggplot2::ylab("Fraction"))
 
@@ -98,7 +104,7 @@ getPaired <- function(foreground, et, nucleotides) {
     # Return the combined dataframe of exon pairs with their corresponding rows from the input dataframe
     # exon_pairs is minimal information
     # combined_rows is maximal information
-    return(list(exon_pairs = exon_pairs_df, paired_proBed = combined_rows_df_expanded, gdf=gdf, gdf2=gdf2))
+    return(list(exon_pairs = exon_pairs_df, paired_proBed = combined_rows_df_expanded, gdf=gdf, gdf2=gdf2,gdf3=gdf3))
   }
 }
 
