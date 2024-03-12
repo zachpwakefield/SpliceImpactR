@@ -18,26 +18,52 @@ setup_gtf <- function(gtf_location) {
     return(pmax(start_min, start2) <= pmin(end_max, end2))
   }
 
+  partial_overlap <- function(start1, end1, start2, end2) {
+    start_min <- min(start1, end1)
+    end_max <- max(start1, end1)
+    temp_start2 <- pmin(start2, end2)
+    temp_end2 <- pmax(start2, end2)
+    return(start_min < temp_start2 | end_max < temp_end2)
+  }
+  firstExonID <- function(min_gtf) {
+    if ("start_codon" %in% min_gtf$type) {
+      rn <- which(overlap(min_gtf$start[min_gtf$type == "start_codon"], min_gtf$end[min_gtf$type == "start_codon"],
+                    min_gtf$start, min_gtf$end) & min_gtf$type == "exon")
+    } else if ("CDS" %in% min_gtf$type) {
+      rn <- which(min_gtf$type == "exon" & overlap(min_gtf$start[min_gtf$type == "CDS"], min_gtf$end[min_gtf$type == "CDS"],
+                                             min_gtf$start, min_gtf$end))[1]
+    } else if ("UTR" %in% min_gtf$type) {
+      rn <- which(min_gtf$type == "exon" & partial_overlap(min_gtf$start[min_gtf$type == "UTR"], min_gtf$end[min_gtf$type == "UTR"],
+                                             min_gtf$start, min_gtf$end))[1]
+    } else {
+      rn <- which(min_gtf$type == "exon")[1]
+    }
+    return(rn)
+  }
+
+  lastExonID <- function(min_gtf) {
+    if ("stop_codon" %in% min_gtf$type) {
+      rn <- which(overlap(min_gtf$start[min_gtf$type == "start_codon"], min_gtf$end[min_gtf$type == "start_codon"],
+                          min_gtf$start, min_gtf$end) & min_gtf$type == "exon")
+    } else if ("CDS" %in% min_gtf$type) {
+      rn <- rev(which(min_gtf$type == "exon" & overlap(min_gtf$start[min_gtf$type == "CDS"], min_gtf$end[min_gtf$type == "CDS"],
+                                                   min_gtf$start, min_gtf$end)))[1]
+    } else if ("UTR" %in% min_gtf$type) {
+      rn <- rev(which(min_gtf$type == "exon" & partial_overlap(min_gtf$start[min_gtf$type == "UTR"], min_gtf$end[min_gtf$type == "UTR"],
+                                                           min_gtf$start, min_gtf$end)))[1]
+    } else {
+      rn <- rev(which(min_gtf$type == "exon"))[1]
+    }
+    return(rn)
+  }
 
   fl_exons <- parallel::mclapply(1:(length(transcript_indices)-1), mc.cores = 8, function(x) {
     min_gtf <- pcgtf[((transcript_indices[x]+1):(transcript_indices[x+1]-1)),]
     if (sum(min_gtf$type == "exon") == 1) {
       list(min_gtf$rowname[which(min_gtf$type == "exon")])
     } else {
-      s <- min_gtf$rowname[ifelse("start_codon" %in% min_gtf$type,
-                                  which(overlap(min_gtf$start[min_gtf$type == "start_codon"], min_gtf$end[min_gtf$type == "start_codon"],
-                                                min_gtf$start, min_gtf$end) & min_gtf$type == "exon"),
-                                  which(min_gtf$type == "exon")[1])]
-      # ifelse(strands[x] == "+", which(min_gtf$type == "exon")[1],
-      #        rev(which(min_gtf$type == "exon"))[1]))]
-
-
-      e <- min_gtf$rowname[ifelse("stop_codon" %in% min_gtf$type,
-                                  which(overlap(min_gtf$start[min_gtf$type == "stop_codon"], min_gtf$end[min_gtf$type == "stop_codon"],
-                                                min_gtf$start, min_gtf$end) & min_gtf$type == "exon"),
-                                  rev(which(min_gtf$type == "exon"))[1])]
-      # ifelse(strands[x] == "+", rev(which(min_gtf$type == "exon"))[1],
-      #        which(min_gtf$type == "exon")[1]))]
+      s <- min_gtf$rowname[firstExonID(min_gtf)]
+      e <- min_gtf$rowname[lastExonID(min_gtf)]
       i <- min_gtf$rowname[!min_gtf$rowname %in% c(s, e) & min_gtf$type == "exon" & min_gtf$rowname %in% seq(s+1, e-1)]
       utr <- min_gtf$rowname[!min_gtf$rowname %in% c(i, s, e) & min_gtf$type == "exon"]
       list(s, e, i, utr)
