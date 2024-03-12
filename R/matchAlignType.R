@@ -27,7 +27,7 @@ matchAlignType <- function(proBed, protCode, nucleotides) {
       fs_check <- c("PartialMatch", "FrameShift", "FrameShift")[which.max(c(f1, f2, f3))]
 
       alignN <- sum(strsplit(msa::msaConsensusSequence(msa::msa(Biostrings::AAStringSet(c(df$prot[i], df$prot[i+1])))), "")[[1]] != "?")
-      longestCons <- max(nchar(strsplit(strsplit(msa::msaConsensusSequence(msa::msa(Biostrings::AAStringSet(c(df$prot[i], df$prot[i+1])))), "")[[1]], split = "[?]+")[[1]]))
+      # longestCons <- max(nchar(strsplit(strsplit(msa::msaConsensusSequence(msa::msa(Biostrings::AAStringSet(c(df$prot[i], df$prot[i+1])))), "")[[1]], split = "[?]+")[[1]]))
       pMatch <- alignN/maxPc
       if (alignN == 1.0) {
         pMatch <- 1.04

@@ -91,7 +91,7 @@ getPaired <- function(foreground, et, nucleotides) {
         ggplot2::scale_fill_manual(values=c('noPC' = "azure4", 'Match' = "#E69F00", 'onePC' = "#56B4E9", 'FrameShift' = "pink", 'PartialMatch' = "deeppink4")) +
         ggplot2::theme_classic() + ggplot2::xlab("Alignment Score") + ggplot2::ylab("Fraction"))
 
-    (gdf3 <- ggplot2::ggplot(gdf_df2, ggplot2::aes(x = dens, fill = type)) +
+    (gdf3 <- ggplot2::ggplot(gdf_df3, ggplot2::aes(x = dens, fill = type)) +
         ggplot2::geom_histogram(ggplot2::aes(y=ggplot2::after_stat(count)/sum(ggplot2::after_stat(count))), colour = 1,
                                 bins = 20) + ggplot2::geom_density(ggplot2::aes(y=.0001*ggplot2::after_stat(count)), color = 'black', fill = "coral2", bw = .1, alpha = .3) +
         ggplot2::scale_fill_manual(values=c('noPC' = "azure4", 'Match' = "#E69F00", 'onePC' = "#56B4E9", 'FrameShift' = "pink", 'PartialMatch' = "deeppink4")) +
