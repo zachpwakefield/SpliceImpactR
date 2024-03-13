@@ -35,20 +35,19 @@ fsDirect <- function(seq1, seq2) {
     } else {return("PartialMatch")}
   } else {return("FrameShift")}
 }
-# fsDirect <- function(seq1, seq2) {
-#   alignment <- pairwiseAlignment(pattern = DNAString(seq1), subject = DNAString(seq2))
-#   leading <- attr(regexpr("^-+", as.character(alignment)), "match.length")
-#   if (leading %% 3 == 0 | leading == -1) {
-#     patternAln <- as.character(alignment@pattern)
-#     subjectAln <- as.character(alignment@subject)
-#     indelsPattern <- gregexpr("-", patternAln)[[1]]
-#     indelsSubject <- gregexpr("-", subjectAln)[[1]]
-#     allIndels <- sort(c(indelsPattern, indelsSubject))
-#     allIndels <- allIndels[allIndels != -1]
-#     continuousIndels <- findContinuousIndels(allIndels)
-#     frameShifts <- any(sapply(continuousIndels, function(region) length(region) %% 3 != 0))
-#     if (frameShifts) {
-#       return("FrameShift")
-#     } else {return("PartialMatch")}
-#   } else {return("FrameShift")}
-# }
+
+fsDirectSpecific <- function(seq1, seq2, alignment, checker) {
+  alignment <- pairwiseAlignment(pattern = DNAString(seq1), subject = DNAString(seq2))
+  leading <- attr(regexpr("^-+", as.character(alignment)), "match.length")
+  if (leading %% 3 == 0 | leading == -1) {
+    checker <- consensusString(alignment)
+    indels <- gregexpr("-", checker)[[1]]
+    allIndels <- sort(indels)
+    allIndels <- allIndels[allIndels != -1]
+    continuousIndels <- findContinuousIndels(allIndels)
+    frameShifts <- any(sapply(continuousIndels, function(region) length(region) %% 3 != 0))
+    if (frameShifts) {
+      return("FrameShift")
+    } else {return("PartialMatch")}
+  } else {return("FrameShift")}
+}
