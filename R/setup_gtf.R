@@ -28,13 +28,13 @@ setup_gtf <- function(gtf_location) {
   firstExonID <- function(min_gtf) {
     if ("start_codon" %in% min_gtf$type) {
       rn <- which(overlap(min_gtf$start[min_gtf$type == "start_codon"], min_gtf$end[min_gtf$type == "start_codon"],
-                    min_gtf$start, min_gtf$end) & min_gtf$type == "exon")
+                          min_gtf$start, min_gtf$end) & min_gtf$type == "exon")
     } else if ("CDS" %in% min_gtf$type) {
       rn <- which(min_gtf$type == "exon" & overlap(min_gtf$start[min_gtf$type == "CDS"], min_gtf$end[min_gtf$type == "CDS"],
-                                             min_gtf$start, min_gtf$end))[1]
+                                                   min_gtf$start, min_gtf$end))[1]
     } else if ("UTR" %in% min_gtf$type) {
       rn <- which(min_gtf$type == "exon" & partial_overlap(min_gtf$start[min_gtf$type == "UTR"], min_gtf$end[min_gtf$type == "UTR"],
-                                             min_gtf$start, min_gtf$end))[1]
+                                                           min_gtf$start, min_gtf$end))[1]
     } else {
       rn <- which(min_gtf$type == "exon")[1]
     }
@@ -43,14 +43,14 @@ setup_gtf <- function(gtf_location) {
 
   lastExonID <- function(min_gtf) {
     if ("stop_codon" %in% min_gtf$type) {
-      rn <- which(overlap(min_gtf$start[min_gtf$type == "start_codon"], min_gtf$end[min_gtf$type == "start_codon"],
+      rn <- which(overlap(min_gtf$start[min_gtf$type == "stop_codon"], min_gtf$end[min_gtf$type == "stop_codon"],
                           min_gtf$start, min_gtf$end) & min_gtf$type == "exon")
     } else if ("CDS" %in% min_gtf$type) {
       rn <- rev(which(min_gtf$type == "exon" & overlap(min_gtf$start[min_gtf$type == "CDS"], min_gtf$end[min_gtf$type == "CDS"],
-                                                   min_gtf$start, min_gtf$end)))[1]
+                                                       min_gtf$start, min_gtf$end)))[1]
     } else if ("UTR" %in% min_gtf$type) {
       rn <- rev(which(min_gtf$type == "exon" & partial_overlap(min_gtf$start[min_gtf$type == "UTR"], min_gtf$end[min_gtf$type == "UTR"],
-                                                           min_gtf$start, min_gtf$end)))[1]
+                                                               min_gtf$start, min_gtf$end)))[1]
     } else {
       rn <- rev(which(min_gtf$type == "exon"))[1]
     }
@@ -58,14 +58,14 @@ setup_gtf <- function(gtf_location) {
   }
 
   fl_exons <- parallel::mclapply(1:(length(transcript_indices)-1), mc.cores = 8, function(x) {
-    min_gtf <- pcgtf[((transcript_indices[x]+1):(transcript_indices[x+1]-1)),]
+    min_gtf <- pcgtf[((transcript_indices[x]+1):(transcript_indices[x+1]-2)),]
     if (sum(min_gtf$type == "exon") == 1) {
       list(min_gtf$rowname[which(min_gtf$type == "exon")])
     } else {
-      s <- min_gtf$rowname[firstExonID(min_gtf)]
-      e <- min_gtf$rowname[lastExonID(min_gtf)]
+      s <- sort(min_gtf$rowname[firstExonID(min_gtf)], decreasing = ifelse(unique(min_gtf$strand)[1] == "+", T, F))[1]
+      e <- sort(min_gtf$rowname[lastExonID(min_gtf)], decreasing = ifelse(unique(min_gtf$strand)[1] == "+", F, T))[1]
       i <- min_gtf$rowname[!min_gtf$rowname %in% c(s, e) & min_gtf$type == "exon" & min_gtf$rowname %in% seq(s+1, e-1)]
-      utr <- min_gtf$rowname[!min_gtf$rowname %in% c(i, s, e) & min_gtf$type == "exon"]
+      utr <- min_gtf$rowname[!(min_gtf$rowname %in% c(i, s, e)) & min_gtf$type == "exon"]
       list(s, e, i, utr)
     }
   })
@@ -90,9 +90,11 @@ setup_gtf <- function(gtf_location) {
     tr_in_gene <- pcgtf[(gene_indices[x]+1):(gene_indices[x+1]-1),]
     if (sum(tr_in_gene$type == 'transcript') > 1) {
       lapply(unique(tr_in_gene$transcript_id), function(y) {
-        tr_start <- tr_in_gene[(tr_in_gene$transcript_id %in% y) & tr_in_gene$classification == "first",]
-        tr_internal <- tr_in_gene[!(tr_in_gene$transcript_id %in% y) & tr_in_gene$classification == "internal",]
-        over <- overlap(tr_start$start, tr_start$end, tr_internal$start, tr_internal$end)
+        tr_start <- filter(tr_in_gene, transcript_id == y, classification == "first")
+        tr_internal <- filter(tr_in_gene, transcript_id != y, classification == "internal")
+        if (nrow(tr_start) > 0 & nrow(tr_internal) > 0) {
+          over <- overlap(tr_start$start, tr_start$end, tr_internal$start, tr_internal$end)
+        } else {return(NA)}
         if (sum(over) >= 1) {
           return(lapply(tr_internal$rowname[over], function(z) c(unique(tr_start$rowname), z)))
         } else {return(NA)}
@@ -104,11 +106,13 @@ setup_gtf <- function(gtf_location) {
     tr_in_gene <- pcgtf[(gene_indices[x]+1):(gene_indices[x+1]-1),]
     if (sum(tr_in_gene$type == 'transcript') > 1) {
       lapply(unique(tr_in_gene$transcript_id), function(y) {
-        tr_start <- tr_in_gene[(tr_in_gene$transcript_id %in% y) & tr_in_gene$classification == "last",]
-        tr_internal <- tr_in_gene[!(tr_in_gene$transcript_id %in% y) & tr_in_gene$classification == "internal",]
-        over <- overlap(tr_start$start, tr_start$end, tr_internal$start, tr_internal$end)
+        tr_stop <- filter(tr_in_gene, transcript_id == y, classification == "last")
+        tr_internal <- filter(tr_in_gene, transcript_id != y, classification == "internal")
+        if (nrow(tr_stop) > 0 & nrow(tr_internal) > 0) {
+          over <- overlap(tr_stop$start, tr_stop$end, tr_internal$start, tr_internal$end)
+        } else {return(NA)}
         if (sum(over) >= 1) {
-          return(lapply(tr_internal$rowname[over], function(z) c(unique(tr_start$rowname), z)))
+          return(lapply(tr_internal$rowname[over], function(z) c(unique(tr_stop$rowname), z)))
         } else {return(NA)}
       })
     } else {return(NA)}
