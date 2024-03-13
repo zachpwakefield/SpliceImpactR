@@ -6,7 +6,12 @@ frameShiftDetector <- function(transDF, proBed) {
     fsDirect(pB_nuc$code.x[rowCount], pB_nuc$code.y[rowCount])
   })
 }
-
+findContinuousIndels <- function(indels) {
+  diffs <- diff(indels)
+  breaks <- which(diffs > 1)
+  continuousRegions <- split(indels, cumsum(c(1, diff(indels) > 1)))
+  continuousRegions
+}
 fsInfer <- function(seq1, seq2) {
   f1 <- as.numeric(Biostrings::pairwiseAlignment(seq1, seq2)@score)
   f2 <- as.numeric(Biostrings::pairwiseAlignment(substr(seq1, 2, nchar(seq1)), seq2)@score)
@@ -14,18 +19,35 @@ fsInfer <- function(seq1, seq2) {
   return(c("partialMatch", "frameShift", "frameShift")[which.max(c(f1, f2, f3))])
 }
 
-fsDirect <- function() {
-
-}
 fsDirect <- function(seq1, seq2) {
-  # Perform pairwise alignment
-  alignment <- Biostrings::pairwiseAlignment(pattern = Biostrings::DNAString(seq1),
-                                             subject = Biostrings::DNAString(seq2))
-
-  patternAlignment <- as.character(alignment@pattern)
-  subjectAlignment <- as.character(alignment@subject)
-
-  # Count the number of '-' characters which represent gaps (indels)
-  totalIndels <- sum(strsplit(patternAlignment, "")[[1]] == "-")+sum(strsplit(subjectAlignment, "")[[1]] == "-")
-  return(c("FrameShift", "Match", "PartialMatch")[c(totalIndels %% 3 == 0, totalIndels > 0, totalIndels == 0)])
+  alignment <- pairwiseAlignment(pattern = DNAString(seq1), subject = DNAString(seq2))
+  leading <- attr(regexpr("^-+", as.character(alignment)), "match.length")
+  if (leading %% 3 == 0 | leading == -1) {
+    checker <- consensusString(alignment)
+    indels <- gregexpr("-", checker)[[1]]
+    allIndels <- sort(indels)
+    allIndels <- allIndels[allIndels != -1]
+    continuousIndels <- findContinuousIndels(allIndels)
+    frameShifts <- any(sapply(continuousIndels, function(region) length(region) %% 3 != 0))
+    if (frameShifts) {
+      return("FrameShift")
+    } else {return("PartialMatch")}
+  } else {return("FrameShift")}
 }
+# fsDirect <- function(seq1, seq2) {
+#   alignment <- pairwiseAlignment(pattern = DNAString(seq1), subject = DNAString(seq2))
+#   leading <- attr(regexpr("^-+", as.character(alignment)), "match.length")
+#   if (leading %% 3 == 0 | leading == -1) {
+#     patternAln <- as.character(alignment@pattern)
+#     subjectAln <- as.character(alignment@subject)
+#     indelsPattern <- gregexpr("-", patternAln)[[1]]
+#     indelsSubject <- gregexpr("-", subjectAln)[[1]]
+#     allIndels <- sort(c(indelsPattern, indelsSubject))
+#     allIndels <- allIndels[allIndels != -1]
+#     continuousIndels <- findContinuousIndels(allIndels)
+#     frameShifts <- any(sapply(continuousIndels, function(region) length(region) %% 3 != 0))
+#     if (frameShifts) {
+#       return("FrameShift")
+#     } else {return("PartialMatch")}
+#   } else {return("FrameShift")}
+# }
