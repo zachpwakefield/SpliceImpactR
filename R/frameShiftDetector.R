@@ -5,6 +5,7 @@ frameShiftDetector <- function(transDF, proBed) {
   alignType <- parallel::mclapply(1:nrow(pB_nuc), mc.cores = 10, function(rowCount) {
     fsDirect(pB_nuc$code.x[rowCount], pB_nuc$code.y[rowCount])
   })
+  return(alignType)
 }
 findContinuousIndels <- function(indels) {
   diffs <- diff(indels)

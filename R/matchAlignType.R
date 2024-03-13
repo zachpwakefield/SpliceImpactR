@@ -21,10 +21,7 @@ matchAlignType <- function(proBed, protCode, nucleotides) {
       alignType <- c("onePC")
     } else {
       # Frame shift checker
-      f1 <- as.numeric(Biostrings::pairwiseAlignment(df$code[i], df$code[i+1])@score)
-      f2 <- as.numeric(Biostrings::pairwiseAlignment(substr(df$code[i], 2, nchar(df$code[i])), df$code[i+1])@score)
-      f3 <- as.numeric(Biostrings::pairwiseAlignment(substr(df$code[i], 3, nchar(df$code[i])), df$code[i+1])@score)
-      fs_check <- c("PartialMatch", "FrameShift", "FrameShift")[which.max(c(f1, f2, f3))]
+      fs_check <- fsDirect(df$code[i], df$code[i+1])
 
       alignN <- sum(strsplit(msa::msaConsensusSequence(msa::msa(Biostrings::AAStringSet(c(df$prot[i], df$prot[i+1])))), "")[[1]] != "?")
       # longestCons <- max(nchar(strsplit(strsplit(msa::msaConsensusSequence(msa::msa(Biostrings::AAStringSet(c(df$prot[i], df$prot[i+1])))), "")[[1]], split = "[?]+")[[1]]))
