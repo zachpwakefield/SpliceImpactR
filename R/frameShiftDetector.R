@@ -36,12 +36,10 @@ fsDirect <- function(seq1, seq2) {
   } else {return("FrameShift")}
 }
 
-fsDirectSpecific <- function(seq1, seq2, alignment, checker) {
-  alignment <- pairwiseAlignment(pattern = DNAString(seq1), subject = DNAString(seq2))
-  leading <- attr(regexpr("^-+", as.character(alignment)), "match.length")
+fsDirectSpecific <- function(seq1, seq2, alignment) {
+  leading <- attr(regexpr("^[?]+", alignment), "match.length")
   if (leading %% 3 == 0 | leading == -1) {
-    checker <- consensusString(alignment)
-    indels <- gregexpr("-", checker)[[1]]
+    indels <- gregexpr("[?]", alignment)[[1]]
     allIndels <- sort(indels)
     allIndels <- allIndels[allIndels != -1]
     continuousIndels <- findContinuousIndels(allIndels)

@@ -21,9 +21,9 @@ matchAlignType <- function(proBed, protCode, nucleotides) {
       alignType <- c("onePC")
     } else {
       # Frame shift checker
-      fs_check <- fsDirect(df$code[i], df$code[i+1])
-
-      alignN <- sum(strsplit(msa::msaConsensusSequence(msa::msa(Biostrings::AAStringSet(c(df$prot[i], df$prot[i+1])))), "")[[1]] != "?")
+      consensus <- msa::msaConsensusSequence(msa::msa(Biostrings::AAStringSet(c(df$prot[i], df$prot[i+1]))))
+      fs_check <- fsDirectSpecific(df$code[i], df$code[i+1], consensus)
+      alignN <- sum(strsplit(consensus, "")[[1]] != "?")
       # longestCons <- max(nchar(strsplit(strsplit(msa::msaConsensusSequence(msa::msa(Biostrings::AAStringSet(c(df$prot[i], df$prot[i+1])))), "")[[1]], split = "[?]+")[[1]]))
       pMatch <- alignN/maxPc
       if (alignN == 1.0) {
