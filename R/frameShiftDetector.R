@@ -2,8 +2,8 @@ frameShiftDetector <- function(transDF, proBed) {
   pB_nuc <- left_join(proBed, transDF, by = c("transcriptID...2" = "transcriptID"), ) # transcript 1
   pB_nuc <- left_join(pB_nuc, transDF, by = c("transcriptID...6" = "transcriptID")) # transcript 2
   pB_nuc <- pB_nuc[pB_nuc$alignType != "onePC",]
-  alignType <- parallel::mclapply(1:nrow(pB_nuc), mc.cores = 10, function(rowCount) {
-    fsDirect(pB_nuc$code.x[rowCount], pB_nuc$code.y[rowCount])
+  alignType <- lapply(1:nrow(pB_nuc), function(rowCount) {
+    fsDirectSpecific(pB_nuc$code.x[rowCount], pB_nuc$code.y[rowCount])
   })
   return(alignType)
 }
@@ -36,7 +36,8 @@ fsDirect <- function(seq1, seq2) {
   } else {return("FrameShift")}
 }
 
-fsDirectSpecific <- function(seq1, seq2, alignment) {
+fsDirectSpecific <- function(seq1, seq2) {
+  alignment <- msa::msaConsensusSequence(msa::msa(Biostrings::DNAStringSet(c(seq1, seq2))))
   leading <- attr(regexpr("^[?]+", alignment), "match.length")
   if (leading %% 3 == 0 | leading == -1) {
     indels <- gregexpr("[?]", alignment)[[1]]

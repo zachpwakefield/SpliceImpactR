@@ -86,12 +86,13 @@ setup_gtf <- function(gtf_location) {
   pcgtf$classification[pcgtf$rowname %in% unlist(lapply(multi_exon_transcripts, "[[", 4))] <- "UTR"
   pcgtf$classification[pcgtf$rowname %in% intersect(unlist(lapply(multi_exon_transcripts, "[[", 1)), unlist(lapply(multi_exon_transcripts, "[[", 2)))] <- "single_exon"
 
-  hybrid_first_extract <- unlist(unlist(parallel::mclapply(1:(length(gene_indices)-1), mc.cores = 8, function(x) {
+  # hybrid_first_extract <- unlist(unlist(parallel::mclapply(1:(length(gene_indices)-1), mc.cores = 8, function(x) {
+  hybrid_first_extract <- unlist(unlist(lapply(1:(length(gene_indices)-1), function(x) {
     tr_in_gene <- pcgtf[(gene_indices[x]+1):(gene_indices[x+1]-1),]
     if (sum(tr_in_gene$type == 'transcript') > 1) {
       lapply(unique(tr_in_gene$transcript_id), function(y) {
-        tr_start <- filter(tr_in_gene, transcript_id == y, classification == "first")
-        tr_internal <- filter(tr_in_gene, transcript_id != y, classification == "internal")
+        tr_start <- tr_in_gene[tr_in_gene$transcript_id == y & tr_in_gene$classification == "first",]
+        tr_internal <- tr_in_gene[tr_in_gene$transcript_id != y & tr_in_gene$classification == "internal",]
         if (nrow(tr_start) > 0 & nrow(tr_internal) > 0) {
           over <- overlap(tr_start$start, tr_start$end, tr_internal$start, tr_internal$end)
         } else {return(NA)}
@@ -106,8 +107,8 @@ setup_gtf <- function(gtf_location) {
     tr_in_gene <- pcgtf[(gene_indices[x]+1):(gene_indices[x+1]-1),]
     if (sum(tr_in_gene$type == 'transcript') > 1) {
       lapply(unique(tr_in_gene$transcript_id), function(y) {
-        tr_stop <- filter(tr_in_gene, transcript_id == y, classification == "last")
-        tr_internal <- filter(tr_in_gene, transcript_id != y, classification == "internal")
+        tr_stop <- tr_in_gene[tr_in_gene$transcript_id == y & tr_in_gene$classification == "last",]
+        tr_internal <- tr_in_gene[tr_in_gene$transcript_id != y & tr_in_gene$classification == "internal",]
         if (nrow(tr_stop) > 0 & nrow(tr_internal) > 0) {
           over <- overlap(tr_stop$start, tr_stop$end, tr_internal$start, tr_internal$end)
         } else {return(NA)}
