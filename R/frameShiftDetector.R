@@ -7,6 +7,28 @@ frameShiftDetector <- function(transDF, proBed) {
   })
   return(alignType)
 }
+fsDirectSpecific <- function(seq1, seq2) {
+  alignment <- msa::msaConsensusSequence(msa::msa(Biostrings::DNAStringSet(c(seq1, seq2)),
+                                                  substitutionMatrix = matrix(c(2, -1, -1, -1,
+                                                                                -1, 2, -1, -1,
+                                                                                -1, -1, 2, -1,
+                                                                                -1, -1, -1, 2),
+                                                                              byrow = TRUE, nrow = 4,
+                                                                              dimnames = list(c("A", "C", "G", "T"),
+                                                                                              c("A", "C", "G", "T"))),
+                                                  gapOpening = 10, gapExtension = 1))
+  leading <- attr(regexpr("^[?]+", alignment), "match.length")
+  if (leading %% 3 == 0 | leading == -1) {
+    indels <- gregexpr("[?]", alignment)[[1]]
+    allIndels <- sort(indels)
+    allIndels <- allIndels[allIndels != -1]
+    continuousIndels <- findContinuousIndels(allIndels)
+    frameShifts <- any(sapply(continuousIndels, function(region) length(region) %% 3 != 0))
+    if (frameShifts) {
+      return("FrameShift")
+    } else {return("PartialMatch")}
+  } else {return("FrameShift")}
+}
 findContinuousIndels <- function(indels) {
   diffs <- diff(indels)
   breaks <- which(diffs > 1)
@@ -36,7 +58,7 @@ fsDirect <- function(seq1, seq2) {
   } else {return("FrameShift")}
 }
 
-fsDirectSpecific <- function(seq1, seq2) {
+fsDirectSpecificOld <- function(seq1, seq2) {
   alignment <- msa::msaConsensusSequence(msa::msa(Biostrings::DNAStringSet(c(seq1, seq2))))
   leading <- attr(regexpr("^[?]+", alignment), "match.length")
   if (leading %% 3 == 0 | leading == -1) {
