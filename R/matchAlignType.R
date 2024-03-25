@@ -11,37 +11,34 @@ matchAlignType <- function(proBed, protCode, nucleotides) {
   setwd(paste0(output_location, "pairedAlignments/"))
   # Iterate through protein codes in pairs
   alignmentTypes <- lapply(seq(1, nrow(df), by = 2), function(i)  {
-    pMatch <- 0
-    alignN <- 0
-    maxPc <- max(nchar(df$prot[i]), nchar(df$prot[i+1]))
-    minPc <- min(nchar(df$prot[i]), nchar(df$prot[i+1]))
     if (df$prot[i] == "none" & df$prot[i+1] == "none") {
       alignType <- c("noPC")
     } else if (df$prot[i] == "none" | df$prot[i+1] == "none") {
       alignType <- c("onePC")
+    } else if (df$prot[i] == df$prot[i+1]) {
+      pMatch <- 1.04
+      alignType <- c("Match")
     } else {
-      # Frame shift checker
-      consensus <- msa::msaConsensusSequence(msa::msa(Biostrings::AAStringSet(c(df$prot[i], df$prot[i+1]))))
-      fs_check <- fsDirectSpecific(df$code[i], df$code[i+1])
-
-      alignN <- sum(strsplit(consensus, "")[[1]] != "?")
-      # longestCons <- max(nchar(strsplit(strsplit(msa::msaConsensusSequence(msa::msa(Biostrings::AAStringSet(c(df$prot[i], df$prot[i+1])))), "")[[1]], split = "[?]+")[[1]]))
-      pMatch <- alignN/maxPc
-      if (alignN == 1.0) {
-        pMatch <- 1.04
-        alignType <- c("Match")
+      fs_check <- frameShiftDetectorSum(df, i)
+      pMatch <- fs_check[[2]]
+      if (alignType[[1]] == alignType[[3]]) {
+        alignType <- fs_check[[1]]
       } else {
-        alignType <- fs_check
-        try(msaPrettyPrint(msa(Biostrings::AAStringSet(c(protCode[i], protCode[i+1])), verbose = FALSE), askForOverwrite=FALSE,
-                           alFile = paste(output_location, "pairedAlignments/", fs_check, "_", proBed$transcript[i], "_", proBed$transcript[i+1], "_pm_Alignment.fasta", sep = ""),
-                           file = paste(output_location, "pairedAlignments/", proBed$transcript[i], "_", proBed$transcript[i+1], "_pm_Alignment.pdf", sep = ""), output = "pdf"))
+        alignType <- c("PartialMatch")
       }
+
+      try(msaPrettyPrint(msa(Biostrings::AAStringSet(c(protCode[i], protCode[i+1])), verbose = FALSE), askForOverwrite=FALSE,
+                         alFile = paste(output_location, "pairedAlignments/", fs_check, "_", proBed$transcript[i], "_", proBed$transcript[i+1], "_pm_Alignment.fasta", sep = ""),
+                         file = paste(output_location, "pairedAlignments/", proBed$transcript[i], "_", proBed$transcript[i+1], "_pm_Alignment.pdf", sep = ""), output = "pdf"))
     }
-    c(alignN, maxPc, pMatch, alignType)
+
+
+
+    c(pMatch, alignType)
 
   })
-  pMatch <- unlist(lapply(alignmentTypes, "[[", 3))
-  alignType <- unlist(lapply(alignmentTypes, "[[", 4))
+  pMatch <- unlist(lapply(alignmentTypes, "[[", 1))
+  alignType <- unlist(lapply(alignmentTypes, "[[", 2))
 
 
   # Print a table of protein categories for diagnostic purposes
