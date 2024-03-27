@@ -5,7 +5,7 @@ matchAlignType <- function(proBed, protCode, nucleotides) {
   protC <- c()         # Stores protein category (PC, nonPC, Same, Different)
   pMatch <- c()        # Stores match percentage
   alignType <- c()     # Stores type of alignment (onePC, Match, PartialMatch, FrameShift)
-  df <- left_join(proBed, nucleotides$transDF, by = c("transcript" = "transcriptID")) # transcripts
+  df <- dplyr::left_join(proBed, nucleotides$transDF, by = c("transcript" = "transcriptID")) # transcripts
 
   system(paste0("mkdir ", output_location, "pairedAlignments"))
   setwd(paste0(output_location, "pairedAlignments/"))
@@ -13,8 +13,10 @@ matchAlignType <- function(proBed, protCode, nucleotides) {
   alignmentTypes <- lapply(seq(1, nrow(df), by = 2), function(i)  {
     if (df$prot[i] == "none" & df$prot[i+1] == "none") {
       alignType <- c("noPC")
+      pMatch <- 0
     } else if (df$prot[i] == "none" | df$prot[i+1] == "none") {
       alignType <- c("onePC")
+      pMatch <- 0
     } else if (df$prot[i] == df$prot[i+1]) {
       pMatch <- 1.04
       alignType <- c("Match")

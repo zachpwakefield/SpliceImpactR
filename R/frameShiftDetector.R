@@ -1,5 +1,5 @@
 frameShiftDetectorSum <- function(df, i) {
-  unlist(c(fsDirectSpecific(df$code[i], df$code[i+1]),
+  pB_nuc <- unlist(c(fsDirectSpecific(df$code[i], df$code[i+1]),
              fsDirectShift(df$code[i], df$code[i+1])))
   return(pB_nuc)
 }
