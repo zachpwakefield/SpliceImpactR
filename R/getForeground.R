@@ -1,6 +1,6 @@
 getForeground <- function(input, test_names, control_names, thresh, fdr, mOverlap, nC, nE, exon_type, pdir, output_location, cores) {
 
-  ## If using foreground set, read in diExon file and extract differentially included exons using lfc()
+  ## If using foreground set, read in diExon file and extract differentially included exons using diff_info()
   df <- input
   df.l <- diff_info(df, numCont = nC, numExp = nE, exon_type = exon_type,
               cores = cores, test_names = test_names, control_names = control_names)

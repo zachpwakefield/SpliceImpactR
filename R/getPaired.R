@@ -1,4 +1,4 @@
-getPaired <- function(foreground, et, nucleotides) {
+getPaired <- function(foreground, et, nucleotides, newGTF) {
   # Create a unique identifier for each exon
   foreground <- foreground %>%
     dplyr::mutate(exon_id = paste0(chr, ":", start, "-", stop))
@@ -100,6 +100,29 @@ getPaired <- function(foreground, et, nucleotides) {
     # remove pair number from gene name after the pairing process
     exon_pairs_df$gene <- unlist(lapply(strsplit(exon_pairs_df$gene, split = "#"), "[[", 1))
     combined_rows_df_expanded$gene <- unlist(lapply(strsplit(combined_rows_df_expanded$gene, split = "#"), "[[", 1))
+
+
+    if (ex_type == "HFE") {
+      hfe_transcripts <- unlist(lapply(newGTF$hybrid_first_extract, function(x) {c(paste0(newGTF$gtf$transcriptID[newGTF$gtf$rownum == x[1]],';',
+                                                                            newGTF$gtf$transcriptID[newGTF$gtf$rownum == x[2]]),
+                                                                            paste0(newGTF$gtf$transcriptID[newGTF$gtf$rownum == x[2]],';',
+                                                                                   newGTF$gtf$transcriptID[newGTF$gtf$rownum == x[1]]))}))
+      in_hfe_pair <- unlist(lapply(seq(1, nrow(combined_rows_df_expanded), by=2), function(x) {
+        paste0(combined_rows_df_expanded$transcript[x], ';', combined_rows_df_expanded$transcript[x+1]) %in% hfe_transcripts
+      }))
+      combined_rows_df_expanded <- combined_rows_df_expanded[rep(in_hfe_pair, each = 2),]
+      exon_pairs_df <- exon_pairs_df[in_hfe_pair,]
+    } else if (ex_type == "HLE") {
+      hle_transcripts <- unlist(lapply(newGTF$hybrid_last_extract, function(x) {c(paste0(newGTF$gtf$transcriptID[newGTF$gtf$rownum == x[1]],';',
+                                                                                          newGTF$gtf$transcriptID[newGTF$gtf$rownum == x[2]]),
+                                                                                   paste0(newGTF$gtf$transcriptID[newGTF$gtf$rownum == x[2]],';',
+                                                                                          newGTF$gtf$transcriptID[newGTF$gtf$rownum == x[1]]))}))
+      in_hle_pair <- unlist(lapply(seq(1, nrow(combined_rows_df_expanded), by=2), function(x) {
+        paste0(combined_rows_df_expanded$transcript[x], ';', combined_rows_df_expanded$transcript[x+1]) %in% hle_transcripts
+      }))
+      combined_rows_df_expanded <- combined_rows_df_expanded[rep(in_hle_pair, each = 2),]
+      exon_pairs_df <- exon_pairs_df[in_hle_pair,]
+    }
 
     system(paste0("mkdir ", output_location, "pairedOutput/"))
     write_csv(exon_pairs_df, paste0(output_location, "pairedOutput/", "exon_pairs.csv"))
