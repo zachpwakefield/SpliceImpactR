@@ -18,7 +18,7 @@ matchAlignType <- function(proBed, protCode, nucleotides) {
     } else {
       fs_check <- frameShiftDetectorSum(df, i)
       pMatch <- fs_check[[2]]
-      if (alignType[[1]] == alignType[[3]]) {
+      if (fs_check[[1]] == fs_check[[3]]) {
         alignType <- fs_check[[1]]
       } else {
         alignType <- c("PartialMatch")
