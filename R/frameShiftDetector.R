@@ -13,7 +13,7 @@ findContinuousIndels <- function(indels) {
 }
 
 fsDirectSpecific <- function(seq1, seq2) {
-  alignment <- msa::msaConsensusSequence(msa::msa(DNAStringSet(c(seq1, seq2)),
+  alignment <- msa::msaConsensusSequence(msa::msa(Biostrings::DNAStringSet(c(seq1, seq2)),
                                                   substitutionMatrix =
                                                     matrix(c(2, -1, -1, -1,
                                                              -1, 2, -1, -1,

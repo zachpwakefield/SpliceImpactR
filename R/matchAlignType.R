@@ -1,10 +1,5 @@
 matchAlignType <- function(proBed, protCode, nucleotides) {
 
-  # Initialize variables for storing alignment and matching information
-  protAlign <- list()  # Stores alignment results
-  protC <- c()         # Stores protein category (PC, nonPC, Same, Different)
-  pMatch <- c()        # Stores match percentage
-  alignType <- c()     # Stores type of alignment (onePC, Match, PartialMatch, FrameShift)
   df <- dplyr::left_join(proBed, nucleotides$transDF, by = c("transcript" = "transcriptID")) # transcripts
 
   system(paste0("mkdir ", output_location, "pairedAlignments"))

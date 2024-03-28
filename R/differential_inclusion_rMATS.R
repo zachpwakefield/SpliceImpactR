@@ -1,4 +1,5 @@
-differential_inclusion_rMATS <- function(control_names, test_names, et, cores, outlier_threshold, min_proportion_samples_per_phenotype = .333) {
+differential_inclusion_rMATS <- function(control_names, test_names,
+                                         stat_model_bool = T, outlier_bool = T, et, cores, outlier_threshold, min_proportion_samples_per_phenotype = .333) {
 
   sample_types <- list()
 
@@ -21,6 +22,8 @@ differential_inclusion_rMATS <- function(control_names, test_names, et, cores, o
   rMATS_df <- extract_rMATS(et = et, frM.list = load_output,
                             sample_ids = unlist(lapply(sample_types_sorted, "[[", 1)),
                             cores = cores)
+
+  rMATS_df[is.na(rMATS_df)] <- 0
 
   # Filter out rows with all 0 or all 1 PSI values
   rMATS_df <- rMATS_df[rowSums(rMATS_df[,grep("psi", colnames(rMATS_df))]) > 0 &
@@ -56,6 +59,9 @@ differential_inclusion_rMATS <- function(control_names, test_names, et, cores, o
     useIndices_cont <- usable[usable <= length(cont.psi)]
     useIndices_test <- usable[usable > length(test.psi)] - length(cont.psi)
     ol_init <- paste(c(control_group, test_group)[usable], collapse = "#")
+    if (!(outlier_bool)) {
+      ol_init <- ""
+    }
     outliers <- ifelse(ol_init == "", "none", ol_init)
 
     # Recalculate PSI, SJC, IJC, mean values excluding outliers for both phenotypes
@@ -79,7 +85,9 @@ differential_inclusion_rMATS <- function(control_names, test_names, et, cores, o
     delta.psi <- mean.test.psi.noOut - mean.cont.psi.noOut
 
     # Perform statistical testing comparing control and test PSI values
-    if ((sum(cont.psi != 0) >= min_proportion_samples_per_phenotype*length(control_names)) |
+    if (!(stat_model_bool)) {
+      p_value <- .01
+      } else if((sum(cont.psi != 0) >= min_proportion_samples_per_phenotype*length(control_names)) |
         (sum(test.psi != 0) >= min_proportion_samples_per_phenotype*length(test_names))) {
 
       data <- data.frame(

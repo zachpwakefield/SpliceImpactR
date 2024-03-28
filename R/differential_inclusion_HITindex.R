@@ -2,7 +2,7 @@
 ## It compares splicing event inclusion levels between test and control groups and identifies significant differences using statistical tests.
 
 
-differential_inclusion_HITindex <- function(test_names, control_names, cores = 2,
+differential_inclusion_HITindex <- function(test_names, control_names, cores = 2, stat_model_bool = T, outlier_bool = T,
                                             outlier_threshold = c("4/n", "4/mean", "1", 1)[1], min_proportion_samples_per_phenotype = .333) {
   sample_types <- list()
 
@@ -69,6 +69,12 @@ differential_inclusion_HITindex <- function(test_names, control_names, cores = 2
       nDOWN <- unlist(lapply(val_extract, "[[", 4))
       HITindex <- unlist(lapply(val_extract, "[[", 5))
 
+      psi[is.na(psi)] <- 0
+      nDiff[is.na(nDiff)] <- 0
+      nUP[is.na(nUP)] <- 0
+      nDOWN[is.na(nDOWN)] <- 0
+      HITindex[is.na(HITindex)] <- 0
+
       # Perform linear regression and calculate Cook's distance for outlier detection
       model <- lm(psi ~ unlist(lapply(sample_types_sorted, "[[", 2)))
       influence <- as.numeric(cooks.distance(model))
@@ -102,6 +108,9 @@ differential_inclusion_HITindex <- function(test_names, control_names, cores = 2
                                      HITindex = HITindex)
       with_outliers_df$condition[condition] <- rep(1, length(condition))
       remove_outliers_df <- with_outliers_df[usable,]
+      if (!(outlier_bool)) {
+        remove_outliers <- with_outliers_df
+      }
       gdf <- remove_outliers_df
       gdf
 
@@ -167,7 +176,9 @@ differential_inclusion_HITindex <- function(test_names, control_names, cores = 2
     # Adjust p-values for multiple testing
     p.adj <- p.adjust(p_vals, method = 'fdr')
     p.adj[p.adj < 0] <- -1
-
+    if (!(stat_model_bool)) {
+      p.adj <- rep(0.01, length(p.adj))
+    }
 
     # Prepare the final output data
     init_output <- vals[!duplicated(vals[,c('gene', 'exon')]),c('gene', 'exon')]
