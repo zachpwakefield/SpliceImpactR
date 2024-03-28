@@ -80,7 +80,9 @@ differential_inclusion_HITindex <- function(test_names, control_names, cores = 2
       influence <- as.numeric(cooks.distance(model))
 
       # Determine outliers based on the specified threshold
-      if (outlier_threshold == "4/n") {
+      if (!(outlier_bool)) {
+        usable <- which(influence <= max(influence))
+      } else if (outlier_threshold == "4/n") {
         usable <- which(influence <= 4/length(sample_types_sorted))
       } else if (outlier_threshold == "4/mean") {
         usable <- which(influence <= 4/mean(influence))
@@ -108,9 +110,6 @@ differential_inclusion_HITindex <- function(test_names, control_names, cores = 2
                                      HITindex = HITindex)
       with_outliers_df$condition[condition] <- rep(1, length(condition))
       remove_outliers_df <- with_outliers_df[usable,]
-      if (!(outlier_bool)) {
-        remove_outliers <- with_outliers_df
-      }
       gdf <- remove_outliers_df
       gdf
 
