@@ -5,25 +5,26 @@ getData <- function(fg, bg, fg_out, bg_out, output_location, fdr_use, min_sample
 
   ## extract bed, fasta, and interproscan files from output_location
   tf <- list.files(output_location)
-  ipscan <- c(pfam$bg_out, pfam$fg_out) #fg_out, bg_out
-  outFast<- c(bg$proFast, fg$proFast) #fg$proFast, fg$proFast
-  outBed <- c(bg$proBed, fg$proBed) #bg$proBed, bg$proBed
+  ipscan <- list(pfam$bg_out, pfam$fg_out) #fg_out, bg_out
+  outFast<- list(bg$proFast, fg$proFast) #fg$proFast, fg$proFast
+  outBed <- list(bg$proBed, fg$proBed) #bg$proBed, bg$proBed
 
   system(paste0("mkdir ", output_location, "DomainEnrichment/"))
   ## Process interproscan results for background and foreground datasets
   interproscan_results <- lapply(1:2, function(o) {
     # Read domain scan results and sequence information
-    ip <- ipscan[o]
-    s <- outBed[o]
+    ip <- ipscan[[o]]
+    s <- outBed[[o]]
     s$id <- paste(paste(paste(paste(s$transcript, s$gene, sep = "#"), s$chr, sep = ";"), paste(s$start, s$stop, sep = "-"), sep = ":"), s$strand, sep = ";")
-    fa <- outFast[o]
+    fa <- outFast[[o]]
     nFa <- fa[grep(">", fa)]
     gN <- gsub(">", "", nFa)
     geneL <- unlist(lapply(strsplit(unlist(lapply(strsplit(fa[grep(">", fa)], split = ";"), "[[", 1)), split = "#"), "[[", 2))
 
 
     ## filter by whichever domain identifying engine(s) selected
-    ips <- ip %>% dplyr::filter(X4 %in% engine)
+    ips <- ip
+    # ips <- ip %>% dplyr::filter(X4 %in% engine)
 
     # Process and aggregate information for each protein domain
     protInf <- list()
