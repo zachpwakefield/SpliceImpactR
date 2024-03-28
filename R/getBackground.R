@@ -77,11 +77,12 @@ getBackground <- function(input, mOverlap, cores, nC, nE, exon_type, pdir, outpu
   # Interleave headers and sequences
   proFast <- paste(rbind(fasta_headers, fasta_sequences))
 
+  system(paste0("mkdir ", output_location, "Background/"))
+  write_csv(proBed, paste0(output_location, "Background/", "bgoutBed.csv"))
+  write_lines(proFast, paste0(output_location, "Background/", "bgoutFast.fa"))
+  write_csv(matched,  paste0(output_location, "Background/", "bgmatched.csv"))
+  write_csv(bed,  paste0(output_location, "Background/", "bgbed.csv"))
 
-  write_csv(proBed, paste0(output_location, "bgoutBed.csv"))
-  write_lines(proFast, paste0(output_location, "bgoutFast.fa"))
-  write_csv(matched,  paste0(output_location, "bgmatched.csv"))
-  write_csv(bed,  paste0(output_location, "bgbed.csv"))
   return(list(matched = matched,
               bed = bed,
               proBed = proBed,

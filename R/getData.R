@@ -1,21 +1,22 @@
 ## This function retrieves and processes data for domain enrichment analysis using various protein domain databases.
 ## It compares domain occurrences in foreground (differentially expressed) and background datasets to identify enriched domains.
 
-getData <- function(output_location, fdr_use, min_sample_success, engine = c("FunFam","Gene3D","CDD","PANTHER","SMART","ProSiteProfiles","Pfam","SUPERFAMILY","MobiDBLite","Coils","PRINTS","ProSitePatterns","PIRSF","NCBIfam","Hamap")[7]) {
+getData <- function(fg, bg, fg_out, bg_out, output_location, fdr_use, min_sample_success, engine = c("FunFam","Gene3D","CDD","PANTHER","SMART","ProSiteProfiles","Pfam","SUPERFAMILY","MobiDBLite","Coils","PRINTS","ProSitePatterns","PIRSF","NCBIfam","Hamap")[7]) {
 
   ## extract bed, fasta, and interproscan files from output_location
   tf <- list.files(output_location)
-  ipscan <- c("bgoutFast.fa.tsv", "fgoutFast.fa.tsv")
-  outFast<- c("bgoutFast.fa", "fgoutFast.fa")
-  outBed <- c("bgoutBed.csv", "fgoutBed.csv")
+  ipscan <- c(bg_out, fg_out) #fg_out, bg_out
+  outFast<- c(bg$proFast, fg$proFast) #fg$proFast, fg$proFast
+  outBed <- c(bg$proBed, fg$proBed) #bg$proBed, bg$proBed
 
+  system(paste0("mkdir ", output_location, "DomainEnrichment/"))
   ## Process interproscan results for background and foreground datasets
-  interproscan_results <- lapply(c("bg", "fg"), function(o) {
+  interproscan_results <- lapply(1:2, function(o) {
     # Read domain scan results and sequence information
-    ip <- readr::read_delim(paste(output_location, ipscan[grep(o, ipscan)], sep = ""), col_names = T, delim = '\t')
-    s <- readr::read_csv(paste(output_location, outBed[grep(o, outBed)], sep =""))
+    ip <- ipscan[o]
+    s <- outBed[o]
     s$id <- paste(paste(paste(paste(s$transcript, s$gene, sep = "#"), s$chr, sep = ";"), paste(s$start, s$stop, sep = "-"), sep = ":"), s$strand, sep = ";")
-    fa <- readr::read_lines(paste(output_location, outFast[grep(o, outFast)], sep = ""))
+    fa <- outFast[o]
     nFa <- fa[grep(">", fa)]
     gN <- gsub(">", "", nFa)
     geneL <- unlist(lapply(strsplit(unlist(lapply(strsplit(fa[grep(">", fa)], split = ";"), "[[", 1)), split = "#"), "[[", 2))
@@ -97,7 +98,7 @@ getData <- function(output_location, fdr_use, min_sample_success, engine = c("Fu
     data <- data[data$domain != "none" & data$domain != "" & data$domain != "-",] %>% dplyr::arrange(fdr)
 
     # Write domain enrichment results to CSV files
-    write.csv(data, paste0(output_location, ifelse(x == "up", "(+)", "(-)"), "domainEnrichment.csv"))
+    write.csv(data, paste0(output_location, "DomainEnrichment/", ifelse(x == "up", "(+)", "(-)"), "domainEnrichment.csv"))
     data
 
 
@@ -129,7 +130,7 @@ getData <- function(output_location, fdr_use, min_sample_success, engine = c("Fu
       ggplot2::scale_fill_manual(values=c('brown','chartreuse4')) + ggplot2::ggtitle(paste0("Domain Enrichment of ", ifelse(x == "1", "(+)", "(-)"),
                                                                                             " PSI Exons"))
 
-    pdf(paste0(output_location, ifelse(x == "1", "(+)", "(-)"), 'enrichmentPlot.pdf'))
+    pdf(paste0(output_location, "DomainEnrichment/", ifelse(x == "1", "(+)", "(-)"), 'enrichmentPlot.pdf'))
     print(enrichmentPlot)
     dev.off()
     enrichmentPlot

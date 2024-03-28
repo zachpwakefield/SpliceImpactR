@@ -81,13 +81,14 @@ getForeground <- function(input, test_names, control_names, thresh, fdr, mOverla
   # Interleave headers and sequences
   proFast <- paste(rbind(fasta_headers, fasta_sequences))
 
-  write_csv(proBed, paste0(output_location, "fgoutBed.csv"))
-  write_lines(proFast, paste0(output_location, "fgoutFast.fa"))
-  write_csv(matched,  paste0(output_location, "fgmatched.csv"))
-  write_csv(df.l,  paste0(output_location, "fglfc.csv"))
-  write_csv(bed,  paste0(output_location, "fgexonBed.csv"))
+  system(paste0("mkdir ", output_location, "Foreground/"))
+  write_csv(proBed, paste0(output_location, "Foreground/", "fgoutBed.csv"))
+  write_lines(proFast, paste0(output_location, "Foreground/", "fgoutFast.fa"))
+  write_csv(matched,  paste0(output_location, "Foreground/", "fgmatched.csv"))
+  write_csv(df.l,  paste0(output_location, "Foreground/", "fglfc.csv"))
+  write_csv(bed,  paste0(output_location, "Foreground/", "fgexonBed.csv"))
 
-  pdf(paste0(output_location, "delta_psi_plot.pdf"))
+  pdf(paste0(output_location, "Foreground/", "delta_psi_plot.pdf"))
   print(lfcPlot)
   dev.off()
 
