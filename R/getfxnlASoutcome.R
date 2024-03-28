@@ -1,4 +1,4 @@
-getfxnlASoutcome <- funciton(output_location,
+getfxnlASoutcome <- function(output_location,
                              test_group,control_group, exon_type, cutoff = .25, cores = 4, translations, transcripts, gtf, tti_location = "") {
   system(paste0("mkdir ",  output_location))
   pdir <- system.file(package="SpliceImpactR")
