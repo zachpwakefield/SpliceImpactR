@@ -5,7 +5,7 @@ getData <- function(fg, bg, fg_out, bg_out, output_location, fdr_use, min_sample
 
   ## extract bed, fasta, and interproscan files from output_location
   tf <- list.files(output_location)
-  ipscan <- c(bg_out, fg_out) #fg_out, bg_out
+  ipscan <- c(pfam$bg_out, pfam$fg_out) #fg_out, bg_out
   outFast<- c(bg$proFast, fg$proFast) #fg$proFast, fg$proFast
   outBed <- c(bg$proBed, fg$proBed) #bg$proBed, bg$proBed
 

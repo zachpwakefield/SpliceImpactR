@@ -1,8 +1,7 @@
 getfxnlASoutcome <- function(output_location,
                              test_group,control_group,
                              exon_type, cutoff = .25,
-                             cores = 4, translations,
-                             transcripts, gtf,
+                             cores = 4
                              tti_location = "") {
   system(paste0("mkdir ",  output_location))
   pdir <- system.file(package="SpliceImpactR")
@@ -23,13 +22,6 @@ getfxnlASoutcome <- function(output_location,
                                                         min_proportion_samples_per_phenotype = .15)
   }
 
-
-  c_trans <- get_c_trans(translations)
-
-  c_nucs <- get_c_nucs(transcripts)
-
-  newGTF <- setup_gtf(gtf)
-  gtf <- newGTF$gtf
 
   fg <- getForeground(input=diAS,
                      test_names = test_group,
@@ -63,10 +55,11 @@ getfxnlASoutcome <- function(output_location,
                      output_location = output_location)
 
   #####
-  pfam <- getPfam(foreground = fg, background = bg, pdir = pdir, cores = cpres, output_location = output_location)
+  pfam <- getPfam(foreground = fg, background = bg, pdir = pdir, cores = cores, output_location = output_location)
 
 
-  gD <- getData(output_location = output_location, fdr_use = .05, min_sample_success = 3, engine = "Pfam")
+  gD <- getData(fg = fg, bg = bg, fg_out = pfam$fg_out, bg_out = pfam$bg_out, output_location = output_location,
+                fdr_use = .05, min_sample_success = 3, engine = "Pfam")
 
 
   tti <- getTTI(paired_foreground = pfg$paired_proBed, background = bg$proBed,
@@ -88,9 +81,5 @@ getfxnlASoutcome <- function(output_location,
               pfam = pfam,
               gD = gD,
               diHIT = diHIT,
-              diAS = diAS,
-              newGTF = newGTF,
-              gtf = gtf,
-              c_trans = c_trans,
-              c_nucs = c_nucs))
+              diAS = diAS))
 }
