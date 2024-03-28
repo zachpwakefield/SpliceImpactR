@@ -281,7 +281,7 @@ init_ddi <- function(pdir, output_location, ppidm_class = c("Gold_Standard", "Go
 
   # Make a copy of pfam_in before filtering for Pfam domains only
   pfam_in_i <- pfam_in
-  pfam_in <- pfam_in %>% dplyr::filter(V4 %in% c("Pfam"))
+  # pfam_in <- pfam_in %>% dplyr::filter(V4 %in% c("Pfam"))
 
   # Select and deduplicate transcriptID and geneID pairs
   gt_df <- pfam_in_i %>% dplyr::select(transcriptID, geneID)
