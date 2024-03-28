@@ -4,7 +4,7 @@
 \title{fxnlASoutcome
 %%  ~~function to do ... ~~
 }
-\description{fxnlASoutcome
+\description{fxnlASoutcomes
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
