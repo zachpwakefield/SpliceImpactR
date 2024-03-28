@@ -102,7 +102,7 @@ getPaired <- function(foreground, et, nucleotides, newGTF) {
     combined_rows_df_expanded$gene <- unlist(lapply(strsplit(combined_rows_df_expanded$gene, split = "#"), "[[", 1))
 
 
-    if (ex_type == "HFE") {
+    if (et == "HFE") {
       hfe_transcripts <- unlist(lapply(newGTF$hybrid_first_extract, function(x) {c(paste0(newGTF$gtf$transcriptID[newGTF$gtf$rownum == x[1]],';',
                                                                             newGTF$gtf$transcriptID[newGTF$gtf$rownum == x[2]]),
                                                                             paste0(newGTF$gtf$transcriptID[newGTF$gtf$rownum == x[2]],';',
@@ -112,7 +112,7 @@ getPaired <- function(foreground, et, nucleotides, newGTF) {
       }))
       combined_rows_df_expanded <- combined_rows_df_expanded[rep(in_hfe_pair, each = 2),]
       exon_pairs_df <- exon_pairs_df[in_hfe_pair,]
-    } else if (ex_type == "HLE") {
+    } else if (et == "HLE") {
       hle_transcripts <- unlist(lapply(newGTF$hybrid_last_extract, function(x) {c(paste0(newGTF$gtf$transcriptID[newGTF$gtf$rownum == x[1]],';',
                                                                                           newGTF$gtf$transcriptID[newGTF$gtf$rownum == x[2]]),
                                                                                    paste0(newGTF$gtf$transcriptID[newGTF$gtf$rownum == x[2]],';',
