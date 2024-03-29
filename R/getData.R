@@ -36,7 +36,7 @@ getData <- function(fg, bg, pfam = pfam, output_location, fdr_use, min_sample_su
     protInf.o[protInf.o == ""] <- "none"
 
     # Construct final output data frames for background and foreground
-    if (o == "fg") {
+    if (o == 2) {
       finOut <- data.frame(exon = gN,
                            protein = unlist(lapply(gN, function(x) s$prot[s$id == x])),
                            protInfor = protInf.o,
