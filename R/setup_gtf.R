@@ -99,7 +99,8 @@ setup_gtf <- function(gtf_location, cores = cores) {
         } else {return(NA)}
         if (sum(over) >= 1) {
           return(list(lapply(tr_internal$rowname[over], function(z) c(unique(tr_start$rowname), z)),
-                      lapply(tr_internal$transcriptID[over], function(z) c(unique(tr_start$transcriptID), z)))
+                      lapply(tr_internal$transcriptID[over], function(z) c(paste0(unique(tr_start$transcriptID), ';', z),
+                                                                           paste0(z, ";", unique(tr_start$transcriptID)))))
           )
         } else {return(NA)}
       })
@@ -121,7 +122,8 @@ setup_gtf <- function(gtf_location, cores = cores) {
         } else {return(NA)}
         if (sum(over) >= 1) {
           return(list(lapply(tr_internal$rowname[over], function(z) c(unique(tr_stop$rowname), z)),
-                      lapply(tr_internal$transcriptID[over], function(z) c(unique(tr_stop$transcriptID), z)))
+                      lapply(tr_internal$transcriptID[over], function(z) c(paste0(unique(tr_stop$transcriptID), ';', z),
+                                                                           paste0(z, ";", unique(tr_stop$transcriptID)))))
           )
         } else {return(NA)}
       })
