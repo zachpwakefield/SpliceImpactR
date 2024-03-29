@@ -57,7 +57,7 @@ setup_gtf <- function(gtf_location, cores = cores) {
     return(rn)
   }
 
-  fl_exons <- parallel::mclapply(1:(length(transcript_indices)-1), mc.cores = 8, function(x) {
+  fl_exons <- parallel::mclapply(1:(length(transcript_indices)-1), mc.cores = cores, function(x) {
     min_gtf <- pcgtf[((transcript_indices[x]+1):(transcript_indices[x+1]-2)),]
     if (sum(min_gtf$type == "exon") == 1) {
       list(min_gtf$rowname[which(min_gtf$type == "exon")])
@@ -85,9 +85,10 @@ setup_gtf <- function(gtf_location, cores = cores) {
   pcgtf$classification[pcgtf$rowname %in% unlist(lapply(multi_exon_transcripts, "[[", 2))] <- "last"
   pcgtf$classification[pcgtf$rowname %in% unlist(lapply(multi_exon_transcripts, "[[", 4))] <- "UTR"
   pcgtf$classification[pcgtf$rowname %in% intersect(unlist(lapply(multi_exon_transcripts, "[[", 1)), unlist(lapply(multi_exon_transcripts, "[[", 2)))] <- "single_exon"
+  pcgtf$transcriptID <- unlist(lapply(strsplit(pcgtf$transcript_id, split = "[.]"), "[[", 1))
 
   # hybrid_first_extract <- unlist(unlist(parallel::mclapply(1:(length(gene_indices)-1), mc.cores = 8, function(x) {
-  hybrid_first_extract <- unlist(unlist(parallel::mclapply(1:(length(gene_indices)-1), mc.cores = cores, function(x) {
+  hybrid_first_extract_duo <- unlist(unlist(parallel::mclapply(1:(length(gene_indices)-1), mc.cores = cores, function(x) {
     tr_in_gene <- pcgtf[(gene_indices[x]+1):(gene_indices[x+1]-1),]
     if (sum(tr_in_gene$type == 'transcript') > 1) {
       lapply(unique(tr_in_gene$transcript_id), function(y) {
@@ -97,13 +98,19 @@ setup_gtf <- function(gtf_location, cores = cores) {
           over <- overlap(tr_start$start, tr_start$end, tr_internal$start, tr_internal$end)
         } else {return(NA)}
         if (sum(over) >= 1) {
-          return(lapply(tr_internal$rowname[over], function(z) c(unique(tr_start$rowname), z)))
+          return(list(lapply(tr_internal$rowname[over], function(z) c(unique(tr_start$rowname), z)),
+                      lapply(tr_internal$transcriptID[over], function(z) c(unique(tr_start$transcriptID), z)))
+          )
         } else {return(NA)}
       })
     } else {return(NA)}
   }), recursive = F), recursive = F)
 
-  hybrid_last_extract <- unlist(unlist(parallel::mclapply(1:(length(gene_indices)-1), mc.cores = cores, function(x) {
+  interM_first <- hybrid_first_extract_duo[!is.na(hybrid_first_extract_duo)]
+  hybrid_first_extract <- unlist(interM_first[seq(1, length(interM_first), by = 2)], recursive = F)
+  hybrid_first_extract_transcripts <- unlist(interM_first[seq(2, length(interM_first), by = 2)], recursive = F)
+
+  hybrid_last_extract_duo <- unlist(unlist(parallel::mclapply(1:(length(gene_indices)-1), mc.cores = cores, function(x) {
     tr_in_gene <- pcgtf[(gene_indices[x]+1):(gene_indices[x+1]-1),]
     if (sum(tr_in_gene$type == 'transcript') > 1) {
       lapply(unique(tr_in_gene$transcript_id), function(y) {
@@ -113,14 +120,17 @@ setup_gtf <- function(gtf_location, cores = cores) {
           over <- overlap(tr_stop$start, tr_stop$end, tr_internal$start, tr_internal$end)
         } else {return(NA)}
         if (sum(over) >= 1) {
-          return(lapply(tr_internal$rowname[over], function(z) c(unique(tr_stop$rowname), z)))
+          return(list(lapply(tr_internal$rowname[over], function(z) c(unique(tr_stop$rowname), z)),
+                      lapply(tr_internal$transcriptID[over], function(z) c(unique(tr_stop$transcriptID), z)))
+          )
         } else {return(NA)}
       })
     } else {return(NA)}
   }), recursive = F), recursive = F)
 
-  hybrid_last_extract <- hybrid_last_extract[!is.na(hybrid_last_extract)]
-  hybrid_first_extract <- hybrid_first_extract[!is.na(hybrid_first_extract)]
+  interM_last <- hybrid_last_extract_duo[!is.na(hybrid_last_extract_duo)]
+  hybrid_last_extract <- unlist(interM_last[seq(1, length(interM_last), by = 2)], recursive = F)
+  hybrid_last_extract_transcripts <- unlist(interM_last[seq(2, length(interM_last), by = 2)], recursive = F)
 
 
   pcgtf$HFE <- "non-hybrid"
@@ -133,7 +143,7 @@ setup_gtf <- function(gtf_location, cores = cores) {
   pcgtf$HLE[pcgtf$rowname %in% unique(unlist(lapply(hybrid_last_extract, "[[", 2)))] <- "HLE_I"
 
   ngtf <- data.frame(geneID = unlist(lapply(strsplit(pcgtf$gene_id, split = "[.]"), "[[", 1)),
-                     transcriptID = unlist(lapply(strsplit(pcgtf$transcript_id, split = "[.]"), "[[", 1)),
+                     transcriptID = pcgtf$transcriptID,
                      transcriptName = pcgtf$transcript_name,
                      geneName = pcgtf$gene_name,
                      exonID = unlist(lapply(strsplit(pcgtf$exon_id, split = "[.]"), "[[", 1)),
@@ -154,5 +164,7 @@ setup_gtf <- function(gtf_location, cores = cores) {
   gtf <- ngtf[ngtf$classification %in% c("gene", "transcript", "first", "internal", "last"),]
   return(list(gtf = gtf,
               hybrid_first_extract = hybrid_first_extract,
-              hybrid_last_extract = hybrid_last_extract))
+              hybrid_last_extract = hybrid_last_extract,
+              hybrid_first_extract_transcripts = hybrid_first_extract_transcripts,
+              hybrid_last_extract_transcripts = hybrid_last_extract_transcripts))
 }
