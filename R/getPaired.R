@@ -72,6 +72,29 @@ getPaired <- function(foreground, et, nucleotides, newGTF, cores = 4) {
     # Use matchAlignType to identify protein alignment score and type
     c(proBed, pMatch, alignType) := matchAlignType(proBed = combined_rows_df_expanded, protCode = combined_rows_df_expanded$prot, nucleotides)
 
+    combined_rows_df_expanded$pMatch <- rep(as.numeric(pMatch), each = 2)
+    combined_rows_df_expanded$alignType <- rep(alignType, each = 2)
+
+    exon_pairs_df$pMatch <- as.numeric(pMatch)
+    exon_pairs_df$alignType <- alignType
+
+    if (et == "HFE") {
+      pair_trans <- unlist(lapply(seq(1, nrow(combined_rows_df_expanded), by=2), function(x) {
+        paste0(combined_rows_df_expanded$transcript[x], ';', combined_rows_df_expanded$transcript[x+1])
+      }))
+      in_hfe_pair <- pair_trans %in% unlist(newGTF$hybrid_first_extract_transcripts)
+      combined_rows_df_expanded <- combined_rows_df_expanded[rep(in_hfe_pair, each = 2),]
+      exon_pairs_df <- exon_pairs_df[in_hfe_pair,]
+    } else if (et == "HLE") {
+      pair_trans <- unlist(lapply(seq(1, nrow(combined_rows_df_expanded), by=2), function(x) {
+        paste0(combined_rows_df_expanded$transcript[x], ';', combined_rows_df_expanded$transcript[x+1])
+      }))
+      in_hle_pair <- pair_trans %in% unlist(newGTF$hybrid_last_extract_transcripts)
+      combined_rows_df_expanded <- combined_rows_df_expanded[rep(in_hle_pair, each = 2),]
+      exon_pairs_df <- exon_pairs_df[in_hle_pair,]
+    }
+
+
     # Make dataframe for plotting in ggplot2
     gdf_df <- data.frame(dens = as.numeric(pMatch), type = alignType)
     gdf_df2 <- gdf_df[gdf_df$type != "noPC",]
@@ -102,21 +125,7 @@ getPaired <- function(foreground, et, nucleotides, newGTF, cores = 4) {
     combined_rows_df_expanded$gene <- unlist(lapply(strsplit(combined_rows_df_expanded$gene, split = "#"), "[[", 1))
 
 
-    if (et == "HFE") {
-      pair_trans <- unlist(lapply(seq(1, nrow(combined_rows_df_expanded), by=2), function(x) {
-        paste0(combined_rows_df_expanded$transcript[x], ';', combined_rows_df_expanded$transcript[x+1])
-      }))
-      in_hfe_pair <- pair_trans %in% unlist(newGTF$hybrid_first_extract_transcripts)
-      combined_rows_df_expanded <- combined_rows_df_expanded[rep(in_hfe_pair, each = 2),]
-      exon_pairs_df <- exon_pairs_df[in_hfe_pair,]
-    } else if (et == "HLE") {
-      pair_trans <- unlist(lapply(seq(1, nrow(combined_rows_df_expanded), by=2), function(x) {
-        paste0(combined_rows_df_expanded$transcript[x], ';', combined_rows_df_expanded$transcript[x+1])
-      }))
-      in_hle_pair <- pair_trans %in% unlist(newGTF$hybrid_last_extract_transcripts)
-      combined_rows_df_expanded <- combined_rows_df_expanded[rep(in_hle_pair, each = 2),]
-      exon_pairs_df <- exon_pairs_df[in_hle_pair,]
-    }
+
 
     system(paste0("mkdir ", output_location, "pairedOutput/"))
     write_csv(exon_pairs_df, paste0(output_location, "pairedOutput/", "exon_pairs.csv"))
