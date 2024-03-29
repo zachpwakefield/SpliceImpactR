@@ -38,7 +38,7 @@ getfxnlASoutcome <- function(output_location,
 
   pfg <- getPaired(foreground = fg$proBed, et = exon_type, nucleotides = c_nucs)
 
-  if (tti_location != "") {
+  if (tti_location == "") {
     iDDI <- init_ddi(pdir = pdir, output_location = output_location, ppidm_class = "Gold_Standard", removeDups = T)
     tti_location <- output_location
   }
