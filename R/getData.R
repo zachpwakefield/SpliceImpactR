@@ -1,7 +1,7 @@
 ## This function retrieves and processes data for domain enrichment analysis using various protein domain databases.
 ## It compares domain occurrences in foreground (differentially expressed) and background datasets to identify enriched domains.
 
-getData <- function(fg, bg, fg_out, bg_out, output_location, fdr_use, min_sample_success, engine = c("FunFam","Gene3D","CDD","PANTHER","SMART","ProSiteProfiles","Pfam","SUPERFAMILY","MobiDBLite","Coils","PRINTS","ProSitePatterns","PIRSF","NCBIfam","Hamap")[7]) {
+getData <- function(fg, bg, pfam = pfam, output_location, fdr_use, min_sample_success, engine = c("FunFam","Gene3D","CDD","PANTHER","SMART","ProSiteProfiles","Pfam","SUPERFAMILY","MobiDBLite","Coils","PRINTS","ProSitePatterns","PIRSF","NCBIfam","Hamap")[7]) {
 
   ## extract bed, fasta, and interproscan files from output_location
   tf <- list.files(output_location)
