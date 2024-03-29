@@ -58,7 +58,7 @@ getfxnlASoutcome <- function(output_location,
   pfam <- getPfam(foreground = fg, background = bg, pdir = pdir, cores = cores, output_location = output_location)
 
 
-  gD <- getData(fg = fg, bg = bg, fg_out = pfam$fg_out, bg_out = pfam$bg_out, output_location = output_location,
+  gD <- getData(fg = fg, bg = bg, pfam = pfam, output_location = output_location,
                 fdr_use = .05, min_sample_success = 3, engine = "Pfam")
 
 
