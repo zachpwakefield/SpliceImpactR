@@ -14,7 +14,7 @@ getfxnlASoutcome <- function(output_location,
                                                           outlier_threshold = "4/n", min_proportion_samples_per_phenotype = .15)
   if (exon_type %in% c("AFE", "HFE")) {
       diAS <- diHIT[diHIT$type == "AFE",]
-  } else if (exon_type %in% c("AFE", "HFE")) {
+  } else if (exon_type %in% c("ALE", "HLE")) {
       diAS <- diHIT[diHIT$type == "ALE",]
     } else {
     diAS <- differential_inclusion_rMATS(test_names = test_group, control_names = control_group,
