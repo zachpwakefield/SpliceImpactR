@@ -1,4 +1,4 @@
-getPaired <- function(foreground, et, nucleotides, newGTF=newGTF, cores = 4) {
+getPaired <- function(foreground, et, nucleotides, newGTF, cores = 4) {
   # Create a unique identifier for each exon
   foreground <- foreground %>%
     dplyr::mutate(exon_id = paste0(chr, ":", start, "-", stop))
