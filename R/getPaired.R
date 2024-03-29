@@ -1,4 +1,4 @@
-getPaired <- function(foreground, et, nucleotides, newGTF=newGTF) {
+getPaired <- function(foreground, et, nucleotides, newGTF=newGTF, cores = 4) {
   # Create a unique identifier for each exon
   foreground <- foreground %>%
     dplyr::mutate(exon_id = paste0(chr, ":", start, "-", stop))
@@ -103,23 +103,27 @@ getPaired <- function(foreground, et, nucleotides, newGTF=newGTF) {
 
 
     if (et == "HFE") {
-      hfe_transcripts <- unlist(lapply(newGTF$hybrid_first_extract, function(x) {c(paste0(newGTF$gtf$transcriptID[newGTF$gtf$rownum == x[1]],';',
+      hfe_transcripts <- unlist(parallel::mclapply(newGTF$hybrid_first_extract, mc.cores = cores, function(x) {c(paste0(newGTF$gtf$transcriptID[newGTF$gtf$rownum == x[1]],';',
                                                                             newGTF$gtf$transcriptID[newGTF$gtf$rownum == x[2]]),
                                                                             paste0(newGTF$gtf$transcriptID[newGTF$gtf$rownum == x[2]],';',
                                                                                    newGTF$gtf$transcriptID[newGTF$gtf$rownum == x[1]]))}))
-      in_hfe_pair <- unlist(lapply(seq(1, nrow(combined_rows_df_expanded), by=2), function(x) {
-        paste0(combined_rows_df_expanded$transcript[x], ';', combined_rows_df_expanded$transcript[x+1]) %in% hfe_transcripts
+
+      pair_trans <- unlist(lapply(seq(1, nrow(combined_rows_df_expanded), by=2), function(x) {
+        paste0(combined_rows_df_expanded$transcript[x], ';', combined_rows_df_expanded$transcript[x+1])
       }))
+      in_hfe_pair <- pair_trans %in% hfe_transcripts
       combined_rows_df_expanded <- combined_rows_df_expanded[rep(in_hfe_pair, each = 2),]
       exon_pairs_df <- exon_pairs_df[in_hfe_pair,]
     } else if (et == "HLE") {
-      hle_transcripts <- unlist(lapply(newGTF$hybrid_last_extract, function(x) {c(paste0(newGTF$gtf$transcriptID[newGTF$gtf$rownum == x[1]],';',
+      hle_transcripts <- unlist(parallel::mclapply(newGTF$hybrid_last_extract, mc.cores = cores, function(x) {c(paste0(newGTF$gtf$transcriptID[newGTF$gtf$rownum == x[1]],';',
                                                                                           newGTF$gtf$transcriptID[newGTF$gtf$rownum == x[2]]),
                                                                                    paste0(newGTF$gtf$transcriptID[newGTF$gtf$rownum == x[2]],';',
                                                                                           newGTF$gtf$transcriptID[newGTF$gtf$rownum == x[1]]))}))
-      in_hle_pair <- unlist(lapply(seq(1, nrow(combined_rows_df_expanded), by=2), function(x) {
-        paste0(combined_rows_df_expanded$transcript[x], ';', combined_rows_df_expanded$transcript[x+1]) %in% hle_transcripts
+
+      pair_trans <- unlist(lapply(seq(1, nrow(combined_rows_df_expanded), by=2), function(x) {
+        paste0(combined_rows_df_expanded$transcript[x], ';', combined_rows_df_expanded$transcript[x+1])
       }))
+      in_hle_pair <- pair_trans %in% hle_transcripts
       combined_rows_df_expanded <- combined_rows_df_expanded[rep(in_hle_pair, each = 2),]
       exon_pairs_df <- exon_pairs_df[in_hle_pair,]
     }

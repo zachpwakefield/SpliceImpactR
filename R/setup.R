@@ -35,7 +35,7 @@ get_c_nucs <- function(transcripts_location) {
 # input: directory containing all the gtf files, default should be package directory or: system.file(package="domainEnrichment")
 # output: cg csv
 
-get_gtf <- function(location) {
-  cg <- setup_gtf(location)
+get_gtf <- function(location, cores) {
+  cg <- setup_gtf(location, cores = cores)
   return(cg)
 }

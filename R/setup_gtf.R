@@ -1,4 +1,4 @@
-setup_gtf <- function(gtf_location) {
+setup_gtf <- function(gtf_location, cores = cores) {
   gtf <- rtracklayer::import(gtf_location)
   gtf_df=as.data.frame(gtf)
   pcgtf <- gtf_df[gtf_df$gene_type == "protein_coding",]
@@ -87,7 +87,7 @@ setup_gtf <- function(gtf_location) {
   pcgtf$classification[pcgtf$rowname %in% intersect(unlist(lapply(multi_exon_transcripts, "[[", 1)), unlist(lapply(multi_exon_transcripts, "[[", 2)))] <- "single_exon"
 
   # hybrid_first_extract <- unlist(unlist(parallel::mclapply(1:(length(gene_indices)-1), mc.cores = 8, function(x) {
-  hybrid_first_extract <- unlist(unlist(lapply(1:(length(gene_indices)-1), function(x) {
+  hybrid_first_extract <- unlist(unlist(parallel::mclapply(1:(length(gene_indices)-1), mc.cores = cores, function(x) {
     tr_in_gene <- pcgtf[(gene_indices[x]+1):(gene_indices[x+1]-1),]
     if (sum(tr_in_gene$type == 'transcript') > 1) {
       lapply(unique(tr_in_gene$transcript_id), function(y) {
@@ -103,7 +103,7 @@ setup_gtf <- function(gtf_location) {
     } else {return(NA)}
   }), recursive = F), recursive = F)
 
-  hybrid_last_extract <- unlist(unlist(parallel::mclapply(1:(length(gene_indices)-1), mc.cores = 8, function(x) {
+  hybrid_last_extract <- unlist(unlist(parallel::mclapply(1:(length(gene_indices)-1), mc.cores = cores, function(x) {
     tr_in_gene <- pcgtf[(gene_indices[x]+1):(gene_indices[x+1]-1),]
     if (sum(tr_in_gene$type == 'transcript') > 1) {
       lapply(unique(tr_in_gene$transcript_id), function(y) {
