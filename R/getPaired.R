@@ -96,7 +96,7 @@ getPaired <- function(foreground, et, nucleotides, newGTF, cores = 4) {
 
 
     # Make dataframe for plotting in ggplot2
-    gdf_df <- data.frame(dens = as.numeric(pMatch), type = alignType)
+    gdf_df <- data.frame(dens = as.numeric(exon_pairs_df$pMatch), type = exon_pairs_df$alignType)
     gdf_df2 <- gdf_df[gdf_df$type != "noPC",]
     gdf_df3 <- gdf_df[gdf_df$type != "noPC" & gdf_df$type != "onePC",]
 
