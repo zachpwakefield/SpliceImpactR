@@ -68,7 +68,7 @@ getTTI <- function(paired_foreground, background, pdir = pdir, steps = 1, max_ve
 
         # Get iGraph plots for the transcripts
         # if (g1_check | g2_check) {
-        tti_igraph <- getTTIiGraphPlot(paired_foreground$transcript[c(tr, tr+1)], gene = paired_foreground$gene[tr], full_graph = g, steps = steps, max_vertices_for_viz = max_vertices_for_viz, plot_bool = T)
+        tti_igraph <- getTTIiGraphPlot(paired_foreground$transcript[c(tr, tr+1)], gene = paired_foreground$gene[tr], full_graph = g, steps = steps, max_vertices_for_viz = max_vertices_for_viz, plot_bool = T, output_location = output_location)
         # }
 
         # Perform enrichment analysis for unique vertices
@@ -78,7 +78,8 @@ getTTI <- function(paired_foreground, background, pdir = pdir, steps = 1, max_ve
           } else {
             if (length(x[[2]]) > 0) {
               list(x[[2]], getEnrichmentTTI(current_transcript = x[[1]], t_impacts = x[[2]], fdr = fdr, transGeneProt = tgp,
-                                            backgroundGenes = genes_in_sample, steps = steps, plot_bool = plot_bool))
+                                            backgroundGenes = genes_in_sample, steps = steps, plot_bool = plot_bool,
+                                            output_location = output_location))
             } else {
               list(x[[2]], NA)
             }
@@ -120,7 +121,7 @@ getTTI <- function(paired_foreground, background, pdir = pdir, steps = 1, max_ve
 
 
 
-getTTIiGraphPlot <- function(paired_transcript, gene, steps, full_graph, max_vertices_for_viz, plot_bool) {
+getTTIiGraphPlot <- function(paired_transcript, gene, steps, full_graph, max_vertices_for_viz, plot_bool, output_location) {
   # Create ego graphs for each of the paired transcripts
   eg <- igraph::make_ego_graph(
     full_graph,  # The full graph from which ego graphs are derived
@@ -193,7 +194,7 @@ getTTIiGraphPlot <- function(paired_transcript, gene, steps, full_graph, max_ver
 }
 
 getEnrichmentTTI <- function(current_transcript, t_impacts, fdr, transGeneProt,
-                             backgroundGenes, steps, plot_bool) {
+                             backgroundGenes, steps, plot_bool, output_location) {
 
   # Extract gene names associated with the input transcript impacts
   enrichment_list <- transGeneProt$gene_name[transGeneProt$transcript_id %in% t_impacts]
