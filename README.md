@@ -15,24 +15,6 @@ The suite of funcitons is designed to anaylyze the consequences of AFE, ALE, SE,
 
 SpliceImpactR first identifies differentially included exons across the input phenotypes. This is performed differently for HIT Index output (AFE/ALE/HFE/HLE) and rMATS output (SE/MXE/A5SS/A3SS).
 
-## HIT Index Statistical Method
-This model is an R implementation of this HIT Index [statistical model](https://github.com/fiszbein-lab/HIT_Index_Stat_Analysis-/tree/main), written by Xingpei Zhang and Zachary Wakefield. The linear regression model for differetnial exon usage is adepted from [Anders et al.](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3460195/) (2012). It assumes that the average between upstream and downstream spliced junction reads for an exon can be regressed by a log-linear model. The statistical model uses χ2 likelihood ratio test to compare a reduce model with a full model and test on whether phenotype has an influence on difference between spliced junction reads which is a direct estimator for PSI values according to [Fiszbein et al.](https://pubmed.ncbi.nlm.nih.gov/35044812/) (2022).
-
-<p align="center">
-<img src="./inst/main_equation.png" width="500" height="200">
-<img src="./inst/test_equation.png" width="500" height="200">
-</p>
-
-
-## rMATS Statistical Method
-
-Further, SpliceImpactR uses a linear model and a generalized linear model to identify differentially included AFE/ALE and SE, respectively. These results are then matched up to annotations using jaccard index matching and associated with a specific transcript. Analyses are performed both on a paired and a global level -- paired analysis involves idenfitied "exon swaps": where each phenotype shows a significant usage of different exons from the same gene. Global analysis looks at overall changes across phenotypes, such as domain enrichment in significantly differentially included exons. The matched transcripts are analyzed on various different levels:
-1. Primary Sequence
-2. Domain Content
-3. Transcript-Transcript Interactions
-
-   
-
 ## Features
 Identification of alternative splicing events from RNA-seq data.
 Analysis of the potential impact of splicing events on protein structure.
@@ -216,6 +198,23 @@ SpliceImpactR is available under the
 
 ##Citation
 If you use SpliceImpactR in your research, please cite:
+
+
+## HIT Index Statistical Method
+This model is an R implementation of this HIT Index [statistical model](https://github.com/fiszbein-lab/HIT_Index_Stat_Analysis-/tree/main), written by Xingpei Zhang and Zachary Wakefield. The linear regression model for differetnial exon usage is adepted from [Anders et al.](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3460195/) (2012). It assumes that the average between upstream and downstream spliced junction reads for an exon can be regressed by a log-linear model. The statistical model uses χ2 likelihood ratio test to compare a reduce model with a full model and test on whether phenotype has an influence on difference between spliced junction reads which is a direct estimator for PSI values according to [Fiszbein et al.](https://pubmed.ncbi.nlm.nih.gov/35044812/) (2022).
+
+<p align="center">
+<img src="./inst/main_equation.png" width="500" height="200">
+<img src="./inst/test_equation.png" width="500" height="200">
+</p>
+
+
+## rMATS Statistical Method
+
+Further, SpliceImpactR uses a linear model and a generalized linear model to identify differentially included AFE/ALE and SE, respectively. These results are then matched up to annotations using jaccard index matching and associated with a specific transcript. Analyses are performed both on a paired and a global level -- paired analysis involves idenfitied "exon swaps": where each phenotype shows a significant usage of different exons from the same gene. Global analysis looks at overall changes across phenotypes, such as domain enrichment in significantly differentially included exons. The matched transcripts are analyzed on various different levels:
+1. Primary Sequence
+2. Domain Content
+3. Transcript-Transcript Interactions
 
 ```bibtex
 Zachary Wakefield
