@@ -61,18 +61,22 @@ getfxnlASoutcome <- function(output_location,
   gD <- getData(fg = fg, bg = bg, pfam = pfam, output_location = output_location,
                 fdr_use = .05, min_sample_success = 3, engine = "Pfam")
 
+  if (nrow(pfg$paired_proBed) > 1) {
+    tti <- getTTI(paired_foreground = pfg$paired_proBed, background = bg$proBed,
+                  pdir = pdir,
+                  steps=1,
+                  max_vertices_for_viz = 5000,
+                  fdr = .05,
+                  plot_bool = T,
+                  ppidm_class = "Gold_Standard",
+                  write_igraphs = T,
+                  ddi = "Gold",
+                  output_location = output_location,
+                  tti_location = tti_location)
+  } else {
+    tti <- NA
+  }
 
-  tti <- getTTI(paired_foreground = pfg$paired_proBed, background = bg$proBed,
-                               pdir = pdir,
-                               steps=1,
-                               max_vertices_for_viz = 5000,
-                               fdr = .05,
-                               plot_bool = T,
-                               ppidm_class = "Gold_Standard",
-                               write_igraphs = T,
-                               ddi = "Gold",
-                               output_location = output_location,
-                               tti_location = tti_location)
 
   return(list(fg = fg,
               pfg = pfg,
