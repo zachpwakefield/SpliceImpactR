@@ -50,6 +50,57 @@ Then, to install the package:
 devtools::install("zachpwakefield/SpliceImpactR")
 ```
 
+## Basic Usage
+
+```r
+library(SpliceImpactR)
+```
+
+SpliceImpactR requires files organized in a particular way:
+```
+sample_name/
+  sample_name.AFEPSI
+  sample_name.ALEPSI
+  sample_name.exon
+  sample_name.SEPSI
+  ...
+```
+
+In order to accomplish this, there is the function organizeSamples(). This works if your files are currently organized as such:
+```
+sample_name/
+  rmats/
+    sample_name.AFEPSI
+    sample_name.ALEPSI
+    sample_name.exon
+  hit/
+    SE.MATS.JC.txt
+    ...
+```
+Load paths for your test and control groups
+eg: output_location/sample_name/sample_name
+```
+test_group <- paste0(output_location, 'data/', sample_name, '/', sample_name)
+control_group <- paste0(output_location, 'data/', sample_name, '/', sample_name)
+```
+
+Download the proper GTF and FASTA files from GENCODE and load them into R
+```r
+c_trans <- SpliceImpactR::get_c_trans("gencode.v45.pc_translations.fa")
+
+c_nucs <- SpliceImpactR::get_c_nucs("gencode.v45.pc_transcripts.fa")
+
+newGTF <- SpliceImpactR::setup_gtf('gencode.v45.annotation.gtf')
+gtf <- newGTF$gtf
+```
+
+Run the entire pipeline for all AS events
+```r
+functionOutcomes <- SpliceImpactR::fullASoutcome(output_directory = "/output_location/",
+              data_directory = "/data_directory/",
+              test_group = test_group,control_group = control_group)
+```
+
 ## Usage
 ```r
 library(SpliceImpactR)
