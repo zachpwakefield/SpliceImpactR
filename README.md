@@ -11,7 +11,7 @@ by Zachary Wakefield
 
 SpliceImpactR is an R package designed for studying the impact of alternative splicing on protein structure and function. It provides tools for analyzing RNA-seq data to identify differentially included splicing events and predict their consequences on the resulting protein products. SpliceImpactR output involves identifying key changes in proteins at various levels: primary sequence, domain content, and transcript-transcript interactions.
 
-The suite of funcitons is designed to anaylyze the consequences of AFE, ALE, SE, MXE, A5SS, and A3SS, along with hybrid exons (HFE, HLE). SpliceImpactR is built to take output from the [HIT Index](https://github.com/thepailab/HITindex) and [rMATS](https://github.com/Xinglab/rmats-turbo). 
+The suite of funcitons is designed to anaylyze the consequences of AFE, ALE, SE, MXE, A5SS, RI, and A3SS, along with hybrid exons (HFE, HLE). SpliceImpactR is built to take output from the [HIT Index](https://github.com/thepailab/HITindex) and [rMATS](https://github.com/Xinglab/rmats-turbo). 
 
 SpliceImpactR first identifies differentially included exons across the input phenotypes. This is performed differently for HIT Index output (AFE/ALE/HFE/HLE) and rMATS output (SE/MXE/A5SS/A3SS).
 
