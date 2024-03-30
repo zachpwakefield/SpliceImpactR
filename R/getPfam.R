@@ -55,8 +55,8 @@ getPfam <- function(background, foreground, pdir, output_location, cores) {
   }))
 
   # Write the processed foreground and background data to TSV files
-  write_tsv(fg_out, paste0(output_location, "fgoutFast.fa.tsv"))
-  write_tsv(bg_out, paste0(output_location, "bgoutFast.fa.tsv"))
+  write_tsv(fg_out, paste0(output_location, "Foreground/", "fgoutFast.fa.tsv"))
+  write_tsv(bg_out, paste0(output_location, "Background/", "bgoutFast.fa.tsv"))
   return(list(fg_out = fg_out,
               bg_out = bg_out))
 }
