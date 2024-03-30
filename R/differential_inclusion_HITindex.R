@@ -78,6 +78,7 @@ differential_inclusion_HITindex <- function(test_names, control_names, cores = 2
       # Perform linear regression and calculate Cook's distance for outlier detection
       model <- lm(psi ~ unlist(lapply(sample_types_sorted, "[[", 2)))
       influence <- as.numeric(cooks.distance(model))
+      influence[is.na(influence)] <- 0
 
       # Determine outliers based on the specified threshold
       if (!(outlier_bool)) {

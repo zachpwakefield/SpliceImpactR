@@ -43,9 +43,12 @@ differential_inclusion_rMATS <- function(control_names, test_names,
     test.psi <- as.numeric(test.cR[grep("psi", names(test.cR))])
     model <- lm(c(cont.psi, test.psi) ~ c(rep(0, length(cont.psi)), rep(1, length(test.psi))))
     influence <- as.numeric(cooks.distance(model))
+    influence[is.na(influence)] <- 0
 
     # Determine usable data points based on outlier threshold
-    if (outlier_threshold == "4/n") {
+    if (!(outlier_bool)) {
+      usable <- which(influence <= max(influence))
+    } else if (outlier_threshold == "4/n") {
       usable <- which(influence <= 4/length(sample_types_sorted))
     } else if (outlier_threshold == "4/mean") {
       usable <- which(influence <= 4/mean(influence))
@@ -59,9 +62,7 @@ differential_inclusion_rMATS <- function(control_names, test_names,
     useIndices_cont <- usable[usable <= length(cont.psi)]
     useIndices_test <- usable[usable > length(test.psi)] - length(cont.psi)
     ol_init <- paste(c(control_group, test_group)[usable], collapse = "#")
-    if (!(outlier_bool)) {
-      ol_init <- ""
-    }
+
     outliers <- ifelse(ol_init == "", "none", ol_init)
 
     # Recalculate PSI, SJC, IJC, mean values excluding outliers for both phenotypes
