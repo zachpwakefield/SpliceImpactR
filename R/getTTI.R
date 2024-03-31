@@ -113,7 +113,7 @@ getTTI <- function(paired_foreground, background, pdir = pdir, steps = 1, max_ve
                         transcript2_setdiff = as.numeric(lapply(lapply(differences, function(yy) {unlist(lapply(yy, function(yy2) {length(yy2[[1]])}))}), "[[", 2))
                         )
   results <- results[results$transcript1_setdiff > 1 | results$transcript2_setdiff > 1,]
-
+  write_csv(results, paste0(output_location, "tti/tti_change_results.csv"))
   # Return the list of differences
   return(list(differences = differences,
               results = results))

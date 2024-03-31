@@ -9,7 +9,7 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
     print(paste0(x, " analysis..."))
     system(paste0("mkdir ",  paste0(output_directory, x, "/")))
 
-    fAS <- getfxnlASoutcome2(output_location = paste0(output_directory, x, "/"),
+    fAS <- getfxnlASoutcome(output_location = paste0(output_directory, x, "/"),
                              test_group = test_group,control_group = control_group,
                              exon_type = x, cutoff = .2, cores = 6,
                              tti_location = tti_location)
