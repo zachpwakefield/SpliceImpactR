@@ -1,4 +1,4 @@
-matchAlignType <- function(proBed, protCode, nucleotides, output_location) {
+matchAlignType <- function(proBed, protCode, nucleotides, output_location, saveAlignments = T) {
 
   df <- dplyr::left_join(proBed, nucleotides$transDF, by = c("transcript" = "transcriptID")) # transcripts
 
@@ -23,9 +23,11 @@ matchAlignType <- function(proBed, protCode, nucleotides, output_location) {
       } else {
         alignType <- c("PartialMatch")
       }
+      if (saveAlignment) {
+        try(msaPrettyPrint(msa(Biostrings::AAStringSet(c(protCode[i], protCode[i+1])), verbose = FALSE), askForOverwrite=FALSE,
+                           file = paste(output_location, "pairedAlignments/", proBed$transcript[i], "_", proBed$transcript[i+1], "_pm_Alignment.pdf", sep = ""), output = "pdf"))
+      }
 
-      try(msaPrettyPrint(msa(Biostrings::AAStringSet(c(protCode[i], protCode[i+1])), verbose = FALSE), askForOverwrite=FALSE,
-                         file = paste(output_location, "pairedAlignments/", proBed$transcript[i], "_", proBed$transcript[i+1], "_pm_Alignment.pdf", sep = ""), output = "pdf"))
     }
 
 
