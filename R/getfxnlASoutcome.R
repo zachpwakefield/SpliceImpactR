@@ -2,7 +2,7 @@ getfxnlASoutcome <- function(output_location,
                              test_group,control_group,
                              exon_type, cutoff = .25,
                              cores = 4,
-                             tti_location = "") {
+                             tti_location = "", full_pipe = T) {
   system(paste0("mkdir ",  output_location))
   pdir <- system.file(package="SpliceImpactR")
   if (length(test_group) > 3 & length(control_group) > 3 ) {
@@ -83,12 +83,16 @@ getfxnlASoutcome <- function(output_location,
     tti <- NA
   }
 
+  if (full_pipe) {
+    return(NA)
+  } else {
+    return(list(diAS = diAS,
+                fg = fg,
+                pfg = pfg,
+                bg = bg,
+                pfam = pfam,
+                gD = gD,
+                tti = tti))
+  }
 
-  return(list(diAS = diAS,
-              fg = fg,
-              pfg = pfg,
-              bg = bg,
-              pfam = pfam,
-              gD = gD,
-              tti = tti))
 }
