@@ -32,12 +32,12 @@ getOverviewComparison <- function(control_names, test_names, exon_type, output_l
     p1 <- ggplot2::ggplot(dfCount, ggplot2::aes(x = type, y = AScount, fill = type)) +
       ggplot2::geom_dotplot(binaxis='y', stackdir='center') + ggplot2::theme_bw()+
       ggplot2::scale_fill_manual(values=c("brown", "chartreuse4"))+ ggplot2::xlab("Group") +
-      ggplot2::ylab("Number of Events") +ggplot2::geom_violin(fill = NA)
+      ggplot2::ylab(paste0("Count of ", exon_type)) +ggplot2::geom_violin(fill = NA)
   } else {
     p1 <- ggplot2::ggplot(dfCount, ggplot2::aes(x = type, y = AScount, fill = type)) +
       ggplot2::geom_dotplot(binaxis='y', stackdir='center') + ggplot2::theme_bw()+
       ggplot2::scale_fill_manual(values=c("brown", "chartreuse4"))+ ggplot2::xlab("Group") +
-      ggplot2::ylab("Number of Events")
+      ggplot2::ylab(paste0("Count of ", exon_type))
   }
 
 
