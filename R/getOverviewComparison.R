@@ -13,10 +13,15 @@ getOverviewComparison <- function(data_list, sample_list, exon_type) {
   dfCount <- data.frame(AScount = unlist(nASE),
                         type = unlist(lapply(sample_list, "[[", 2)))
   if (length(sample_list) > 8) {
-    p1 <- ggplot2::ggplot(dfCount, ggplot2::aes(x = type, y = AScount, fill = type)) + ggplot2::geom_dotplot(binaxis='y', stackdir='center') + ggplot2::theme_bw()+ggplot2::scale_fill_manual(values=c("brown", "chartreuse4"))+ ggplot2::xlab("Group") + ggplot2::ylab("Number of Events")
+    p1 <- ggplot2::ggplot(dfCount, ggplot2::aes(x = type, y = AScount, fill = type)) +
+      ggplot2::geom_dotplot(binaxis='y', stackdir='center') + ggplot2::theme_bw()+
+      ggplot2::scale_fill_manual(values=c("brown", "chartreuse4"))+ ggplot2::xlab("Group") +
+      ggplot2::ylab("Number of Events") +ggplot2::geom_violin(fill = NA)
   } else {
     p1 <- ggplot2::ggplot(dfCount, ggplot2::aes(x = type, y = AScount, fill = type)) +
-      ggplot2::geom_dotplot(binaxis='y', stackdir='center') + ggplot2::theme_bw()+ggplot2::scale_fill_manual(values=c("brown", "chartreuse4"))+ ggplot2::xlab("Group") + ggplot2::ylab("Number of Events") +ggplot2::geom_violin(fill = NA)
+      ggplot2::geom_dotplot(binaxis='y', stackdir='center') + ggplot2::theme_bw()+
+      ggplot2::scale_fill_manual(values=c("brown", "chartreuse4"))+ ggplot2::xlab("Group") +
+      ggplot2::ylab("Number of Events")
   }
 
 
@@ -27,11 +32,11 @@ getOverviewComparison <- function(data_list, sample_list, exon_type) {
   if (length(sample_list) > 8) {
     p2 <- ggplot2::ggplot(dfASpg, ggplot2::aes(x = type, y = ASpg, fill = type)) + ggplot2::geom_dotplot(binaxis='y', stackdir='center') + ggplot2::theme_bw()+
       ggplot2::scale_fill_manual(values=c("brown", "chartreuse4")) + ggplot2::xlab("Group") +
-      ggplot2::ylab(paste0("Mean ", exon_type, " \n per gene"))
+      ggplot2::ylab(paste0("Mean ", exon_type, " \n per gene")) + ggplot2::geom_violin(fill = NA)
   } else {
     p2 <- ggplot2::ggplot(dfASpg, ggplot2::aes(x = type, y = ASpg, fill = type)) + ggplot2::geom_dotplot(binaxis='y', stackdir='center') + ggplot2::theme_bw()+
       ggplot2::scale_fill_manual(values=c("brown", "chartreuse4")) + ggplot2::xlab("Group") +
-      ggplot2::ylab(paste0("Mean ", exon_type, " \n per gene")) + ggplot2::geom_violin(fill = NA)
+      ggplot2::ylab(paste0("Mean ", exon_type, " \n per gene"))
   }
   ## PSI distribution across phenotype
   psiVals <- lapply(data_list, function(x) x[,grep("PSI", colnames(x))])
