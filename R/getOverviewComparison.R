@@ -21,10 +21,8 @@ getOverviewComparison <- function(control_names, test_names, exon_type) {
   sample_list <- c(sample_types[which(unlist(lapply(sample_types, "[[", 2)) == "control")], sample_types[which(unlist(lapply(sample_types, "[[", 2)) == "test")])
 
   # Load PSI values for each sample and splicing event type
-  data_list <- lapply(sample_types_sorted, function(x) read.table(paste0(x[1], paste0(".", et, "PSI")), header = T, sep = '\t'))
+  data_list <- lapply(sample_list, function(x) read.table(paste0(x[1], paste0(".", exon_type, "PSI")), header = T, sep = '\t'))
 
-  goc <- getOverviewComparison(load_output, sample_types_sorted, et)
-  print(goc[[4]])
   ## Number of AS across phenotype
   nASE <- lapply(data_list, function(x) nrow(x[x[,grep("PSI", colnames(x))] > 0,]))
   dfCount <- data.frame(AScount = unlist(nASE),
@@ -63,7 +61,7 @@ getOverviewComparison <- function(control_names, test_names, exon_type) {
   dfECDF <- dfECDF[dfECDF$val < 1 & dfECDF$val > 0,]
   p3 <- ggplot2::ggplot(dfECDF, ggplot2::aes(x = val, colour = type, fill = type)) +
     ggplot2::stat_ecdf(geom = "step") + ggplot2::theme_bw() + ggplot2::scale_color_manual(breaks=c("control","test"),
-                                                                                 values=c("brown", "chartreuse4")) + ggplot2::xlab("PSI") + ggplot2::ylab(paste0(exon_type, " PSI ECDF"))
+                                                                                          values=c("brown", "chartreuse4")) + ggplot2::xlab("PSI") + ggplot2::ylab(paste0(exon_type, " PSI ECDF"))
   comb_plot <- ggpubr::ggarrange(p1, p2, p3, labels = c("A", "B", "C"))
 
   return(list(p1 = p1, p2 = p2, p3 = p3, comb_plot = comb_plot))
