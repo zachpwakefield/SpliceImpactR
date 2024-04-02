@@ -2,9 +2,15 @@
 % Please edit documentation in R/getOverviewComparison.R
 \name{getOverviewComparison}
 \alias{getOverviewComparison}
-\title{Get comparison between phenotypes: count of AS event, count of AS event per gene, ECDF compare}
+\title{Get comparison between phenotypes: count of AS event, count of AS event per gene, ECDF compare and save to Foreground subdir}
 \usage{
-getOverviewComparison(control_names, test_names, exon_type)
+getOverviewComparison(
+  control_names,
+  test_names,
+  exon_type,
+  output_location,
+  plot = T
+)
 }
 \arguments{
 \item{control_names}{paths of control samples}
@@ -12,13 +18,15 @@ getOverviewComparison(control_names, test_names, exon_type)
 \item{test_names}{paths of test samples}
 
 \item{exon_type}{type of AS being investigated}
+
+\item{output_location}{location where everything is being saved}
 }
 \value{
 3 individual plots and 1 combined plot.
 }
 \description{
-Get comparison between phenotypes: count of AS event, count of AS event per gene, ECDF compare
+Get comparison between phenotypes: count of AS event, count of AS event per gene, ECDF compare and save to Foreground subdir
 }
 \examples{
-getOverviewComparison(c("path_control1", "path_control2"), c("path_test1", "path_test2"), "AFE")
+getOverviewComparison(c("path_control1", "path_control2"), c("path_test1", "path_test2"), "AFE", "path_to_output")
 }

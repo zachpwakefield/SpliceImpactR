@@ -1,12 +1,13 @@
-#' Get comparison between phenotypes: count of AS event, count of AS event per gene, ECDF compare
+#' Get comparison between phenotypes: count of AS event, count of AS event per gene, ECDF compare and save to Foreground subdir
 #'
 #' @param control_names paths of control samples
 #' @param test_names paths of test samples
 #' @param exon_type type of AS being investigated
+#' @param output_location location where everything is being saved
 #' @return 3 individual plots and 1 combined plot.
 #' @examples
-#' getOverviewComparison(c("path_control1", "path_control2"), c("path_test1", "path_test2"), "AFE")
-getOverviewComparison <- function(control_names, test_names, exon_type) {
+#' getOverviewComparison(c("path_control1", "path_control2"), c("path_test1", "path_test2"), "AFE", "path_to_output")
+getOverviewComparison <- function(control_names, test_names, exon_type, output_location, plot = T) {
   sample_types <- list()
 
   # Categorize each sample name as 'test' or 'control'
@@ -63,6 +64,10 @@ getOverviewComparison <- function(control_names, test_names, exon_type) {
     ggplot2::stat_ecdf(geom = "step") + ggplot2::theme_bw() + ggplot2::scale_color_manual(breaks=c("control","test"),
                                                                                           values=c("brown", "chartreuse4")) + ggplot2::xlab("PSI") + ggplot2::ylab(paste0(exon_type, " PSI ECDF"))
   comb_plot <- ggpubr::ggarrange(p1, p2, p3, labels = c("A", "B", "C"))
+
+  pdf(paste0(output_location, "Foreground/", "comparison_plots.pdf"))
+  print(comb_plot)
+  dev.off()
 
   return(list(p1 = p1, p2 = p2, p3 = p3, comb_plot = comb_plot))
 }

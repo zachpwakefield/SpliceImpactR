@@ -42,6 +42,8 @@ getfxnlASoutcome <- function(output_location,
                      pdir=pdir,
                      output_location=output_location)
 
+  initial_comparison <- getOverviewComparison(control_names, test_names, exon_type, output_location)
+
   pfg <- getPaired(foreground = fg$proBed, et = exon_type, nucleotides = c_nucs, output_location = output_location, newGTF = newGTF, saveAlignments = F)
 
   if (tti_location == "") {
