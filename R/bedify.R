@@ -7,8 +7,8 @@ bedifyForeground <- function(matched, outname, cores) {
 
   # Creat a carbon copy of matched with changed column names to avoid ".x" and ".y"
   matched_carbon <- matched %>%
-    dplyr::rename(.data$matchedStart = start) %>%
-    dplyr::rename(.data$matchedStop = stop)
+    dplyr::rename(matchedStart = .data$start) %>%
+    dplyr::rename(matchedStop = .data$stop)
 
   # Left join matched data with gtf_exons based on transcriptID
   bed <- dplyr::left_join(matched_carbon, gtf_exons_limited, by = "transcriptID")
