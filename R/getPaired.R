@@ -73,8 +73,8 @@ getPaired <- function(foreground, et, nucleotides, newGTF, cores = 4, output_loc
     placeholder_tri <- matchAlignType(proBed = combined_rows_df_expanded, protCode = combined_rows_df_expanded$prot, nucleotides = nucleotides, output_location = output_location,
                                                    saveAlignments = T)
     proBed <- placeholder_tri[[1]]
-    pMatch <- placeholder_tri[[1]]
-    alignType <- placeholder_tri[[1]]
+    pMatch <- placeholder_tri[[2]]
+    alignType <- placeholder_tri[[3]]
 
     combined_rows_df_expanded$pMatch <- rep(as.numeric(pMatch), each = 2)
     combined_rows_df_expanded$alignType <- rep(alignType, each = 2)
