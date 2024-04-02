@@ -35,7 +35,7 @@ getOverviewComparison <- function(data_list, sample_list) {
 
   dfECDF <- dfECDF[dfECDF$val < 1 & dfECDF$val > 0,]
   p3 <- ggplot2::ggplot(dfECDF, ggplot2::aes(x = val, colour = type, fill = type)) +
-    stat_ecdf(geom = "step") + ggplot2::theme_bw() + ggplot2::scale_color_manual(breaks=c("control","test"),
+    ggplot2::stat_ecdf(geom = "step") + ggplot2::theme_bw() + ggplot2::scale_color_manual(breaks=c("control","test"),
                                                                                  values=c("brown", "chartreuse4")) + ggplot2::xlab("PSI") + ggplot2::ylab("ECDF")
   comb_plot <- ggpubr::ggarrange(p1, p2, p3, labels = c("A", "B", "C"))
 
