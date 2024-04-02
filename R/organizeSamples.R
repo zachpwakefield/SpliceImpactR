@@ -7,7 +7,7 @@
 # # rmats
 # # hit
 
-organizeSamples <- function(samples, cores = 1) {
+organizeSamples <- function(samples, output_location, cores = 1) {
 
   # Create a main directory to store all the data
   system(paste0("mkdir ", paste0(output_location, 'data/')))

@@ -21,3 +21,8 @@ import(igraph)
 import(BiocManager)
 import(biomaRt)
 import(rtracklayer)
+importFrom("grDevices", "dev.off", "pdf")
+importFrom("stats", "binomial", "coef", "cooks.distance", "glm", "lm",
+               "logLik", "p.adjust", "pchisq", "setNames")
+importFrom("utils", "read.csv", "read.delim", "read.table",
+               "write.csv")
