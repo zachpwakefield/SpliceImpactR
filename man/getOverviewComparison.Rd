@@ -20,5 +20,5 @@ getOverviewComparison(data_list, sample_list, exon_type)
 Get comparison between phenotypes: count of AS event, count of AS event per gene, ECDF compare
 }
 \examples{
-getOverviewComparison(load_output, sample_types_sorted)
+getOverviewComparison(load_output, sample_types_sorted, "AFE")
 }

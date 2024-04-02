@@ -5,7 +5,7 @@
 #' @param exon_type type of AS being investigated
 #' @return 3 individual plots and 1 combined plot.
 #' @examples
-#' getOverviewComparison(load_output, sample_types_sorted)
+#' getOverviewComparison(load_output, sample_types_sorted, "AFE")
 getOverviewComparison <- function(data_list, sample_list, exon_type) {
 
   ## Number of AS across phenotype
