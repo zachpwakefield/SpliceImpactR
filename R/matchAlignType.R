@@ -23,7 +23,7 @@ matchAlignType <- function(proBed, protCode, nucleotides, output_location, saveA
       } else {
         alignType <- c("PartialMatch")
       }
-      if (saveAlignment) {
+      if (saveAlignments) {
         try(msaPrettyPrint(msa(Biostrings::AAStringSet(c(protCode[i], protCode[i+1])), verbose = FALSE), askForOverwrite=FALSE,
                            file = paste(output_location, "pairedAlignments/", proBed$transcript[i], "_", proBed$transcript[i+1], "_pm_Alignment.pdf", sep = ""), output = "pdf"))
       }

@@ -31,3 +31,4 @@ Imports:
   biomaRt, 
   hypeR,
   rtracklayer
+RoxygenNote: 7.1.2
