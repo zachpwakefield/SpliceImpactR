@@ -1,5 +1,6 @@
 differential_inclusion_rMATS <- function(control_names, test_names,
-                                         stat_model_bool = T, outlier_bool = T, et, cores, outlier_threshold, min_proportion_samples_per_phenotype = .333) {
+                                         stat_model_bool = T, outlier_bool = T, et, cores, outlier_threshold,
+                                         min_proportion_samples_per_phenotype = .2) {
 
   if ((length(test_names) + length(control_names)) < 6 & (stat_model_bool | outlier_bool) ) {
     warning("Don't use the stat model and outlier filtering with low sample number (eg: <= 6)")
