@@ -4,12 +4,14 @@
 \alias{getOverviewComparison}
 \title{Get comparison between phenotypes: count of AS event, count of AS event per gene, ECDF compare}
 \usage{
-getOverviewComparison(data_list, sample_list)
+getOverviewComparison(data_list, sample_list, exon_type)
 }
 \arguments{
 \item{data_list}{A list containing dataframes of each output file from HIT Index or rMATS as index 1 and "control" or "test" as index 2 for each position in the list}
 
 \item{sample_list}{sample_types_sorted from di function}
+
+\item{exon_type}{type of AS being investigated}
 }
 \value{
 3 individual plots and 1 combined plot.
