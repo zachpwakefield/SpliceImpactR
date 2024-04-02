@@ -1,13 +1,30 @@
 #' Get comparison between phenotypes: count of AS event, count of AS event per gene, ECDF compare
 #'
-#' @param data_list A list containing dataframes of each output file from HIT Index or rMATS as index 1 and "control" or "test" as index 2 for each position in the list
-#' @param sample_list sample_types_sorted from di function
+#' @param control_names paths of control samples
+#' @param test_names paths of test samples
 #' @param exon_type type of AS being investigated
 #' @return 3 individual plots and 1 combined plot.
 #' @examples
-#' getOverviewComparison(load_output, sample_types_sorted, "AFE")
-getOverviewComparison <- function(data_list, sample_list, exon_type) {
+#' getOverviewComparison(c("path_control1", "path_control2"), c("path_test1", "path_test2"), "AFE")
+getOverviewComparison <- function(control_names, test_names, exon_type) {
+  sample_types <- list()
 
+  # Categorize each sample name as 'test' or 'control'
+  for (i in test_names) {
+    sample_types <- c(sample_types, list(c(i, 'test')))
+  }
+
+  for (i in control_names) {
+    sample_types <- c(sample_types, list(c(i, 'control')))
+  }
+  # Sort samples by type (control then test)
+  sample_list <- c(sample_types[which(unlist(lapply(sample_types, "[[", 2)) == "control")], sample_types[which(unlist(lapply(sample_types, "[[", 2)) == "test")])
+
+  # Load PSI values for each sample and splicing event type
+  data_list <- lapply(sample_types_sorted, function(x) read.table(paste0(x[1], paste0(".", et, "PSI")), header = T, sep = '\t'))
+
+  goc <- getOverviewComparison(load_output, sample_types_sorted, et)
+  print(goc[[4]])
   ## Number of AS across phenotype
   nASE <- lapply(data_list, function(x) nrow(x[x[,grep("PSI", colnames(x))] > 0,]))
   dfCount <- data.frame(AScount = unlist(nASE),

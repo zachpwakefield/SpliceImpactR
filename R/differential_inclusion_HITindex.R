@@ -28,9 +28,6 @@ differential_inclusion_HITindex <- function(test_names, control_names, cores = 2
     # Load PSI values for each sample and splicing event type
     load_output <- lapply(sample_types_sorted, function(x) read.table(paste0(x[1], paste0(".", et, "PSI")), header = T, sep = '\t'))
 
-    goc <- getOverviewComparison(load_output, sample_types_sorted, et)
-    print(goc[[4]])
-
     # Extract unique genes and exons
     genes <- unique(unlist(lapply(load_output, function(x) x$gene)))
     exons <- lapply(genes, function(x) unique(unlist(lapply(load_output, function(y) y$exon[y$gene == x]))))
