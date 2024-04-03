@@ -4,7 +4,7 @@
 #' @param test_names paths of test samples
 #' @param exon_type type of AS being investigated
 #' @param output_location location where everything is being saved
-#' @return 3 individual plots and 1 combined plot.
+#' @return 4 individual plots and 1 combined plot.
 #' @examples
 #' getOverviewComparison(c("path_control1", "path_control2"), c("path_test1", "path_test2"), "AFE", "path_to_output")
 getOverviewComparison <- function(control_names, test_names, exon_type, output_location, plot = T) {
@@ -54,20 +54,44 @@ getOverviewComparison <- function(control_names, test_names, exon_type, output_l
       ggplot2::scale_fill_manual(values=c("brown", "chartreuse4")) + ggplot2::xlab("Group") +
       ggplot2::ylab(paste0("Mean ", exon_type, " \n per gene"))
   }
+
+  ## Distribution of Isoforms
+  dASpg <- lapply(data_list, function(x) as.numeric(table(x$gene)))
+  dfdASpg <- data.frame(ASpg = unlist(dASpg),
+                        type = unlist(lapply(1:length(dASpg), function(x) rep(unlist(lapply(sample_list, "[[", 2))[x], length(dASpg[[x]])))))
+
+  p3 <- ggplot2::ggplot(dfdASpg, ggplot2::aes(y = .data$ASpg, fill = .data$type)) +
+    ggplot2::geom_histogram(binwidth = 1) + ggplot2::theme_bw() +
+    ggplot2::scale_x_continuous(breaks=seq(0,
+                                           max(c(as.integer(table(dfdASpg$ASpg[dfdASpg$type == "control"])),
+                                                 as.integer(table(dfdASpg$ASpg[dfdASpg$type == "test"])))),
+                                           floor(max(c(as.integer(table(dfdASpg$ASpg[dfdASpg$type == "control"])),
+                                                       as.integer(table(dfdASpg$ASpg[dfdASpg$type == "test"]))))/2))) +
+    ggplot2::facet_wrap(ggplot2::vars(.data$type), strip.position = "bottom") +
+    ggplot2::scale_fill_manual(values=c("brown", "chartreuse4")) +
+    ggplot2::xlab(paste0("Gene count")) +
+    ggplot2::ylab(paste0(exon_type, " count per gene")) +
+    theme(strip.background=ggplot2::element_rect(colour="black",
+                                                 fill="white"),
+          axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1))
+
   ## PSI distribution across phenotype
   psiVals <- lapply(data_list, function(x) x[,grep("PSI", colnames(x))])
   dfECDF <- data.frame(val = unlist(psiVals),
                        type = unlist(lapply(1:length(psiVals), function(x) rep(unlist(lapply(sample_list, "[[", 2))[x], length(psiVals[[x]])))))
 
   dfECDF <- dfECDF[dfECDF$val < 1 & dfECDF$val > 0,]
-  p3 <- ggplot2::ggplot(dfECDF, ggplot2::aes(x = val, colour = type, fill = type)) +
+  p4 <- ggplot2::ggplot(dfECDF, ggplot2::aes(x = val, colour = type, fill = type)) +
     ggplot2::stat_ecdf(geom = "step") + ggplot2::theme_bw() + ggplot2::scale_color_manual(breaks=c("control","test"),
-                                                                                          values=c("brown", "chartreuse4")) + ggplot2::xlab("PSI") + ggplot2::ylab(paste0(exon_type, " PSI ECDF"))
-  comb_plot <- ggpubr::ggarrange(p1, p2, p3, labels = c("A", "B", "C"))
+                                                                                          values=c("brown", "chartreuse4")) + ggplot2::xlab("PSI") + ggplot2::ylab(paste0(exon_type, " PSI eCDF"))
+  comb_plot <- ggpubr::ggarrange(p1, p2, p3, p4, labels = c("A", "B", "C", "D"),
+                                 common.legend = TRUE, legend="bottom")
 
   pdf(paste0(output_location, "Foreground/", "comparison_plots.pdf"))
   print(comb_plot)
   dev.off()
+
+
 
   return(list(p1 = p1, p2 = p2, p3 = p3, comb_plot = comb_plot))
 }

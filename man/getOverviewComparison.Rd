@@ -22,7 +22,7 @@ getOverviewComparison(
 \item{output_location}{location where everything is being saved}
 }
 \value{
-3 individual plots and 1 combined plot.
+4 individual plots and 1 combined plot.
 }
 \description{
 Get comparison between phenotypes: count of AS event, count of AS event per gene, ECDF compare and save to Foreground subdir
