@@ -62,7 +62,7 @@ getOverviewComparison <- function(control_names, test_names, exon_type, output_l
 
   p3 <- ggplot2::ggplot(dfdASpg, ggplot2::aes(y = .data$ASpg, fill = .data$type)) +
     ggplot2::geom_histogram(binwidth = 1) + ggplot2::theme_bw() +
-    ggplot2::scale_y_continuous(breaks=seq(1,max(.data$ASpg)))+
+    ggplot2::scale_y_continuous(breaks=seq(1,max(dfdASpg$ASpg)))+
     ggplot2::scale_x_continuous(breaks=seq(0,
                                            max(c(as.integer(table(dfdASpg$ASpg[dfdASpg$type == "control"])),
                                                  as.integer(table(dfdASpg$ASpg[dfdASpg$type == "test"])))),
