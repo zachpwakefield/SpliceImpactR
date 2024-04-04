@@ -109,9 +109,9 @@ getPaired <- function(foreground, et, nucleotides, newGTF, cores = 4, output_loc
     gdf_df3 <- gdf_df[gdf_df$type != "noPC" & gdf_df$type != "onePC",]
 
 
-    dfProp <- data.frame(vals = as.numeric(table(gdf_df$type)),
-                         type = names(table(gdf_df$type)),
-                         col = c("Pair Type", "Pair Type", "Pair Type"))
+    dfProp <- data.frame(vals = c(sum(gdf_df == 'noPC'), sum(gdf_df == 'onePC'), sum(gdf_df == 'Match'), sum(gdf_df == 'FrameShift'), sum(gdf_df == 'PartialMatch')),
+                         type = c("noPC", "onePC", "Match", "FrameShift", "PartialMatch"),
+                         col = c("Pair Type", "Pair Type", "Pair Type", "Pair Type", "Pair Type"))
 
     (propCoding <- ggplot2::ggplot(dfProp, ggplot2::aes(fill=.data$type, x = .data$col, y = .data$vals)) +
       geom_bar(position="stack", stat="identity") +
