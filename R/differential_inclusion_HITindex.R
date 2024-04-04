@@ -5,7 +5,7 @@
 differential_inclusion_HITindex <- function(test_names, control_names, cores = 2, stat_model_bool = T, outlier_bool = T,
                                             outlier_threshold = c("4/n", "4/mean", "1", 1)[1], min_proportion_samples_per_phenotype = .2) {
   if ((length(test_names) + length(control_names)) < 6 & (stat_model_bool | outlier_bool) ) {
-    warning("Don't use the stat model and outlier filtering with low sample number (eg: <= 6)")
+    warning("The stat model and outlier filtering will not have much power with low sample number (eg: <= 6)")
   }
 
   sample_types <- list()
