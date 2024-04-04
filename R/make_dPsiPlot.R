@@ -1,4 +1,4 @@
-make_dPsiPlot <- function(dpsi_df, pdir, num_thresh = 30) {
+make_dPsiPlot <- function(dpsi_df, stat_bool = T, thresh, pdir, num_thresh = 30) {
 
   # Map Ensembl IDs in the lfc_df to HGNC symbols using the conversion table
   gene_id_to_name <- setNames(gtf$geneName, gtf$geneID)
@@ -16,13 +16,24 @@ make_dPsiPlot <- function(dpsi_df, pdir, num_thresh = 30) {
   # Remove gene labels for points below the threshold (either by p-value or log fold change)
   dpsi_df$hgnc[-log(dpsi_df$p.adj) <= -log(lab_thresh$p.adj[num_thresh]) | abs(dpsi_df$delta.psi) < abs(lab_thresh$delta.psi[num_thresh])]  <- ""
 
+  if (stat_bool) {
+    # Create the log fold change plot using ggplot2
+    (deExons <- ggplot2::ggplot(dpsi_df,ggplot2:: aes(x = .data$delta.psi, y = -log(.data$p.adj), color = col, label = hgnc)) + ggplot2::geom_point(ggplot2::aes(shape = type), size = 2, color = dpsi_df$col) +
+       ggplot2::theme_classic() + ggplot2::ylab("-Log2(FDR)") + ggplot2::xlab("Delta Psi")
+     # +coord_cartesian(xlim = c(-100, 20))
+     # + ggplot2::geom_text(hjust=.2, vjust=0, size = 3)
+    )
+  } else {
+    diE <- data.frame(val = c(sum(dpsi_df$delta.psi <= thresh), sum(dpsi_df$delta.psi >= thresh)),
+               type = c("-", "+"))
 
-  # Create the log fold change plot using ggplot2
-  (deExons <- ggplot2::ggplot(dpsi_df,ggplot2:: aes(x = delta.psi, y = -log(p.adj), color = col, label = hgnc)) + ggplot2::geom_point(ggplot2::aes(shape = type), size = 2, color = dpsi_df$col) +
-      ggplot2::theme_classic() + ggplot2::ylab("-Log2(FDR)") + ggplot2::xlab("Delta Psi")
-    # +coord_cartesian(xlim = c(-100, 20))
-    # + ggplot2::geom_text(hjust=.2, vjust=0, size = 3)
-  )
+    (deExons <- ggplot2::ggplot(diE ,ggplot2:: aes(x = .data$type, y = .data$val, fill = .data$type)) +
+        ggplot2::geom_bar(stat="identity") + ggplot2::ylab("Count") + ggplot2::xlab("diExons") +
+       ggplot2::theme_classic()
+    )
+
+  }
+
   print("delta psi plot done!") # Print completion message
   return(deExons) # Return the ggplot2 object for the plot
 }

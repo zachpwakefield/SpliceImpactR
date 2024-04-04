@@ -21,7 +21,7 @@ getLengthComparison <- function(paired_df, output_location) {
 
   posneg_change_in_length <- unlist(lapply(seq(1, nrow(paired_df), by = 2), function(x) {
     if (paired_df$protLength[x] != 0 & paired_df$protLength[x+1] != 0) {
-      paired_df$protLength[x+1]-paired_df$protLength[x]
+      paired_df$protLength[x]-paired_df$protLength[x+1]
     }}))
 
   proteinLength$deltaLength <- posneg_change_in_length
