@@ -29,7 +29,7 @@ make_dPsiPlot <- function(dpsi_df, thresh = .2, p_thresh = .05, pdir, num_thresh
 
   (deExons_chart <- ggplot2::ggplot(diE ,ggplot2:: aes(x = .data$type, y = .data$val, fill = .data$type)) +
       ggplot2::geom_bar(stat="identity") + ggplot2::ylab("Count") + ggplot2::xlab("diExons") +
-     ggplot2::theme_classic() + ggplot2::scale_fill_manual(values=c("brown", "chartreuse4", ), breaks = c("-", "+"))
+     ggplot2::theme_classic() + ggplot2::scale_fill_manual(values=c("brown", "chartreuse4"), breaks = c("-", "+"))
   )
 
 
