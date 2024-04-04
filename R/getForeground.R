@@ -9,7 +9,7 @@ getForeground <- function(input, test_names, control_names, thresh, fdr, mOverla
   bdf.l <- df.l[abs(df.l$delta.psi) >= thresh & df.l$p.adj <= fdr,]
 
   ## Make volcano plot with make_lfcPlot()
-  lfcPlot <- make_dPsiPlot(df.l, pdir = pdir)
+  lfcPlot <- make_dPsiPlot(df.l, thresh = thresh, p_thresh = .05, pdir = pdir)
 
   ## Make data.frame with gene, location of each exon on total foreground
   redExon <- data.frame(geneR = unlist(lapply(strsplit(bdf.l$gene, split = "[.]"), "[[", 1)),
@@ -89,7 +89,11 @@ getForeground <- function(input, test_names, control_names, thresh, fdr, mOverla
   write_csv(bed,  paste0(output_location, "Foreground/", "fgexonBed.csv"))
 
   pdf(paste0(output_location, "Foreground/", "delta_psi_plot.pdf"))
-  print(lfcPlot)
+  print(lfcPlot[[1]])
+  dev.off()
+
+  pdf(paste0(output_location, "Foreground/", "diExonChart.pdf"))
+  print(lfcPlot[[2]])
   dev.off()
 
 
