@@ -138,9 +138,9 @@ getPaired <- function(foreground, et, nucleotides, newGTF, cores = 4, output_loc
         ggplot2::scale_fill_manual(values=c('noPC' = "azure4", 'Match' = "#E69F00", 'onePC' = "#56B4E9", 'FrameShift' = "pink", 'PartialMatch' = "deeppink4")) +
         ggplot2::theme_classic() + ggplot2::xlab("Alignment Score") + ggplot2::ylab("Fraction"))
 
-    gdf1_comp <- ggpubr::ggarrange(dfProp, gdf1, nrow = 1, widths = c(1, 3))
-    gdf2_comp <- ggpubr::ggarrange(dfProp, gdf2, nrow = 1, widths = c(1, 3))
-    gdf3_comp <- ggpubr::ggarrange(dfProp, gdf3, nrow = 1, widths = c(1, 3))
+    gdf1_comp <- ggpubr::ggarrange(propCoding, gdf1, nrow = 1, widths = c(1, 2))
+    gdf2_comp <- ggpubr::ggarrange(propCoding, gdf2, nrow = 1, widths = c(1, 2))
+    gdf3_comp <- ggpubr::ggarrange(propCoding, gdf3, nrow = 1, widths = c(1, 2))
     # remove pair number from gene name after the pairing process
     exon_pairs_df$gene <- unlist(lapply(strsplit(exon_pairs_df$gene, split = "#"), "[[", 1))
     combined_rows_df_expanded$gene <- unlist(lapply(strsplit(combined_rows_df_expanded$gene, split = "#"), "[[", 1))
@@ -162,13 +162,13 @@ getPaired <- function(foreground, et, nucleotides, newGTF, cores = 4, output_loc
     print(gdf3_comp)
     dev.off()
     pdf(paste0(output_location, "pairedOutput/", "pc_prop.pdf"))
-    print(dfProp)
+    print(propCoding)
     dev.off()
 
     # Return the combined dataframe of exon pairs with their corresponding rows from the input dataframe
     # exon_pairs is minimal information
     # combined_rows is maximal information
-    return(list(exon_pairs = exon_pairs_df, paired_proBed = combined_rows_df_expanded, gdf=gdf1_comp, gdf2=gdf2_comp,gdf3=gdf3_comp))
+    return(list(exon_pairs = exon_pairs_df, paired_proBed = combined_rows_df_expanded, gdf=gdf1_comp, gdf2=gdf2_comp,gdf3=gdf3_comp, propCoding = propCoding))
   }
 }
 
