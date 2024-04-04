@@ -168,7 +168,7 @@ getPaired <- function(foreground, et, nucleotides, newGTF, cores = 4, output_loc
     # Return the combined dataframe of exon pairs with their corresponding rows from the input dataframe
     # exon_pairs is minimal information
     # combined_rows is maximal information
-    return(list(exon_pairs = exon_pairs_df, paired_proBed = combined_rows_df_expanded, gdf=gdf, gdf2=gdf2,gdf3=gdf3))
+    return(list(exon_pairs = exon_pairs_df, paired_proBed = combined_rows_df_expanded, gdf=gdf1_comp, gdf2=gdf2_comp,gdf3=gdf3_comp))
   }
 }
 
