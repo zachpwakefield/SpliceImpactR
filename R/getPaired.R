@@ -138,9 +138,12 @@ getPaired <- function(foreground, et, nucleotides, newGTF, cores = 4, output_loc
         ggplot2::scale_fill_manual(values=c('noPC' = "azure4", 'Match' = "#E69F00", 'onePC' = "#56B4E9", 'FrameShift' = "pink", 'PartialMatch' = "deeppink4")) +
         ggplot2::theme_classic() + ggplot2::xlab("Alignment Score") + ggplot2::ylab("Fraction"))
 
-    gdf1_comp <- ggpubr::ggarrange(propCoding, gdf1, nrow = 1, widths = c(1, 2))
-    gdf2_comp <- ggpubr::ggarrange(propCoding, gdf2, nrow = 1, widths = c(1, 2))
-    gdf3_comp <- ggpubr::ggarrange(propCoding, gdf3, nrow = 1, widths = c(1, 2))
+    gdf1_comp <- ggpubr::ggarrange(propCoding, gdf1, nrow = 1, widths = c(1, 2),
+                                   common.legend = TRUE)
+    gdf2_comp <- ggpubr::ggarrange(propCoding, gdf2, nrow = 1, widths = c(1, 2),
+                                   common.legend = TRUE)
+    gdf3_comp <- ggpubr::ggarrange(propCoding, gdf3, nrow = 1, widths = c(1, 2),
+                                   common.legend = TRUE)
     # remove pair number from gene name after the pairing process
     exon_pairs_df$gene <- unlist(lapply(strsplit(exon_pairs_df$gene, split = "#"), "[[", 1))
     combined_rows_df_expanded$gene <- unlist(lapply(strsplit(combined_rows_df_expanded$gene, split = "#"), "[[", 1))
