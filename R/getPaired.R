@@ -108,6 +108,16 @@ getPaired <- function(foreground, et, nucleotides, newGTF, cores = 4, output_loc
     gdf_df2 <- gdf_df[gdf_df$type != "noPC",]
     gdf_df3 <- gdf_df[gdf_df$type != "noPC" & gdf_df$type != "onePC",]
 
+
+    dfProp <- data.frame(vals = as.numeric(table(gdf_df$type)),
+                         type = names(table(gdf_df$type)),
+                         col = c("Pair Type", "Pair Type", "Pair Type"))
+
+    (propCoding <- ggplot2::ggplot(dfProp, ggplot2::aes(fill=.data$type, x = .data$col, y = .data$vals)) +
+      geom_bar(position="stack", stat="identity") +
+      ggplot2::scale_fill_manual(values=c('noPC' = "azure4", 'Match' = "#E69F00", 'onePC' = "#56B4E9", 'FrameShift' = "pink", 'PartialMatch' = "deeppink4")) +
+      ggplot2::theme_classic() + ggplot2::xlab("") + ggplot2::ylab("Count"))
+
     # Alignment plot showing distribution of different type of exon swapping
     (gdf <- ggplot2::ggplot(gdf_df, ggplot2::aes(x = dens, fill = type)) +
         ggplot2::geom_histogram(ggplot2::aes(y=ggplot2::after_stat(count)/sum(ggplot2::after_stat(count))), colour = 1,
@@ -128,6 +138,9 @@ getPaired <- function(foreground, et, nucleotides, newGTF, cores = 4, output_loc
         ggplot2::scale_fill_manual(values=c('noPC' = "azure4", 'Match' = "#E69F00", 'onePC' = "#56B4E9", 'FrameShift' = "pink", 'PartialMatch' = "deeppink4")) +
         ggplot2::theme_classic() + ggplot2::xlab("Alignment Score") + ggplot2::ylab("Fraction"))
 
+    gdf1_comp <- ggpubr::ggarrange(dfProp, gdf1, nrow = 1, widths = c(1, 3))
+    gdf2_comp <- ggpubr::ggarrange(dfProp, gdf2, nrow = 1, widths = c(1, 3))
+    gdf3_comp <- ggpubr::ggarrange(dfProp, gdf3, nrow = 1, widths = c(1, 3))
     # remove pair number from gene name after the pairing process
     exon_pairs_df$gene <- unlist(lapply(strsplit(exon_pairs_df$gene, split = "#"), "[[", 1))
     combined_rows_df_expanded$gene <- unlist(lapply(strsplit(combined_rows_df_expanded$gene, split = "#"), "[[", 1))
@@ -140,13 +153,16 @@ getPaired <- function(foreground, et, nucleotides, newGTF, cores = 4, output_loc
     write_csv(combined_rows_df_expanded, paste0(output_location, "pairedOutput/", "paired_combined_rows.csv"))
 
     pdf(paste0(output_location, "pairedOutput/", "align_noPC.pdf"))
-    print(gdf)
+    print(gdf1_comp)
     dev.off()
     pdf(paste0(output_location, "pairedOutput/", "align_onePC.pdf"))
-    print(gdf2)
+    print(gdf2_comp)
     dev.off()
     pdf(paste0(output_location, "pairedOutput/", "align_PC.pdf"))
-    print(gdf3)
+    print(gdf3_comp)
+    dev.off()
+    pdf(paste0(output_location, "pairedOutput/", "pc_prop.pdf"))
+    print(dfProp)
     dev.off()
 
     # Return the combined dataframe of exon pairs with their corresponding rows from the input dataframe
