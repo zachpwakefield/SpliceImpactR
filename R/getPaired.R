@@ -65,13 +65,17 @@ getPaired <- function(foreground, et, nucleotides, newGTF, cores = 4, output_loc
     # Combine all rows into a single data frame
     combined_rows_df <- do.call(rbind, combined_rows)
     combined_rows_df_expanded <- do.call(rbind, lapply(1:nrow(combined_rows_df), function(x) {
-      rbind(foreground[foreground$exon_id == combined_rows_df$pos_exon_id[x] & foreground$add_inf == combined_rows_df$add_inf.pos[x],],
-            foreground[foreground$exon_id == combined_rows_df$neg_exon_id[x] & foreground$add_inf == combined_rows_df$add_inf.neg[x],])
+      rbind(foreground[foreground$exon_id == combined_rows_df$pos_exon_id[x] &
+                         foreground$add_inf == combined_rows_df$add_inf.pos[x] &
+                         foreground$gene == combined_rows_df$gene[x],],
+            foreground[foreground$exon_id == combined_rows_df$neg_exon_id[x] &
+                         foreground$add_inf == combined_rows_df$add_inf.neg[x] &
+                         foreground$gene == combined_rows_df$gene[x],])
     }))
 
     # Use matchAlignType to identify protein alignment score and type
     placeholder_tri <- matchAlignType(proBed = combined_rows_df_expanded, protCode = combined_rows_df_expanded$prot, nucleotides = nucleotides, output_location = output_location,
-                                                   saveAlignments = T)
+                                                   saveAlignments = saveAlignments)
     proBed <- placeholder_tri[[1]]
     pMatch <- placeholder_tri[[2]]
     alignType <- placeholder_tri[[3]]
