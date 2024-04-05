@@ -41,7 +41,8 @@ getLengthComparison <- function(paired_df, output_location) {
   pairedLengthPlot <- ggpubr::ggpaired(proteinLengthPaired, cond1 = "cont", cond2 = "test",line.color = "black", line.size = 0.4,
                                        fill = "condition")+
     ggpubr::stat_compare_means(paired = TRUE) +
-    ggplot2::scale_fill_manual(values=c("brown", "chartreuse4"))
+    ggplot2::scale_fill_manual(values=c("brown", "chartreuse4")) +
+    ggplot2::theme(legend.position = "none")
 
   dfPC <- data.frame(count = as.numeric(table(whichPC)),
                      type = names(table(whichPC)))

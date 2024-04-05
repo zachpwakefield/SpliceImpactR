@@ -18,10 +18,11 @@ make_dPsiPlot <- function(dpsi_df, thresh = .2, p_thresh = .05, pdir, num_thresh
 
 
   # Create the log fold change plot using ggplot2
-  (deExons <- ggplot2::ggplot(dpsi_df,ggplot2:: aes(x = .data$delta.psi, y = -log(.data$p.adj), color = col, label = hgnc)) + ggplot2::geom_point(ggplot2::aes(shape = type), size = 2, color = dpsi_df$col) +
-     ggplot2::theme_classic() + ggplot2::ylab("-Log2(FDR)") + ggplot2::xlab("Delta Psi")
-   # +coord_cartesian(xlim = c(-100, 20))
-   # + ggplot2::geom_text(hjust=.2, vjust=0, size = 3)
+  (deExons <- ggplot2::ggplot(dpsi_df,ggplot2:: aes(x = .data$delta.psi, y = -log(.data$p.adj), color = col, label = hgnc)) +
+      ggplot2::geom_point(ggplot2::aes(shape = type), size = 2, color = dpsi_df$col) +
+      ggplot2::theme_classic() + ggplot2::ylab("-Log2(FDR)") +
+      ggplot2::xlab("Delta Psi") +
+      ggplot2::theme(legend.position = "none")
   )
 
   diE <- data.frame(val = c(sum(dpsi_df$delta.psi < -1*(thresh) & dpsi_df$p.adj < .05), sum(dpsi_df$delta.psi > thresh & dpsi_df$p.adj < .05)),
@@ -29,11 +30,12 @@ make_dPsiPlot <- function(dpsi_df, thresh = .2, p_thresh = .05, pdir, num_thresh
 
   (deExons_chart <- ggplot2::ggplot(diE ,ggplot2:: aes(x = .data$type, y = .data$val, fill = .data$type)) +
       ggplot2::geom_bar(stat="identity") + ggplot2::ylab("Count") + ggplot2::xlab("diExons") +
-     ggplot2::theme_classic() + ggplot2::scale_fill_manual(values=c("brown", "chartreuse4"), breaks = c("-", "+"))
+      ggplot2::theme_classic() + ggplot2::scale_fill_manual(values=c("brown", "chartreuse4"), breaks = c("-", "+")) +
+      ggplot2::geom_text(aes(label = .data$val), vjust = 1.5, colour = "white", size = 5) +
+      ggplot2::theme(legend.position = "none")
   )
 
-
+  comb_plot <- ggpubr::ggarrange(deExons_chart, deExons, widths = c(1, 2.5))
   print("delta psi plot done!") # Print completion message
-  return(list(deExons = deExons,
-              deExons_chart = deExons_chart)) # Return the ggplot2 object for the plot
+  return(comb_plot) # Return the ggplot2 object for the plot
 }
