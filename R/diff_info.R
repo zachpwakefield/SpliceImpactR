@@ -1,4 +1,4 @@
-diff_info <- function(de_df, numCont, numExp, exon_type, cores = 8, test_names, control_names, color_thresh = .5) {
+diff_info <- function(de_df, numCont, numExp, exon_type, cores = 8, test_names, control_names, color_thresh = .2) {
   col <- list()  # Initialize list to store colors for visualization
 
   de_df$p.adj[is.na(de_df$p.adj)] <- 1
