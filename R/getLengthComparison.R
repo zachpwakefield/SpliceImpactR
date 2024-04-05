@@ -36,16 +36,15 @@ getLengthComparison <- function(paired_df, output_location) {
       "pc"
     }
   }))
+  proteinLengthPaired <- data.frame(test = as.integer(paired_df$protLength[pc][seq(1, length(pc), by = 2)]),
+                                    cont = as.integer(paired_df$protLength[pc][seq(2, length(pc), by = 2)]))
+  pairedLengthPlot <- ggpubr::ggpaired(proteinLengthPaired, cond1 = "cont", cond2 = "test",line.color = "black", line.size = 0.4,
+                                       fill = "condition")+
+    ggpubr::stat_compare_means(paired = TRUE) +
+    ggplot2::scale_fill_manual(values=c("brown", "chartreuse4"))
 
   dfPC <- data.frame(count = as.numeric(table(whichPC)),
                      type = names(table(whichPC)))
-
-  lengthPlot <- ggplot2::ggplot(proteinLength, ggplot2::aes(x = .data$type, y = .data$protLength, fill = .data$type)) +
-    ggplot2::geom_boxplot() +
-    ggplot2::theme_bw() +
-    ggplot2::scale_fill_manual(values=c("brown", "chartreuse4"), breaks = c("control", "test")) + ggplot2::xlab("Group") +
-    ggplot2::ylab("Protein Length") +
-    ggplot2::theme(legend.position = "none")
 
   changeDistribution_temp <- ggplot2::ggplot(proteinLength, ggplot2::aes(x = .data$deltaLength)) +
     ggplot2::geom_density(fill = "deeppink4", alpha = .4) +
@@ -60,7 +59,7 @@ getLengthComparison <- function(paired_df, output_location) {
   proteinCodingPlot <- ggplot2::ggplot(dfPC, ggplot2::aes(x = .data$count, y = .data$type, fill = .data$type)) + geom_bar(stat="identity") + theme_bw() +
     ggplot2::scale_fill_manual(values=c("brown", "deeppink4", "chartreuse4", "azure4"), breaks = c("pc", "control", "test", 'both'))
 
-  comb_plot <- ggpubr::ggarrange(lengthPlot, changeDistribution, proteinCodingPlot, nrow = 1, widths = c(3, 2.5, 3))
+  comb_plot <- ggpubr::ggarrange(pairedLengthPlot, changeDistribution, proteinCodingPlot, nrow = 1, widths = c(3, 2.5, 3))
 
   pdf(paste0(output_location, "pairedOutput/", "paired_length_comparison_plots.pdf"), height = 8, width = 12)
   print(comb_plot)
