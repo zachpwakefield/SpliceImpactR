@@ -48,12 +48,19 @@ getLengthComparison <- function(paired_df, output_location) {
 
   changeDistribution_temp <- ggplot2::ggplot(proteinLength, ggplot2::aes(x = .data$deltaLength)) +
     ggplot2::geom_density(fill = "deeppink4", alpha = .4) +
-    ggplot2::theme_bw()
+    ggplot2::theme(panel.grid.major = ggplot2::element_blank(),
+                   panel.grid.minor = ggplot2::element_blank(),
+                   panel.background = ggplot2::element_blank(),
+                   axis.line = ggplot2::element_line(colour = "black"))
 
   maxVal <- round(max(ggplot2::ggplot_build(changeDistribution_temp)$data[[1]]$y), 3)
 
   changeDistribution <- changeDistribution_temp + ggplot2::scale_y_continuous(breaks=seq(0,maxVal, maxVal)) + ggplot2::coord_flip() + ggplot2::ylab("Density") +
-    ggplot2::xlab("Change in Protein Length")
+    ggplot2::xlab("Change in Protein Length") +
+    ggplot2::theme(panel.grid.major = ggplot2::element_blank(),
+                   panel.grid.minor = ggplot2::element_blank(),
+                   panel.background = ggplot2::element_blank(),
+                   axis.line = ggplot2::element_line(colour = "black"))
 
 
   proteinCodingPlot <- ggplot2::ggplot(dfPC, ggplot2::aes(x = .data$count, y = .data$type, fill = .data$type)) + geom_bar(stat="identity") + theme_bw() +
