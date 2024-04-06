@@ -13,10 +13,6 @@ make_dPsiPlot <- function(dpsi_df, thresh = .2, p_thresh = .05, pdir, num_thresh
   # Prepare the data for labeling in the plot, sorting by absolute log fold change and adjusted p-value
   lab_thresh <- dpsi_df %>% dplyr::arrange(desc(abs(delta.psi)), p.adj)
 
-  # Remove gene labels for points below the threshold (either by p-value or log fold change)
-  dpsi_df$hgnc[-log(dpsi_df$p.adj) <= -log(lab_thresh$p.adj[num_thresh]) | abs(dpsi_df$delta.psi) < abs(lab_thresh$delta.psi[num_thresh])]  <- ""
-
-
   # Create the log fold change plot using ggplot2
   (deExons <- ggplot2::ggplot(dpsi_df,ggplot2:: aes(x = .data$delta.psi, y = -log(.data$p.adj), color = col, label = hgnc)) +
       ggplot2::geom_point(ggplot2::aes(shape = type), size = 2, color = dpsi_df$col) +
