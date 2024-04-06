@@ -5,9 +5,7 @@ getfxnlASoutcome <- function(output_location,
                              tti_location = "", full_pipe = T) {
   system(paste0("mkdir ",  output_location))
   pdir <- system.file(package="SpliceImpactR")
-  if (length(test_group) > 3 & length(control_group) > 3 ) {
-    boolUse <- T
-  } else {boolUse <- F}
+  boolUse <- T
 
   if (exon_type %in% c("AFE", "HFE")) {
       diHIT <- differential_inclusion_HITindex(test_names = test_group, control_names = control_group,
