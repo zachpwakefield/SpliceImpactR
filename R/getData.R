@@ -129,7 +129,11 @@ getData <- function(fg, bg, pfam = pfam, output_location, fdr_use, min_sample_su
       ggplot2::theme(axis.ticks.y=ggplot2::element_blank()  #remove y axis ticks
       )+
       ggplot2::scale_fill_manual(values=c('brown','chartreuse4')) + ggplot2::ggtitle(paste0("Domain Enrichment of ", ifelse(x == "1", "(+)", "(-)"),
-                                                                                            " PSI Exons"))
+                                                                                            " PSI Exons")) +
+      ggplot2::theme(panel.grid.major = ggplot2::element_blank(),
+                     panel.grid.minor = ggplot2::element_blank(),
+                     panel.background = ggplot2::element_blank(),
+                     axis.line = ggplot2::element_line(colour = "black"))
 
     pdf(paste0(output_location, "DomainEnrichment/", ifelse(x == "1", "(+)", "(-)"), 'enrichmentPlot.pdf'))
     print(enrichmentPlot)
@@ -139,7 +143,7 @@ getData <- function(fg, bg, pfam = pfam, output_location, fdr_use, min_sample_su
   })
 
   # Return the enrichment plot object for display
-  print(eP)
+  # print(eP)
 
   # Return a list containing the domain enrichment data and plots
   return(list(data=data,
