@@ -1,6 +1,6 @@
 getfxnlASoutcome <- function(output_location,
                              test_group,control_group,
-                             exon_type, cutoff = .25,
+                             exon_type, cutoff = .25, outlier_handle = "4/n",
                              cores = 4,
                              tti_location = "", full_pipe = T) {
   system(paste0("mkdir ",  output_location))
@@ -69,7 +69,7 @@ getfxnlASoutcome <- function(output_location,
 
 
   gD <- getData(fg = fg, bg = bg, pfam = pfam, output_location = output_location,
-                fdr_use = .05, min_sample_success = 3, engine = "Pfam")
+                fdr_use = .05, min_sample_success = 5, engine = "Pfam")
 
   if (nrow(pfg$paired_proBed) > 1) {
     tti <- getTTI(paired_foreground = pfg$paired_proBed, background = bg$proBed,
