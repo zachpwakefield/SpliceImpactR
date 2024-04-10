@@ -1,4 +1,4 @@
-make_dPsiPlot <- function(dpsi_df, thresh = .2, p_thresh = .05, pdir, num_thresh = 30) {
+make_dPsiPlot <- function(dpsi_df, thresh = .2, pdir) {
 
   # Map Ensembl IDs in the lfc_df to HGNC symbols using the conversion table
   gene_id_to_name <- setNames(gtf$geneName, gtf$geneID)
@@ -13,23 +13,23 @@ make_dPsiPlot <- function(dpsi_df, thresh = .2, p_thresh = .05, pdir, num_thresh
   # Prepare the data for labeling in the plot, sorting by absolute log fold change and adjusted p-value
   lab_thresh <- dpsi_df %>% dplyr::arrange(desc(abs(delta.psi)), p.adj)
 
-  # Create the log fold change plot using ggplot2
-  (deExons <- ggplot2::ggplot(dpsi_df,ggplot2:: aes(x = .data$delta.psi, y = -log(.data$p.adj), color = col, label = hgnc)) +
-      ggplot2::geom_point(ggplot2::aes(shape = type), size = 2, color = dpsi_df$col) +
-      ggplot2::theme_classic() + ggplot2::ylab("-Log2(FDR)") +
-      ggplot2::xlab("Delta Psi") +
-      ggplot2::theme(legend.position = "none")
-  )
+  # Create the dpsi change plot using ggplot2
+  deExons <- ggplot2::ggplot(dpsi_df,ggplot2:: aes(x = .data$delta.psi, y = -log(.data$p.adj), color = .data$col, label = .data$hgnc)) +
+    ggplot2::geom_point(ggplot2::aes(shape = .data$type), size = 2, color = dpsi_df$col) +
+    ggplot2::theme_classic() + ggplot2::ylab("-Log2(FDR)") +
+    ggplot2::xlab("Delta Psi") +
+    ggplot2::theme(legend.position = "none")
+
 
   diE <- data.frame(val = c(sum(dpsi_df$delta.psi < -1*(thresh) & dpsi_df$p.adj < .05), sum(dpsi_df$delta.psi > thresh & dpsi_df$p.adj < .05)),
-             type = c("-", "+"))
+                    type = c("-", "+"))
 
-  (deExons_chart <- ggplot2::ggplot(diE ,ggplot2:: aes(x = .data$type, y = .data$val, fill = .data$type)) +
-      ggplot2::geom_bar(stat="identity") + ggplot2::ylab("Count") + ggplot2::xlab("diExons") +
-      ggplot2::theme_classic() + ggplot2::scale_fill_manual(values=c("brown", "chartreuse4"), breaks = c("-", "+")) +
-      ggplot2::geom_text(aes(label = .data$val), vjust = 1.5, colour = "white", size = 5) +
-      ggplot2::theme(legend.position = "none")
-  )
+  deExons_chart <- ggplot2::ggplot(diE ,ggplot2:: aes(x = .data$type, y = .data$val, fill = .data$type)) +
+    ggplot2::geom_bar(stat="identity") + ggplot2::ylab("Count") + ggplot2::xlab("diExons") +
+    ggplot2::theme_classic() + ggplot2::scale_fill_manual(values=c("brown", "chartreuse4"), breaks = c("-", "+")) +
+    ggplot2::geom_text(aes(label = .data$val), vjust = 1.5, colour = "white", size = 5) +
+    ggplot2::theme(legend.position = "none")
+
 
   comb_plot <- ggpubr::ggarrange(deExons_chart, deExons, widths = c(1, 2.5))
   print("delta psi plot done!") # Print completion message

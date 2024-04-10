@@ -9,7 +9,7 @@ getForeground <- function(input, test_names, control_names, thresh, fdr, mOverla
   bdf.l <- df.l[abs(df.l$delta.psi) >= thresh & df.l$p.adj <= fdr,]
 
   ## Make volcano plot with make_lfcPlot()
-  lfcPlot <- make_dPsiPlot(df.l, thresh = thresh, p_thresh = .05, pdir = pdir)
+  lfcPlot <- make_dPsiPlot(df.l, thresh = thresh, pdir = pdir)
 
   ## Make data.frame with gene, location of each exon on total foreground
   redExon <- data.frame(geneR = unlist(lapply(strsplit(bdf.l$gene, split = "[.]"), "[[", 1)),

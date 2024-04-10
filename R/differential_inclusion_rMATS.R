@@ -65,9 +65,10 @@ differential_inclusion_rMATS <- function(control_names, test_names,
     # Apply outlier exclusion for control and test groups
     useIndices_cont <- usable[usable <= length(cont.psi)]
     useIndices_test <- usable[usable > length(test.psi)] - length(cont.psi)
-    ol_init <- paste(c(control_group, test_group)[usable], collapse = "#")
+    ol_init <- setdiff(1:length(influence), usable)
 
-    outliers <- ifelse(ol_init == "", "none", ol_init)
+    outliers <- ifelse(length(ol_init) == 0, "none",
+                       paste(c(control_group, test_group)[setdiff(1:length(influence), usable)], collapse = "#"))
 
     # Recalculate PSI, SJC, IJC, mean values excluding outliers for both phenotypes
     cont.SJC.noOut <- as.numeric(cont.cR[grep("SJC", names(cont.cR))])[useIndices_cont]
@@ -107,7 +108,7 @@ differential_inclusion_rMATS <- function(control_names, test_names,
       null_model <- glm(counts ~ success, family = binomial(link = "logit"), data = data)
 
       # Fit the alternative model (allowing different Psi for each condition)
-      alt_model <- glm(counts ~ success * condition, family = binomial(link = "logit"), data = data)
+      alt_model <- glm(counts ~ success + condition, family = binomial(link = "logit"), data = data)
 
       # Compute the likelihood ratio test statistic
       lrt_stat <- -2 * (logLik(null_model) - logLik(alt_model))
