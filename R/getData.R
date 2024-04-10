@@ -1,7 +1,10 @@
 ## This function retrieves and processes data for domain enrichment analysis using various protein domain databases.
 ## It compares domain occurrences in foreground (differentially expressed) and background datasets to identify enriched domains.
 
-getData <- function(fg, bg, pfam = pfam, output_location, fdr_use, min_sample_success, engine = c("FunFam","Gene3D","CDD","PANTHER","SMART","ProSiteProfiles","Pfam","SUPERFAMILY","MobiDBLite","Coils","PRINTS","ProSitePatterns","PIRSF","NCBIfam","Hamap")[7]) {
+getData <- function(fg, bg, pfam = pfam,
+                    output_location, fdr_use, min_sample_success,
+                    engine = c("FunFam","Gene3D","CDD","PANTHER","SMART","ProSiteProfiles","Pfam","SUPERFAMILY","MobiDBLite","Coils","PRINTS","ProSitePatterns","PIRSF","NCBIfam","Hamap")[7],
+                    repeatingDomains = T) {
 
   ## extract bed, fasta, and interproscan files from output_location
   tf <- list.files(output_location)
@@ -61,8 +64,18 @@ getData <- function(fg, bg, pfam = pfam, output_location, fdr_use, min_sample_su
     }
 
     # Extract key values for phyper() hypergeometric
-    bg_dom <- unlist(strsplit(interproscan_results[[1]]$protInfor, split = ';'))
-    fg_dom <- unlist(strsplit(fg_ip$protInfor, split = ';'))
+    if (repeatingDomains == F) {
+      bg_dom <- unique(lapply(interproscan_results[[1]]$protInfor, function(dom) {
+        unique(unlist(strsplit(dom, split = ";")))
+      }))
+      fg_dom <- unique(lapply(fg_ip$protInfor, function(dom) {
+        unique(unlist(strsplit(dom, split = ";")))
+      }))
+    } else if (repeatingDomains) {
+      bg_dom <- unlist(strsplit(interproscan_results[[1]]$protInfor, split = ';'))
+      fg_dom <- unlist(strsplit(fg_ip$protInfor, split = ';'))
+  }
+
     fg_dom_li <- lapply(strsplit(fg_ip$protInfor, split = ';'), unique)
     searcher <- unique(fg_dom)
 

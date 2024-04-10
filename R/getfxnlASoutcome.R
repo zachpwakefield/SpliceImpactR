@@ -2,10 +2,9 @@ getfxnlASoutcome <- function(output_location,
                              test_group,control_group,
                              exon_type, cutoff = .25, outlier_handle = "4/n",
                              cores = 4,
-                             tti_location = "", full_pipe = T) {
+                             tti_location = "", full_pipe = T, boolUse = T) {
   system(paste0("mkdir ",  output_location))
   pdir <- system.file(package="SpliceImpactR")
-  boolUse <- T
 
   if (exon_type %in% c("AFE", "HFE")) {
       diHIT <- differential_inclusion_HITindex(test_names = test_group, control_names = control_group,

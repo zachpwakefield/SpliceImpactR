@@ -38,7 +38,7 @@ getLengthComparison <- function(paired_df, output_location) {
   }))
   proteinLengthPaired <- data.frame(test = as.integer(paired_df$protLength[pc][seq(1, length(pc), by = 2)]),
                                     cont = as.integer(paired_df$protLength[pc][seq(2, length(pc), by = 2)]))
-  pairedLengthPlot <- ggpubr::ggpaired(proteinLengthPaired, cond1 = "cont", cond2 = "test",line.color = "black", line.size = 0.4,
+  pairedLengthPlot <- ggpubr::ggpaired(proteinLengthPaired, cond1 = "cont", cond2 = "test",line.color = "grey", line.size = ifelse(nrow(proteinLengthPaired) > 20, 0, 0.4), point_size = ifelse(nrow(proteinLengthPaired) > 20, 0, 1.2),
                                        fill = "condition")+
     ggpubr::stat_compare_means(paired = TRUE) +
     ggplot2::scale_fill_manual(values=c("brown", "chartreuse4")) +
