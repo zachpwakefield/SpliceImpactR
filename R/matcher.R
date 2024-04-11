@@ -10,7 +10,6 @@ matcher <- function(ex_type, background = F, cores, redExon = redExon, minOverla
   transcript_starts <- setNames(gtf$start[gtf$classification == 'transcript'], gtf$transcriptID[gtf$classification == 'transcript'])
 
   if (background) {
-    gtf_filtered <- gtf[gtf$classification == lim,]
     results <- unlist(parallel::mclapply(1:nrow(redExon), mc.cores = cores, function(i) {
       HITmatcher(i, redExon = redExon, gtf_filtered=gtf_filtered, minOverlap = minOverlap,
                  protein_coding_transcripts = protein_coding_transcripts)
