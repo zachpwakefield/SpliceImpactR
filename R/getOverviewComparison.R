@@ -25,7 +25,17 @@ getOverviewComparison <- function(control_names, test_names, exon_type, output_l
   data_list <- lapply(sample_list, function(x) read.table(paste0(x[1], paste0(".", exon_type, "PSI")), header = T, sep = '\t'))
 
   ## Number of AS across phenotype
-  nASE <- lapply(data_list, function(x) nrow(x[x[,grep("PSI", colnames(x))] > 0,]))
+  if (exon_type %in% c("AFE", "ALE", "HFE", "HLE")) {
+    colNameInc <- "PSI"
+  } else {
+    colNameInc <- "IncLevel1"
+  }
+  nASE <- lapply(data_list, function(x) {
+    vals <- x[,grep(colNameInc, colnames(x), fixed = T)]
+    vals <- vals[!is.na(vals)]
+    length(vals[vals > 0 & vals < 1])
+  })
+
   dfCount <- data.frame(AScount = unlist(nASE),
                         type = unlist(lapply(sample_list, "[[", 2)))
   if (length(sample_list) > 8) {
@@ -40,9 +50,16 @@ getOverviewComparison <- function(control_names, test_names, exon_type, output_l
       ggplot2::ylab(paste0("Count of ", exon_type))
   }
 
-
   ## Number of AS per gene across phenotype
-  nASpg <- lapply(data_list, function(x) mean(as.numeric(table(x$gene ))))
+  nASpg <- lapply(data_list, function(x) {
+    if (exon_type %in% c("AFE", "HFE")) {
+      mean(as.numeric(table(x$gene[x$AFEPSI > 0])))
+    } else if (exon_type %in% c("ALE", "HLE")) {
+      mean(as.numeric(table(x$gene[x$ALEPSI > 0])))
+    } else {
+      mean(as.numeric(table(x$geneSymbol[x$IncLevel1 > 0])))
+    }
+  })
   dfASpg <- data.frame(ASpg = unlist(nASpg),
                        type = unlist(lapply(sample_list, "[[", 2)))
   if (length(sample_list) > 8) {
@@ -56,13 +73,22 @@ getOverviewComparison <- function(control_names, test_names, exon_type, output_l
   }
 
   ## Distribution of Isoforms
-  dASpg <- lapply(data_list, function(x) as.numeric(table(x$gene)))
+  ## Distribution of Isoforms
+  if (exon_type %in% c("AFE", "ALE", "HFE", "HLE")) {
+    dASpg <- lapply(data_list, function(x) as.numeric(table(x$gene)))
+
+  } else {
+    dASpg <- lapply(data_list, function(x) {
+      as.numeric(table(x$geneSymbol[x$IncLevel1 > 0 & x$IncLevel1 < 1]))
+
+    })
+  }
   dfdASpg <- data.frame(ASpg = unlist(dASpg),
                         type = unlist(lapply(1:length(dASpg), function(x) rep(unlist(lapply(sample_list, "[[", 2))[x], length(dASpg[[x]])))))
 
   p3 <- ggplot2::ggplot(dfdASpg, ggplot2::aes(y = .data$ASpg, fill = .data$type)) +
     ggplot2::geom_histogram(binwidth = 1) + ggplot2::theme_bw() +
-    ggplot2::scale_y_continuous(breaks=seq(1,max(dfdASpg$ASpg)))+
+    ggplot2::scale_y_continuous(breaks=seq(1,max(dfdASpg$ASpg), floor(max(dfdASpg$ASpg)/5)))+
     ggplot2::scale_x_continuous(breaks=seq(0,
                                            max(c(as.integer(table(dfdASpg$ASpg[dfdASpg$type == "control"])),
                                                  as.integer(table(dfdASpg$ASpg[dfdASpg$type == "test"])))),
@@ -77,7 +103,7 @@ getOverviewComparison <- function(control_names, test_names, exon_type, output_l
           axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1))
 
   ## PSI distribution across phenotype
-  psiVals <- lapply(data_list, function(x) x[,grep("PSI", colnames(x))])
+  psiVals <- lapply(data_list, function(x) x[,grep(colNameInc, colnames(x))])
   dfECDF <- data.frame(val = unlist(psiVals),
                        type = unlist(lapply(1:length(psiVals), function(x) rep(unlist(lapply(sample_list, "[[", 2))[x], length(psiVals[[x]])))))
 
