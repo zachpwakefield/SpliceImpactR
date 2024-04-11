@@ -65,12 +65,12 @@ getData <- function(fg, bg, pfam = pfam,
 
     # Extract key values for phyper() hypergeometric
     if (repeatingDomains == F) {
-      bg_dom <- unique(lapply(interproscan_results[[1]]$protInfor, function(dom) {
+      bg_dom <- unique(unlist(lapply(interproscan_results[[1]]$protInfor, function(dom) {
         unique(unlist(strsplit(dom, split = ";")))
-      }))
-      fg_dom <- unique(lapply(fg_ip$protInfor, function(dom) {
+      })))
+      fg_dom <- unique(unlist(lapply(fg_ip$protInfor, function(dom) {
         unique(unlist(strsplit(dom, split = ";")))
-      }))
+      })))
     } else if (repeatingDomains) {
       bg_dom <- unlist(strsplit(interproscan_results[[1]]$protInfor, split = ';'))
       fg_dom <- unlist(strsplit(fg_ip$protInfor, split = ';'))
