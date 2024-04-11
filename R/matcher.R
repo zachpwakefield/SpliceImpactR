@@ -9,7 +9,13 @@ matcher <- function(ex_type, background = F, cores, redExon = redExon, minOverla
   # Pre-compute a lookup for start positions of all transcripts in gtf
   transcript_starts <- setNames(gtf$start[gtf$classification == 'transcript'], gtf$transcriptID[gtf$classification == 'transcript'])
 
-  if (ex_type %in% c("AFE", "ALE", "HFE", "HLE") | background) {
+  if (background) {
+    gtf_filtered <- gtf[gtf$classification == lim,]
+    results <- unlist(parallel::mclapply(1:nrow(redExon), mc.cores = cores, function(i) {
+      HITmatcher(i, redExon = redExon, gtf_filtered=gtf_filtered, minOverlap = minOverlap,
+                 protein_coding_transcripts = protein_coding_transcripts)
+    }))
+  } else if (ex_type %in% c("AFE", "ALE", "HFE", "HLE")) {
     if (ex_type == "AFE" | ex_type == "HFE") {
       lim <- "first"
     } else if (ex_type == "ALE" | ex_type == "HLE") {
