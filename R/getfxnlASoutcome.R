@@ -7,13 +7,13 @@ getfxnlASoutcome <- function(output_location,
   pdir <- system.file(package="SpliceImpactR")
 
   if (exon_type %in% c("AFE", "HFE")) {
-      diHIT <- differential_inclusion_HITindex(test_names = test_group, control_names = control_group,
+      diHIT <- differential_inclusion_HITindex(test_names = test_group, control_names = control_group, et = "AFE",
                                                cores = cores,stat_model_bool = boolUse, outlier_bool = boolUse,
                                                outlier_threshold = outlier_handle, min_proportion_samples_per_phenotype = .15)
 
       diAS <- diHIT[diHIT$type == "AFE",]
   } else if (exon_type %in% c("ALE", "HLE")) {
-      diHIT <- differential_inclusion_HITindex(test_names = test_group, control_names = control_group,
+      diHIT <- differential_inclusion_HITindex(test_names = test_group, control_names = control_group, et = "ALE",
                                                cores = cores,stat_model_bool = boolUse, outlier_bool = boolUse,
                                                outlier_threshold = outlier_handle, min_proportion_samples_per_phenotype = .15)
 
@@ -65,7 +65,7 @@ getfxnlASoutcome <- function(output_location,
   pfam <- getPfam(foreground = fg, background = bg, pdir = pdir, cores = cores, output_location = output_location)
 
 
-  gD <- getData(fg = fg, bg = bg, pfam = pfam, output_location = output_location,
+  gD <- getData(fg = fg, bg = bg, cores = cores, pfam = pfam, output_location = output_location,
                 fdr_use = .05, min_sample_success = 5, engine = "Pfam")
 
   if (nrow(pfg$paired_proBed) > 1) {

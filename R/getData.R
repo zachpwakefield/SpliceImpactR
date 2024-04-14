@@ -1,7 +1,7 @@
 ## This function retrieves and processes data for domain enrichment analysis using various protein domain databases.
 ## It compares domain occurrences in foreground (differentially expressed) and background datasets to identify enriched domains.
 
-getData <- function(fg, bg, pfam = pfam,
+getData <- function(fg, bg, pfam = pfam, cores = cores,
                     output_location, fdr_use, min_sample_success,
                     engine = c("FunFam","Gene3D","CDD","PANTHER","SMART","ProSiteProfiles","Pfam","SUPERFAMILY","MobiDBLite","Coils","PRINTS","ProSitePatterns","PIRSF","NCBIfam","Hamap")[7],
                     repeatingDomains = T) {
@@ -30,24 +30,22 @@ getData <- function(fg, bg, pfam = pfam,
     # ips <- ip %>% dplyr::filter(X4 %in% engine)
 
     # Process and aggregate information for each protein domain
-    protInf <- list()
-    for (j in 1:length(gN)) {
-      protInf[[j]] <- ips$X6[ips$X1 == gN[j]]
-      protInf[[j]] <- paste(protInf[[j]], collapse = ';')
-    }
+    protInf <- mclapply(1:length(gN), mc.cores = cores, function(j) {
+      paste(ips$X6[ips$X1 == gN[j]], collapse = ';')
+    })
     protInf.o <- unlist(protInf)
     protInf.o[protInf.o == ""] <- "none"
 
     # Construct final output data frames for background and foreground
     if (o == 2) {
       finOut <- data.frame(exon = gN,
-                           protein = unlist(lapply(gN, function(x) s$prot[s$id == x])),
+                           protein = s$prot[match(gN, s$id)],
                            protInfor = protInf.o,
-                           delta.psi = unlist(lapply(gN, function(x) s$delta.psi[s$id == x])),
-                           p.adj = unlist(lapply(gN, function(x) s$p.adj[s$id == x])))
+                           delta.psi = s$delta.psi[match(gN, s$id)],
+                           p.adj = s$p.adj[match(gN, s$id)])
     } else {
       finOut <- data.frame(exon = gN,
-                           protein = unlist(lapply(gN, function(x) s$prot[s$id == x])),
+                           protein = s$prot[match(gN, s$id)],
                            protInfor = protInf.o)
     }
   })
