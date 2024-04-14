@@ -16,19 +16,25 @@ matchAlignType <- function(proBed, protCode, nucleotides, output_location, saveA
       pMatch <- 1.04
       alignType <- c("Match")
     } else {
-      fs_check <- frameShiftDetectorSum(df, i)
-      pMatch <- fs_check[[2]]
-      if (fs_check[[1]] == fs_check[[3]]) {
-        alignType <- fs_check[[1]]
-      } else {
+      if (as.numeric(nchar(df$code[i]))*as.numeric(nchar(df$code[i+1])) >= 2000000000) {
         alignType <- c("PartialMatch")
-      }
-      if (saveAlignments) {
-        try(msaPrettyPrint(msa(Biostrings::AAStringSet(c(protCode[i], protCode[i+1])), verbose = FALSE), askForOverwrite=FALSE,
-                           file = paste(output_location, "pairedAlignments/", proBed$transcript[i], "_", proBed$transcript[i+1], "_pm_Alignment.pdf", sep = ""), output = "pdf"))
-      }
+        pMatch <- 0.9
+      } else {
+        fs_check <- frameShiftDetectorSum(df, i)
 
-    }
+        pMatch <- fs_check[[2]]
+        if (fs_check[[1]] == fs_check[[3]]) {
+          alignType <- fs_check[[1]]
+        } else {
+          alignType <- c("PartialMatch")
+        }
+        if (saveAlignments) {
+          try(msaPrettyPrint(msa(Biostrings::AAStringSet(c(protCode[i], protCode[i+1])), verbose = FALSE), askForOverwrite=FALSE,
+                             file = paste(output_location, "pairedAlignments/", proBed$transcript[i], "_", proBed$transcript[i+1], "_pm_Alignment.pdf", sep = ""), output = "pdf"))
+        }
+
+      }
+      }
 
 
 
