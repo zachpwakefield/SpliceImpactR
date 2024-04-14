@@ -4,7 +4,7 @@
 getData <- function(fg, bg, pfam = pfam, cores = cores,
                     output_location, fdr_use, min_sample_success,
                     engine = c("FunFam","Gene3D","CDD","PANTHER","SMART","ProSiteProfiles","Pfam","SUPERFAMILY","MobiDBLite","Coils","PRINTS","ProSitePatterns","PIRSF","NCBIfam","Hamap")[7],
-                    repeatingDomains = T) {
+                    repeatingDomains = F) {
 
   ## extract bed, fasta, and interproscan files from output_location
   tf <- list.files(output_location)
