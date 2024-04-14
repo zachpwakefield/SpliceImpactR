@@ -2,7 +2,7 @@ getfxnlASoutcome <- function(output_location,
                              test_group,control_group,
                              exon_type, cutoff = .25, outlier_handle = "4/n",
                              cores = 4,
-                             tti_location = "", full_pipe = T, boolUse = T) {
+                             tti_location = "", full_pipe = T, boolUse = T, bg = NA) {
   system(paste0("mkdir ",  output_location))
   pdir <- system.file(package="SpliceImpactR")
 
@@ -50,16 +50,18 @@ getfxnlASoutcome <- function(output_location,
     tti_location <- output_location
   }
 
+  if (is.na(bg)) {
+    bg_input <- gsub("[^/]*$", "", c(control_group, test_group))
+    bg <- getBackground(input=bg_input,
+                        mOverlap = .5,
+                        cores = cores,
+                        nC = length(control_group),
+                        nE = length(test_group),
+                        exon_type = exon_type,
+                        pdir = pdir,
+                        output_location = output_location)
+  }
 
-  bg_input <- gsub("[^/]*$", "", c(control_group, test_group))
-  bg <- getBackground(input=bg_input,
-                     mOverlap = .5,
-                     cores = cores,
-                     nC = length(control_group),
-                     nE = length(test_group),
-                     exon_type = exon_type,
-                     pdir = pdir,
-                     output_location = output_location)
 
   #####
   pfam <- getPfam(foreground = fg, background = bg, pdir = pdir, cores = cores, output_location = output_location)

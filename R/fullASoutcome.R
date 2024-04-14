@@ -5,6 +5,16 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
                           tti_location = "/projectnb/evolution/zwakefield/allison_mettl/analysis/sir/") {
   system(paste0("mkdir ",  output_directory))
   pdir <- system.file(package="SpliceImpactR")
+  ##get bg for all classes
+  bg_input <- gsub("[^/]*$", "", c(control_group, test_group))
+  bg <- getBackground(input=bg_input,
+                      mOverlap = .5,
+                      cores = cores,
+                      nC = length(control_group),
+                      nE = length(test_group),
+                      exon_type = as_types[1],
+                      pdir = pdir,
+                      output_location = output_location)
   lapply(as_types, function(x) {
     print(paste0(x, " analysis..."))
     system(paste0("mkdir ",  paste0(output_directory, x, "/")))
