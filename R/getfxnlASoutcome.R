@@ -2,7 +2,7 @@ getfxnlASoutcome <- function(output_location,
                              test_group,control_group,
                              exon_type, cutoff = .25, outlier_handle = "4/n",
                              cores = 4,
-                             tti_location = "", full_pipe = T, boolUse = T, bg = NA) {
+                             tti_location = "", full_pipe = T, boolUse = T, bg = NA, mOverlap = .5) {
   system(paste0("mkdir ",  output_location))
   pdir <- system.file(package="SpliceImpactR")
 
@@ -31,7 +31,7 @@ getfxnlASoutcome <- function(output_location,
                      control_names = control_group,
                      thresh = cutoff,
                      fdr=.05,
-                     mOverlap=.5,
+                     mOverlap=mOverlap,
                      cores=cores,
                      nC=length(control_group),
                      nE=length(test_group),

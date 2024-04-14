@@ -2,7 +2,7 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
                           output_directory, data_directory,
                           test_group, control_group, outlier_handle,
                           cutoff = .2, cores = 6,
-                          tti_location = "/projectnb/evolution/zwakefield/allison_mettl/analysis/sir/") {
+                          tti_location = "/projectnb/evolution/zwakefield/allison_mettl/analysis/sir/", mOverlap = .5) {
   system(paste0("mkdir ",  output_directory))
   pdir <- system.file(package="SpliceImpactR")
   ##get bg for all classes
@@ -22,7 +22,7 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
     fAS <- getfxnlASoutcome(output_location = paste0(output_directory, x, "/"),
                              test_group = test_group,control_group = control_group,
                              exon_type = x, cutoff = .2, outlier_handle = outlier_handle, cores = 6,
-                             tti_location = tti_location, full_pipe = T)
+                             tti_location = tti_location, full_pipe = T, mOverlap = mOverlap)
   })
 
 }
