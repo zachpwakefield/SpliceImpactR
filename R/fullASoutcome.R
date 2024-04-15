@@ -22,7 +22,7 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
     fAS <- getfxnlASoutcome(output_location = paste0(output_directory, x, "/"),
                              test_group = test_group,control_group = control_group,
                              exon_type = x, cutoff = .2, outlier_handle = outlier_handle, cores = 6,
-                             tti_location = tti_location, full_pipe = T, mOverlap = mOverlap)
+                             tti_location = tti_location, full_pipe = T, mOverlap = mOverlap, bg = bg)
   })
 
 }
