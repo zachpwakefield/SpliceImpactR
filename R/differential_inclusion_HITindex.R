@@ -119,6 +119,8 @@ differential_inclusion_HITindex <- function(test_names, control_names, et, cores
 
   }))
 
+  vals <- vals[vals$nUP + vals$nDOWN > 10,]
+
   # Compute p-values for each exon using a likelihood ratio test
   p_vals <- mclapply(unique(vals$exon), mc.cores = cores, function(x) {
     # Only include exons present in at least 1/3 of each of the phenotypes
@@ -132,7 +134,7 @@ differential_inclusion_HITindex <- function(test_names, control_names, et, cores
       # Mark test samples for the current exon
       df$cond2 <- 0
       df$cond2[df$exon == x & df$condition == 1] <- 1
-      df$var <- rep(c(var(df$psi[df$condition == 0]), var(df$psi[df$condition == 1])), each = 2)
+      # df$var <- rep(c(var(df$psi[df$condition == 0]), var(df$psi[df$condition == 1])), each = 2)
       x1 <- df[,c('psi', 'condition')]
 
       full_model <- lm(psi ~ condition, data = x1)
