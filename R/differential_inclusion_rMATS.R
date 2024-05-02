@@ -96,19 +96,16 @@ differential_inclusion_rMATS <- function(control_names, test_names,
       } else if((sum(cont.psi != 0) >= min_proportion_samples_per_phenotype*length(control_names)) |
         (sum(test.psi != 0) >= min_proportion_samples_per_phenotype*length(test_names))) {
 
-      data <- data.frame(
-        counts = c(cont.IJC.noOut, cont.SJC.noOut, test.IJC.noOut, test.SJC.noOut),
-        success = c(rep(1, length(cont.IJC.noOut)), rep(0, length(cont.SJC.noOut)),
-                    rep(1, length(test.IJC.noOut)), rep(0, length(test.SJC.noOut))),  # 1 for inclusion, 0 for skipping
-        condition = rep(c(rep("cont", length(cont.IJC.noOut)), rep("test", length(test.IJC.noOut))), each = 2)
-      )
-      data$counts <- as.factor(data$count)
+        data <- data.frame(
+          psi = c(cont.psi.noOut, test.psi.noOut),
+          condition = c(rep(0, length(cont.psi.noOut)), rep(1, length(test.psi.noOut)))
+        )
 
-      # Fit the null model (assuming same Psi for both conditions)
-      null_model <- glm(counts ~ success, family = binomial(link = "logit"), data = data)
+        # Fit the null model (assuming same Psi for both conditions)
+        null_model <- lm(psi ~ 1, data = data)
 
-      # Fit the alternative model (allowing different Psi for each condition)
-      alt_model <- glm(counts ~ success + condition, family = binomial(link = "logit"), data = data)
+        # Fit the alternative model (allowing different Psi for each condition)
+        alt_model <- lm(psi ~ condition, data = data)
 
       # Compute the likelihood ratio test statistic
       lrt_stat <- -2 * (logLik(null_model) - logLik(alt_model))
