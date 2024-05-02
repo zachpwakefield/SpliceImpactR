@@ -127,46 +127,19 @@ differential_inclusion_HITindex <- function(test_names, control_names, et, cores
 
       # Subset data for the current exon
       gene_exon <- unique(vals$gene[vals$exon == x])
-      df <- vals[!is.na(match(vals$gene, gene_exon)),]
+      df <- vals[!is.na(match(vals$exon, x)),]
 
       # Mark test samples for the current exon
       df$cond2 <- 0
       df$cond2[df$exon == x & df$condition == 1] <- 1
+      df$var <- rep(c(var(df$psi[df$condition == 0]), var(df$psi[df$condition == 1])), each = 2)
+      x1 <- df[,c('psi', 'condition')]
 
-      # Prepare data for linear models
-      snames <- lapply(sample_types_sorted, "[[", 1)
-
-      # Preparing df with sample information
-      dsamp1f <- do.call(cbind, lapply(unique(df$sample), function(d) {
-        init <- rep(0, length(df$sample))
-        init[df$sample == d] <- 1
-        df1d <- data.frame("plh" = init)
-        colnames(df1d) <- paste(unlist(lapply(sample_types_sorted, "[[", 1))[d])
-        df1d
-      }))
-
-      # Preparing df with PSI information
-      dpsi1f <- do.call(cbind, lapply(unique(df$exon), function(e) {
-        init <- rep(0, length(df$exon))
-        init[df$exon == e] <- 1
-        dp1d <- data.frame("plh" = init)
-        colnames(dp1d) <- e
-        dp1d
-      }))
-      d1f <- cbind(dpsi1f, dsamp1f)
-      d1f$condition <- df$cond2
-      d1f$y1 <- df$log_nDiff
-
-      # Fit full and reduced models, calculate log-likelihoods
-
-      ## full model
-      x1 <- d1f
-      full_model <- lm(y1 ~ ., data = x1)
+      full_model <- lm(psi ~ condition, data = x1)
       full_ll <- logLik(full_model)
 
       ## reduced model
-      x2 <- d1f[,colnames(d1f) != 'condition']
-      reduced_model <- lm(y1 ~ ., data = x2)
+      reduced_model <- lm(psi ~ 1, data = x1)
       reduced_ll <- logLik(reduced_model)
 
       # Calculate likelihood ratio statistic and p-value
