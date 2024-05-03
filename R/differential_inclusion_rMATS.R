@@ -1,6 +1,6 @@
 differential_inclusion_rMATS <- function(control_names, test_names,
                                          stat_model_bool = T, outlier_bool = T, et, cores, outlier_threshold,
-                                         min_proportion_samples_per_phenotype = .2) {
+                                         min_proportion_samples_per_phenotype = .2, minReads = 10) {
 
   if ((length(test_names) + length(control_names)) < 6 & (stat_model_bool | outlier_bool) ) {
     warning("Don't use the stat model and outlier filtering with low sample number (eg: <= 6)")
@@ -33,6 +33,8 @@ differential_inclusion_rMATS <- function(control_names, test_names,
   rMATS_df <- rMATS_df[rowSums(rMATS_df[,grep("psi", colnames(rMATS_df))]) > 0 &
                          rowMeans(rMATS_df[,grep("psi", colnames(rMATS_df))]) != 1,]
 
+  rMATS_df <- rowSums(rMATS_df[,c(grep('IJC', colnames(rMATS_df)),
+                                  grep('SJC', colnames(rMATS_df)))]) >= minReads
 
   # Perform statistical analysis for each row in parallel
   stats_out <- do.call(rbind, parallel::mclapply(1:nrow(rMATS_df), mc.cores = cores, function(x) {

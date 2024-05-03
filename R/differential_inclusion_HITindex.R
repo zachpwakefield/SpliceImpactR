@@ -3,7 +3,7 @@
 
 
 differential_inclusion_HITindex <- function(test_names, control_names, et, cores = 2, stat_model_bool = T, outlier_bool = T,
-                                            outlier_threshold = c("4/n", "4/mean", "1", 1)[1], min_proportion_samples_per_phenotype = .2) {
+                                            outlier_threshold = c("4/n", "4/mean", "1", 1)[1], minReads = 10, min_proportion_samples_per_phenotype = .2) {
   if ((length(test_names) + length(control_names)) < 6 & (stat_model_bool | outlier_bool) ) {
     warning("The stat model and outlier filtering will not have much power with low sample number (eg: <= 6)")
   }
@@ -119,7 +119,7 @@ differential_inclusion_HITindex <- function(test_names, control_names, et, cores
 
   }))
 
-  vals <- vals[vals$nUP + vals$nDOWN > 10,]
+  vals <- vals[vals$nUP + vals$nDOWN >= minReads,]
 
   # Compute p-values for each exon using a likelihood ratio test
   p_vals <- mclapply(unique(vals$exon), mc.cores = cores, function(x) {
