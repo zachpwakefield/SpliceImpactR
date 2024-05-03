@@ -33,8 +33,8 @@ differential_inclusion_rMATS <- function(control_names, test_names,
   rMATS_df <- rMATS_df[rowSums(rMATS_df[,grep("psi", colnames(rMATS_df))]) > 0 &
                          rowMeans(rMATS_df[,grep("psi", colnames(rMATS_df))]) != 1,]
 
-  rMATS_df <- rowSums(rMATS_df[,c(grep('IJC', colnames(rMATS_df)),
-                                  grep('SJC', colnames(rMATS_df)))]) >= minReads
+  rMATS_df <- rMATS_df[rowSums(rMATS_df[,c(grep('IJC', colnames(rMATS_df)),
+                                  grep('SJC', colnames(rMATS_df)))]) >= minReads,]
 
   # Perform statistical analysis for each row in parallel
   stats_out <- do.call(rbind, parallel::mclapply(1:nrow(rMATS_df), mc.cores = cores, function(x) {
