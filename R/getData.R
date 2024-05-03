@@ -1,16 +1,16 @@
 ## This function retrieves and processes data for domain enrichment analysis using various protein domain databases.
 ## It compares domain occurrences in foreground (differentially expressed) and background datasets to identify enriched domains.
 
-getData <- function(fg, bg, pfam = pfam, cores = cores,
+getData <- function(fg, bg, pfg, pfam, cores = cores,
                     output_location, fdr_use, min_sample_success,
                     engine = c("FunFam","Gene3D","CDD","PANTHER","SMART","ProSiteProfiles","Pfam","SUPERFAMILY","MobiDBLite","Coils","PRINTS","ProSitePatterns","PIRSF","NCBIfam","Hamap")[7],
-                    repeatingDomains = F) {
+                    repeatingDomains = F, topViz = 15) {
 
   ## extract bed, fasta, and interproscan files from output_location
   tf <- list.files(output_location)
   ipscan <- list(pfam$bg_out, pfam$fg_out) #fg_out, bg_out
   outFast<- list(bg$proFast, fg$proFast) #fg$proFast, fg$proFast
-  outBed <- list(bg$proBed, fg$proBed) #bg$proBed, bg$proBed
+  outBed <- list(bg$proBed, pfg$paired_proBed) #bg$proBed, bg$proBed
 
   system(paste0("mkdir ", output_location, "DomainEnrichment/"))
   ## Process interproscan results for background and foreground datasets
@@ -20,9 +20,17 @@ getData <- function(fg, bg, pfam = pfam, cores = cores,
     s <- outBed[[o]]
     s$id <- paste(paste(paste(paste(s$transcript, s$gene, sep = "#"), s$chr, sep = ";"), paste(s$start, s$stop, sep = "-"), sep = ":"), s$strand, sep = ";")
     fa <- outFast[[o]]
-    nFa <- fa[grep(">", fa)]
-    gN <- gsub(">", "", nFa)
-    geneL <- unlist(lapply(strsplit(unlist(lapply(strsplit(fa[grep(">", fa)], split = ";"), "[[", 1)), split = "#"), "[[", 2))
+    if (o == 2) {
+      s <- s[s$alignType %in% c("TooLong", "PartialMatch", "FrameShift"),]
+      fa <- fa[sort(c(which(fa %in% paste0(">", s$id)), (which(fa %in% paste0(">", s$id))+1)))]
+      nFa <- fa[grep(">", fa)]
+      gN <- gsub(">", "", nFa)
+      gN <- unlist(lapply(s$id, function(faIter) {gN[gN %in% faIter]}))
+    } else {
+      nFa <- fa[grep(">", fa)]
+      gN <- gsub(">", "", nFa)
+    }
+
 
 
     ## filter by whichever domain identifying engine(s) selected
@@ -47,32 +55,37 @@ getData <- function(fg, bg, pfam = pfam, cores = cores,
       finOut <- data.frame(exon = gN,
                            protein = s$prot[match(gN, s$id)],
                            protInfor = protInf.o)
+
     }
+    finOut
   })
 
   # Perform domain enrichment analysis for upregulated and downregulated genes
   data <- lapply(c("up", "down"), function(x) {
-
     # Separate upregulated and downregulated genes based on delta.psi
     if (x == "up") {
       fg_ip <- interproscan_results[[2]][interproscan_results[[2]]$delta.psi > 0,]
-
+      fg_sc <- interproscan_results[[2]][interproscan_results[[2]]$delta.psi < 0,]
     } else {
       fg_ip <- interproscan_results[[2]][interproscan_results[[2]]$delta.psi < 0,]
+      fg_sc <- interproscan_results[[2]][interproscan_results[[2]]$delta.psi > 0,]
     }
+
 
     # Extract key values for phyper() hypergeometric
     if (repeatingDomains == F) {
       bg_dom <- unlist(lapply(interproscan_results[[1]]$protInfor, function(dom) {
         unique(unlist(strsplit(dom, split = ";")))
       }))
-      fg_dom <- unlist(lapply(fg_ip$protInfor, function(dom) {
-        unique(unlist(strsplit(dom, split = ";")))
+      fg_dom <- unlist(lapply(1:nrow(fg_ip), function(ind) {
+        setdiff(unique(unlist(strsplit(fg_ip$protInfor[ind], split = ";"))), unique(unlist(strsplit(fg_sc$protInfor[ind], split = ";"))))
       }))
     } else if (repeatingDomains) {
       bg_dom <- unlist(strsplit(interproscan_results[[1]]$protInfor, split = ';'))
-      fg_dom <- unlist(strsplit(fg_ip$protInfor, split = ';'))
-  }
+      fg_dom <- unlist(lapply(1:nrow(fg_ip), function(ind) {
+        setdiff(unlist(strsplit(fg_ip$protInfor[ind], split = ";")), unlist(strsplit(fg_sc$protInfor[ind], split = ";")))
+      }))
+    }
 
     fg_dom_li <- lapply(strsplit(fg_ip$protInfor, split = ';'), unique)
     searcher <- unique(fg_dom)
@@ -118,20 +131,19 @@ getData <- function(fg, bg, pfam = pfam, cores = cores,
 
   # Generate enrichment plots for upregulated and downregulated genes
   eP <-lapply(1:2, function(x) {
-
     # Prepare data for plotting
-    sp <- data[[x]][data[[x]]$fdr <= fdr_use & data[[x]]$sample_successes >= min_sample_success,c(1, 6)]
+    sp <- data[[x]][data[[x]]$fdr <= fdr_use & data[[x]]$sample_successes >= min_sample_success,c(1, 6, 11)]
     if (nrow(sp) == 0) {
       print("Lower min_sample_success and/or increase fdr, none meet criteria")
       return(NA)
     }
     sp$category <- "foreground"
     colnames(sp)[2] <- c("proportion")
-    pp <- data[[x]][data[[x]]$fdr <= fdr_use & data[[x]]$sample_successes >= min_sample_success,c(1, 9)]
+    pp <- data[[x]][data[[x]]$fdr <= fdr_use & data[[x]]$sample_successes >= min_sample_success,c(1, 9, 11)]
     pp$category <- "background"
     colnames(pp)[2] <- c("proportion")
     df <- rbind(sp, pp)
-
+    df <- df[df$rel_prop >= ifelse(nrow(df) > topViz, sort(df$rel_prop, decreasing = T)[topViz], max(df$rel_prop)),]
     # Create and save enrichment plots using ggplot2
     enrichmentPlot <- ggplot2::ggplot(data=df, ggplot2::aes(x=domain, y=proportion, fill=category)) +
       ggplot2::geom_bar(stat="identity", position=ggplot2::position_dodge())+
