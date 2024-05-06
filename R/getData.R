@@ -61,7 +61,7 @@ getData <- function(fg, bg, pfg, pfam, cores = cores,
   })
 
   # Perform domain enrichment analysis for upregulated and downregulated genes
-  data <- lapply(c("up", "down"), function(x) {
+  dataList <- lapply(c("up", "down"), function(x) {
     # Separate upregulated and downregulated genes based on delta.psi
     if (x == "up") {
       fg_ip <- interproscan_results[[2]][interproscan_results[[2]]$delta.psi > 0,]
@@ -87,8 +87,16 @@ getData <- function(fg, bg, pfg, pfam, cores = cores,
       }))
     }
 
+
+
+
     fg_dom_li <- lapply(strsplit(fg_ip$protInfor, split = ';'), unique)
     searcher <- unique(fg_dom)
+
+    l_dd <- lengths(fg_dom_li)
+    count_swaps_dd <- sum(l_dd) >= 1
+    lengthsDistributionDF <- data.frame(vals = l_dd, types = x)
+    barPlotDF <- data.frame(vals = count_swaps_dd, types = x)
 
     successes <- lapply(searcher, function(x) c(sum(fg_dom == x), sum(bg_dom == x)))
     pop_size <- length(bg_dom)
@@ -124,13 +132,38 @@ getData <- function(fg, bg, pfg, pfam, cores = cores,
 
     # Write domain enrichment results to CSV files
     write.csv(data, paste0(output_location, "DomainEnrichment/", ifelse(x == "up", "(+)", "(-)"), "domainEnrichment.csv"))
-    data
+
+    list(data, lengthsDistributionDF, barPlotDF)
 
 
   })
+  lengthDist <- data.frame(vals = c(3, 4, 2, 3, 4, 6, 7, 2, 10, 11, 13, 15, 16, 17),
+                           types = c("-", "-", "-", "-", "-", "-", "-", "-", "+", "+",
+                                     "+", "+", "+", "+"))
+  changeNum <- data.frame(vals = c(100, 110),
+                           types = c("-", "+"))
+  lengthDist <- do.call(rbind, lapply(dataList, "[[", 2))
+  changeNum <- do.call(rbind, lapply(dataList, "[[", 2))
+
+  domainChangesNums <- ggplot2::ggplot(lengthDist, ggplot2::aes(x = types, y = vals, fill = types)) + ggplot2::geom_boxplot() +
+    ggplot2::scale_fill_manual(values=c("brown", "chartreuse4"), breaks = c("-", "+")) +
+    ggplot2::theme_classic() + ggplot2::ylab("Number of domain changes per swap") + ggplot2::xlab("")
+
+  domainChanges <- ggplot2::ggplot(lengthDist, ggplot2::aes(x = types, y = vals, fill = types)) + ggplot2::geom_bar(stat = 'identity') +
+    ggplot2::scale_fill_manual(values=c("brown", "chartreuse4"), breaks = c("-", "+")) +
+    ggplot2::theme_classic() + ggplot2::xlab("") + ggplot2::ylab("Count of swaps with domain changes")+
+    ggplot2::theme(legend.position = "none")
+
+  comb_plot <- ggpubr::ggarrange(domainChanges, domainChangesNums, nrow = 1, widths = c(1, 2.5))
+
+  pdf(paste0(output_location, "DomainEnrichment/", "domainStats.pdf"), height = 8, width = 6)
+  print(comb_plot)
+  dev.off()
 
   # Generate enrichment plots for upregulated and downregulated genes
   eP <-lapply(1:2, function(x) {
+    data <- lapply(dataList, "[[", 1)
+
     # Prepare data for plotting
     sp <- data[[x]][data[[x]]$fdr <= fdr_use & data[[x]]$sample_successes >= min_sample_success,c(1, 6, 11)]
     if (nrow(sp) == 0) {
