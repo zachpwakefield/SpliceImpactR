@@ -137,17 +137,15 @@ getData <- function(fg, bg, pfg, pfam, cores = cores,
 
 
   })
-  lengthDist <- data.frame(vals = c(3, 4, 2, 3, 4, 6, 7, 2, 10, 11, 13, 15, 16, 17),
-                           types = c("-", "-", "-", "-", "-", "-", "-", "-", "+", "+",
-                                     "+", "+", "+", "+"))
-  changeNum <- data.frame(vals = c(100, 110),
-                           types = c("-", "+"))
+
   lengthDist <- do.call(rbind, lapply(dataList, "[[", 2))
-  changeNum <- do.call(rbind, lapply(dataList, "[[", 2))
+  changeNum <- do.call(rbind, lapply(dataList, "[[", 3))
 
   domainChangesNums <- ggplot2::ggplot(lengthDist, ggplot2::aes(x = types, y = vals, fill = types)) + ggplot2::geom_boxplot() +
     ggplot2::scale_fill_manual(values=c("brown", "chartreuse4"), breaks = c("-", "+")) +
-    ggplot2::theme_classic() + ggplot2::ylab("Number of domain changes per swap") + ggplot2::xlab("")
+    ggplot2::theme_classic() + ggplot2::ylab("Number of domain changes per swap") +
+    ggplot2::xlab("") +
+    ggplot2::theme(legend.position = "none")
 
   domainChanges <- ggplot2::ggplot(lengthDist, ggplot2::aes(x = types, y = vals, fill = types)) + ggplot2::geom_bar(stat = 'identity') +
     ggplot2::scale_fill_manual(values=c("brown", "chartreuse4"), breaks = c("-", "+")) +
