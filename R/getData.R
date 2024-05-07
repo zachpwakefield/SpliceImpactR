@@ -142,13 +142,13 @@ getData <- function(fg, bg, pfg, pfam, cores = cores,
   changeNum <- do.call(rbind, lapply(dataList, "[[", 3))
 
   domainChangesNums <- ggplot2::ggplot(lengthDist, ggplot2::aes(x = types, y = vals, fill = types)) + ggplot2::geom_boxplot() +
-    ggplot2::scale_fill_manual(values=c("brown", "chartreuse4"), breaks = c("-", "+")) +
+    ggplot2::scale_fill_manual(values=c("brown", "chartreuse4"), breaks = c("down", "up")) +
     ggplot2::theme_classic() + ggplot2::ylab("Number of domain changes per swap") +
     ggplot2::xlab("") +
     ggplot2::theme(legend.position = "none")
 
   domainChanges <- ggplot2::ggplot(lengthDist, ggplot2::aes(x = types, y = vals, fill = types)) + ggplot2::geom_bar(stat = 'identity') +
-    ggplot2::scale_fill_manual(values=c("brown", "chartreuse4"), breaks = c("-", "+")) +
+    ggplot2::scale_fill_manual(values=c("brown", "chartreuse4"), breaks = c("down", "up")) +
     ggplot2::theme_classic() + ggplot2::xlab("") + ggplot2::ylab("Count of swaps with domain changes")+
     ggplot2::theme(legend.position = "none")
 
