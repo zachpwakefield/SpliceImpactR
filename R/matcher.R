@@ -91,9 +91,9 @@ HITmatcher <- function(i, redExon = redExon, gtf_filtered=gtf_filtered, minOverl
   }
 
   # Further refine to only include those that are also in the protein coding transcripts, if necessary
-  pc_gtf_min <- gtf_min[gtf_min$transcriptID %in% protein_coding_transcripts,]
-
-  gtf_min <- ifelse(nrow(pc_gtf_min) == 0, gtf_min, pc_gtf_min)
+  if (sum(gtf_min$transcriptID %in% protein_coding_transcripts) > 0) {
+    gtf_min <- gtf_min[gtf_min$transcriptID %in% protein_coding_transcripts,]
+  }
 
   # Order by Jaccard index to find best match
   gtf_min <- gtf_min[order(-gtf_min[, "jaccard"]),]
