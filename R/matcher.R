@@ -90,6 +90,11 @@ HITmatcher <- function(i, redExon = redExon, gtf_filtered=gtf_filtered, minOverl
     return(0) # Skip again if no relevant gtf entries found with jaccard index over the minOverlap
   }
 
+  # Further refine to only include those that are also in the protein coding transcripts, if necessary
+  pc_gtf_min <- gtf_min[gtf_min$transcriptID %in% protein_coding_transcripts,]
+
+  gtf_min <- ifelse(nrow(pc_gtf_min) == 0, gtf_min, pc_gtf_min)
+
   # Order by Jaccard index to find best match
   gtf_min <- gtf_min[order(-gtf_min[, "jaccard"]),]
 
@@ -100,13 +105,8 @@ HITmatcher <- function(i, redExon = redExon, gtf_filtered=gtf_filtered, minOverl
   ## If multiple best, use length of matched exon
   else if (gtf_min$jaccard[1] == gtf_min$jaccard[2]) {
 
-    # Further refine to only include those that are also in the protein coding transcripts, if necessary
-    pc_gtf_min <- gtf_min[gtf_min$transcriptID %in% protein_coding_transcripts,]
-    if (nrow(pc_gtf_min) == 0) {
-      c_gtf <- gtf_min[gtf_min$jaccard == max(gtf_min$jaccard),] %>% dplyr::arrange(desc(length_jacc))
-    } else {
-      c_gtf <- pc_gtf_min[pc_gtf_min$jaccard == max(pc_gtf_min$jaccard),] %>% dplyr::arrange(desc(length_jacc))
-    }
+    c_gtf <- gtf_min[gtf_min$jaccard == max(gtf_min$jaccard),] %>% dplyr::arrange(desc(length_jacc))
+
     return(c_gtf$rownum[1])
   } else {return(0)}
 }
