@@ -1,8 +1,8 @@
 getfxnlASoutcome <- function(output_location,
-                             test_group,control_group,
+                             test_group,control_group,data_df,
                              exon_type, cutoff = .25, outlier_handle = "4/n",
                              cores = 4,
-                             tti_location = "", full_pipe = T, boolUse = T, bg = NA, mOverlap = .5) {
+                             tti_location = "", full_pipe = T, boolUse = T, bg = NA, mOverlap = .01) {
   system(paste0("mkdir ",  output_location))
   pdir <- system.file(package="SpliceImpactR")
 
@@ -41,11 +41,11 @@ getfxnlASoutcome <- function(output_location,
                      pdir=pdir,
                      output_location=output_location)
 
-  initial_comparison <- getOverviewComparison(control_group, test_group, exon_type, output_location)
+  initial_comparison <- getOverviewComparison(data_df, exon_type, output_location)
 
   pfg <- getPaired(foreground = fg$proBed, et = exon_type, nucleotides = c_nucs, output_location = output_location, newGTF = newGTF, saveAlignments = F)
 
-  length_comparison <- getLengthComparison(pfg$paired_proBed, output_location)
+  length_comparison <- getLengthComparison(data_df, pfg$paired_proBed, output_location)
 
   if (tti_location == "") {
     iDDI <- init_ddi(pdir = pdir, output_location = output_location, ppidm_class = "Gold_Standard", removeDups = T)
@@ -55,7 +55,7 @@ getfxnlASoutcome <- function(output_location,
   if (is.na(bg)) {
     bg_input <- gsub("[^/]*$", "", c(control_group, test_group))
     bg <- getBackground(input=bg_input,
-                        mOverlap = .5,
+                        mOverlap = mOverlap,
                         cores = cores,
                         nC = length(control_group),
                         nE = length(test_group),
@@ -70,7 +70,7 @@ getfxnlASoutcome <- function(output_location,
 
 
   gD <- getData(fg = fg, bg = bg, pfg=pfg, cores = cores, pfam = pfam, output_location = output_location,
-                fdr_use = .05, min_sample_success = 5, engine = "Pfam", topViz = 15)
+                fdr_use = .05, min_sample_success = 3, engine = "Pfam", topViz = 15)
 
   if (nrow(pfg$paired_proBed) > 1) {
     tti <- getTTI(paired_foreground = pfg$paired_proBed, background = bg$proBed,

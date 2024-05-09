@@ -7,17 +7,13 @@
 #' @return 4 individual plots and 1 combined plot.
 #' @examples
 #' getOverviewComparison(c("path_control1", "path_control2"), c("path_test1", "path_test2"), "AFE", "path_to_output")
-getOverviewComparison <- function(control_names, test_names, exon_type, output_location, plot = T) {
+getOverviewComparison <- function(data_df, exon_type, output_location, plot = T) {
   sample_types <- list()
 
-  # Categorize each sample name as 'test' or 'control'
-  for (i in test_names) {
-    sample_types <- c(sample_types, list(c(i, 'test')))
+  for (i in 1:nrow(data_df)) {
+    sample_types <- c(sample_types, list(c(data_df$sample_names[i], data_df$utc[i], data_df$phenotype_names[i])))
   }
 
-  for (i in control_names) {
-    sample_types <- c(sample_types, list(c(i, 'control')))
-  }
   # Sort samples by type (control then test)
   sample_list <- c(sample_types[which(unlist(lapply(sample_types, "[[", 2)) == "control")], sample_types[which(unlist(lapply(sample_types, "[[", 2)) == "test")])
 
@@ -27,25 +23,31 @@ getOverviewComparison <- function(control_names, test_names, exon_type, output_l
   ## Number of AS across phenotype
   if (exon_type %in% c("AFE", "ALE", "HFE", "HLE")) {
     colNameInc <- "PSI"
+    nASE <- lapply(data_list, function(x) {
+      vals <- x[,grep(colNameInc, colnames(x), fixed = T)]
+      vals <- vals[!is.na(vals)]
+      length(vals)
+    })
   } else {
     colNameInc <- "IncLevel1"
+    nASE <- lapply(data_list, function(x) {
+      vals <- x[,grep(colNameInc, colnames(x), fixed = T)]
+      vals <- vals[!is.na(vals)]
+      length(vals[vals > 0 & vals < 1])
+    })
   }
-  nASE <- lapply(data_list, function(x) {
-    vals <- x[,grep(colNameInc, colnames(x), fixed = T)]
-    vals <- vals[!is.na(vals)]
-    length(vals[vals > 0 & vals < 1])
-  })
+
 
   dfCount <- data.frame(AScount = unlist(nASE),
-                        type = unlist(lapply(sample_list, "[[", 2)))
-  if (length(sample_list) > 8) {
+                        type = unlist(lapply(sample_list, "[[", 3)))
+  if (length(sample_list) > 10) {
     p1 <- ggplot2::ggplot(dfCount, ggplot2::aes(x = type, y = AScount, fill = type)) +
-      ggplot2::geom_dotplot(binaxis='y', stackdir='center') + ggplot2::theme_bw()+
+      ggplot2::geom_violin() + ggplot2::theme_bw()+
       ggplot2::scale_fill_manual(values=c("brown", "chartreuse4"))+ ggplot2::xlab("Group") +
       ggplot2::ylab(paste0("Count of ", exon_type)) +ggplot2::geom_violin(fill = NA)
   } else {
     p1 <- ggplot2::ggplot(dfCount, ggplot2::aes(x = type, y = AScount, fill = type)) +
-      ggplot2::geom_dotplot(binaxis='y', stackdir='center') + ggplot2::theme_bw()+
+      ggplot2::geom_violin() + ggplot2::theme_bw()+
       ggplot2::scale_fill_manual(values=c("brown", "chartreuse4"))+ ggplot2::xlab("Group") +
       ggplot2::ylab(paste0("Count of ", exon_type))
   }
@@ -61,9 +63,10 @@ getOverviewComparison <- function(control_names, test_names, exon_type, output_l
     }
   })
   dfASpg <- data.frame(ASpg = unlist(nASpg),
-                       type = unlist(lapply(sample_list, "[[", 2)))
-  if (length(sample_list) > 8) {
-    p2 <- ggplot2::ggplot(dfASpg, ggplot2::aes(x = type, y = ASpg, fill = type)) + ggplot2::geom_dotplot(binaxis='y', stackdir='center') + ggplot2::theme_bw()+
+                       type = unlist(lapply(sample_list, "[[", 3)))
+  if (length(sample_list) > 10) {
+    p2 <- ggplot2::ggplot(dfASpg, ggplot2::aes(x = type, y = ASpg, fill = type)) + ggplot2::geom_violin() +
+      ggplot2::theme_bw()+
       ggplot2::scale_fill_manual(values=c("brown", "chartreuse4")) + ggplot2::xlab("Group") +
       ggplot2::ylab(paste0("Mean ", exon_type, " \n per gene")) + ggplot2::geom_violin(fill = NA)
   } else {
@@ -84,9 +87,10 @@ getOverviewComparison <- function(control_names, test_names, exon_type, output_l
     })
   }
   dfdASpg <- data.frame(ASpg = unlist(dASpg),
-                        type = unlist(lapply(1:length(dASpg), function(x) rep(unlist(lapply(sample_list, "[[", 2))[x], length(dASpg[[x]])))))
+                        type = unlist(lapply(1:length(dASpg), function(x) rep(unlist(lapply(sample_list, "[[", 2))[x], length(dASpg[[x]])))),
+                        type_label = unlist(lapply(1:length(dASpg), function(x) rep(unlist(lapply(sample_list, "[[", 3))[x], length(dASpg[[x]])))))
 
-  p3 <- ggplot2::ggplot(dfdASpg, ggplot2::aes(y = .data$ASpg, fill = .data$type)) +
+  p3 <- ggplot2::ggplot(dfdASpg, ggplot2::aes(y = .data$ASpg, fill = .data$type_label)) +
     ggplot2::geom_histogram(binwidth = 1) + ggplot2::theme_bw() +
     ggplot2::scale_y_continuous(breaks=seq(1,max(dfdASpg$ASpg), floor(max(dfdASpg$ASpg)/5)))+
     ggplot2::scale_x_continuous(breaks=seq(0,
@@ -94,11 +98,11 @@ getOverviewComparison <- function(control_names, test_names, exon_type, output_l
                                                  as.integer(table(dfdASpg$ASpg[dfdASpg$type == "test"])))),
                                            floor(max(c(as.integer(table(dfdASpg$ASpg[dfdASpg$type == "control"])),
                                                        as.integer(table(dfdASpg$ASpg[dfdASpg$type == "test"]))))/2))) +
-    ggplot2::facet_wrap(ggplot2::vars(.data$type), strip.position = "bottom") +
+    ggplot2::facet_wrap(ggplot2::vars(.data$type_label), strip.position = "bottom") +
     ggplot2::scale_fill_manual(values=c("brown", "chartreuse4")) +
     ggplot2::xlab(paste0("Gene count")) +
     ggplot2::ylab(paste0(exon_type, " count per gene")) +
-    theme(strip.background=ggplot2::element_rect(colour="black",
+    ggplot2::theme(strip.background=ggplot2::element_rect(colour="black",
                                                  fill="white"),
           axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1))
 

@@ -5,7 +5,7 @@
 #' @return 1 combined plot.
 #' @examples
 #' getOverviewComparison(paired_combined_rows, output_path)
-getLengthComparison <- function(paired_df, output_location) {
+getLengthComparison <- function(data_df, paired_df, output_location) {
 
   paired_df$protLength <- nchar(paired_df$prot)
   paired_df$protLength[paired_df$prot == "none"] <- 0
@@ -16,8 +16,11 @@ getLengthComparison <- function(paired_df, output_location) {
   }
   ))
 
+
+
   proteinLength <- data.frame(protLength = paired_df$protLength[pc],
-                              type = rep(c("test", "control"), length(pc)/2))
+                              type = rep(c(unique(data_df$phenotype_names[data_df$utc == "test"]),
+                                           unique(data_df$phenotype_names[data_df$utc == "control"])), length(pc)/2))
 
   posneg_change_in_length <- unlist(lapply(seq(1, nrow(paired_df), by = 2), function(x) {
     if (paired_df$protLength[x] != 0 & paired_df$protLength[x+1] != 0) {
@@ -27,18 +30,22 @@ getLengthComparison <- function(paired_df, output_location) {
   proteinLength$deltaLength <- posneg_change_in_length
   whichPC <- unlist(lapply(seq(1, nrow(paired_df), by = 2), function(x) {
     if (paired_df$protLength[x] == 0 & paired_df$protLength[x+1] == 0) {
-      "both"
+      "noPC"
     } else if (paired_df$protLength[x] == 0) {
-      "test"
+      unique(data_df$phenotype_names[data_df$utc == "test"])
     } else if (paired_df$protLength[x+1] == 0) {
-      "control"
+      unique(data_df$phenotype_names[data_df$utc == "control"])
     } else {
-      "pc"
+      "bothPC"
     }
   }))
   proteinLengthPaired <- data.frame(test = as.integer(paired_df$protLength[pc][seq(1, length(pc), by = 2)]),
                                     cont = as.integer(paired_df$protLength[pc][seq(2, length(pc), by = 2)]))
-  pairedLengthPlot <- ggpubr::ggpaired(proteinLengthPaired, cond1 = "cont", cond2 = "test",line.color = "grey", line.size = ifelse(nrow(proteinLengthPaired) > 20, 0, 0.4), point.size = ifelse(nrow(proteinLengthPaired) > 20, 0, 1.2),
+  names(proteinLengthPaired) <- c(unique(data_df$phenotype_names[data_df$utc == "test"]), unique(data_df$phenotype_names[data_df$utc == "control"]))
+  pairedLengthPlot <- ggpubr::ggpaired(proteinLengthPaired,
+                                       cond1 = unique(data_df$phenotype_names[data_df$utc == "control"]),
+                                       cond2 = unique(data_df$phenotype_names[data_df$utc == "test"]),
+                                       line.color = "grey", line.size = ifelse(nrow(proteinLengthPaired) > 20, 0, 0.4), point.size = ifelse(nrow(proteinLengthPaired) > 20, 0, 1.2),
                                        fill = "condition")+
     ggpubr::stat_compare_means(paired = TRUE) +
     ggplot2::scale_fill_manual(values=c("brown", "chartreuse4")) +
@@ -64,8 +71,11 @@ getLengthComparison <- function(paired_df, output_location) {
                    axis.line = ggplot2::element_line(colour = "black"))
 
 
-  proteinCodingPlot <- ggplot2::ggplot(dfPC, ggplot2::aes(x = .data$count, y = .data$type, fill = .data$type)) + geom_bar(stat="identity") + theme_bw() +
-    ggplot2::scale_fill_manual(values=c("brown", "deeppink4", "chartreuse4", "azure4"), breaks = c("pc", "control", "test", 'both'))
+  proteinCodingPlot <- ggplot2::ggplot(dfPC, ggplot2::aes(x = .data$count, y = .data$type, fill = .data$type)) + ggplot2::geom_bar(stat="identity") + ggplot2::theme_bw() +
+    ggplot2::scale_fill_manual(values=c("brown", "deeppink4", "chartreuse4", "azure4"), breaks = c("bothPC",
+                                                                                                   unique(data_df$phenotype_names[data_df$utc == "control"]),
+                                                                                                   unique(data_df$phenotype_names[data_df$utc == "test"]),
+                                                                                                   'noPC'))
 
   comb_plot <- ggpubr::ggarrange(pairedLengthPlot, changeDistribution, proteinCodingPlot, nrow = 1, widths = c(3, 2.5, 3))
 
