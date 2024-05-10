@@ -48,9 +48,6 @@ getTranscriptForeground <- function(gtf = gtf, redExon = redExon, ex_type = exon
 
 getTranscriptBackground <- function(gtf = gtf, redExon = redExon, ex_type = exon_type, minOverlap = .5, cores) {
 
-  # Print a message indicating the start of the search for the specified exon type
-  print(paste("searching for ", ex_type, "...", sep = ""))
-
   # Parallel computation for each exon in redExon using multiple cores
   results <- matcher(ex_type = ex_type, background = T, cores = cores, redExon = redExon, minOverlap = minOverlap)
 

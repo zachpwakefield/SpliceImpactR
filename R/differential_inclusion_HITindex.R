@@ -21,7 +21,7 @@ differential_inclusion_HITindex <- function(test_names, control_names, et, cores
     sample_types <- c(sample_types, list(c(i, 'control')))
   }
 
-# Process each splicing event type (AFE, ALE) separately
+  # Process each splicing event type (AFE, ALE) separately
 
   # Sort samples by type (control then test)
   sample_types_sorted <- c(sample_types[which(unlist(lapply(sample_types, "[[", 2)) == "control")], sample_types[which(unlist(lapply(sample_types, "[[", 2)) == "test")])
@@ -90,7 +90,7 @@ differential_inclusion_HITindex <- function(test_names, control_names, et, cores
 
     # Determine outliers based on the specified threshold
     if (!(outlier_bool)) {
-      usable <- which(influence <= max(influence))
+      usable <- which(influence <= Inf)
     } else if (outlier_threshold == "4/n") {
       usable <- which(influence <= 4/length(sample_types_sorted))
     } else if (outlier_threshold == "4/mean") {
@@ -150,13 +150,13 @@ differential_inclusion_HITindex <- function(test_names, control_names, et, cores
       # Calculate likelihood ratio statistic and p-value
       LR_statistic <- -2 * (as.numeric(reduced_ll) - as.numeric(full_ll))
       p_val <- pchisq(LR_statistic, df = 1, lower.tail = FALSE)
-      ifelse(!is.na(p_val), p_val, -1)} else {-1}
+      ifelse(!is.na(p_val), p_val, 1)} else {1}
 
   })
 
   # Adjust p-values for multiple testing
   p.adj <- p.adjust(p_vals, method = 'fdr')
-  p.adj[p.adj < 0] <- -1
+  p.adj[p.adj < 0] <- 1
   if (!(stat_model_bool)) {
     p.adj <- rep(0.01, length(p.adj))
   }
