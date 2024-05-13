@@ -1,5 +1,6 @@
 exportPattern("^[[:alpha:]]+")
 import(tidyverse)
+import(data.table)
 import(methods)
 import(ggpubr)
 import(xlsx)

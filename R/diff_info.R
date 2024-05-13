@@ -19,10 +19,6 @@ diff_info <- function(de_df, numCont, numExp, exon_type, cores = 8, test_names, 
 
   de_df$col <- unlist(col) # Add color information to the dataframe
 
-  # Count the number of outliers for each gene
-  p.scDE <- de_df
-  p.scDE$numOutliers <- str_count(p.scDE$outlier, "#")
-
   # Return the processed dataframe with differential expression analysis results
-  return (de = p.scDE)
+  return (de = de_df)
 }
