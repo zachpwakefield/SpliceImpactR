@@ -86,7 +86,7 @@ differential_inclusion_HITindex <- function(test_names, control_names, et, cores
   ), by = .(gene, exon)]
 
 
-  psi_data[, zero_count := sum(psi_adjusted == 0), by = .(id)]
+  psi_data[, zero_count := sum(psi_adjusted == 0), by = .(gene, exon)]
 
   # Filter data based on min proportion of samples per phenotype and return result
   final_data <- psi_data[psi_data$valid_group, .(
