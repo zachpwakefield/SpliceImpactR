@@ -1,6 +1,6 @@
 differential_inclusion_rMATS <- function(control_names, test_names,
                                          stat_model_bool = T, outlier_bool = T, et, cores, outlier_threshold,
-                                         min_proportion_samples_per_phenotype = .2, minReads = 10) {
+                                         min_prop_samples = .2, minReads = 10) {
 
 
   sample_types <- data.table::data.table(sample_name = c(test_names, control_names),
@@ -153,13 +153,9 @@ differential_inclusion_rMATS <- function(control_names, test_names,
   final_data$p.val[is.na(final_data$p.val)] <- 1
   final_data$add_inf <- "none"
   final_data$type <- et
-
-  fd2 <- final_data
-
-  # [final_data$count_control >= .1 * sum(sample_types$type == "control") &
-  #                     final_data$count_test >= .1 * sum(sample_types$type == "test") &
-  #                     final_data$zero_count <= .5 * nrow(sample_types) &
-  #                     abs(final_data$delta.psi) > .3 & final_data$p.adj < .05,]
+  fd2 <- final_data[final_data$count_control >= min_prop_samples * sum(sample_types$type == "control") &
+                    final_data$count_test >= min_prop_samples * sum(sample_types$type == "test") &
+                    final_data$zero_count <= max_zero_prop * nrow(sample_types),]
 
   idSplit <- strsplit(fd2$id, split = "#")
   fd2[, gene := unlist(lapply(idSplit, "[[", 1))]

@@ -1,7 +1,7 @@
 differential_inclusion_HITindex <- function(test_names, control_names, et, cores = 2,
                                             outlier_threshold = c("4/n", "1", 1)[1],
-                                            minReads = 10,
-                                            min_proportion_samples_per_phenotype = .2) {
+                                            min_proportion_samples = .2,
+                                            minReads = 10, max_zero_prop = .8) {
 
 
   # Create sample type vector efficiently
@@ -85,10 +85,13 @@ differential_inclusion_HITindex <- function(test_names, control_names, et, cores
     control_average_psi = mean(psi_adjusted[type == "control"])
   ), by = .(gene, exon)]
 
+
+  psi_data[, zero_count := sum(psi_adjusted == 0), by = .(id)]
+
   # Filter data based on min proportion of samples per phenotype and return result
   final_data <- psi_data[psi_data$valid_group, .(
     gene, exon, p.val, delta.psi, test_average_psi, control_average_psi,
-    count_test = sum(type == "test"), count_control = sum(type == "control")
+    count_test = sum(type == "test"), count_control = sum(type == "control"), zero_count
 
   ), by = .(gene, exon)]
 
@@ -96,10 +99,13 @@ differential_inclusion_HITindex <- function(test_names, control_names, et, cores
 
   # Adjust p-values for multiple testing
   final_data$p.adj <- p.adjust(final_data$p.val, method = "fdr")
-  final_data$p.adj[is.na(final_data$p.adj)] <- 0
-  final_data$p.val[is.na(final_data$p.val)] <- 0
+  final_data$p.adj[is.na(final_data$p.adj)] <- 1
+  final_data$p.val[is.na(final_data$p.val)] <- 1
   final_data$add_inf <- "none"
   final_data$type <- et
+  final_data <- final_data[final_data$count_control >= min_proportion_samples * sum(sample_types$type == "control") &
+                final_data$count_test >= min_proportion_samples * sum(sample_types$type == "test") &
+                final_data$zero_count <= max_zero_prop * nrow(sample_types),]
   return(data.frame(final_data))
 
 }
