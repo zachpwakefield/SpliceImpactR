@@ -1,6 +1,6 @@
 differential_inclusion_HITindex <- function(test_names, control_names, et, cores = 2,
                                             outlier_threshold = c("4/n", "1", 1)[1],
-                                            min_proportion_samples = .2,
+                                            min_prop_samples = .2,
                                             minReads = 10, max_zero_prop = .8) {
 
 
@@ -103,8 +103,8 @@ differential_inclusion_HITindex <- function(test_names, control_names, et, cores
   final_data$p.val[is.na(final_data$p.val)] <- 1
   final_data$add_inf <- "none"
   final_data$type <- et
-  final_data <- final_data[final_data$count_control >= min_proportion_samples * sum(sample_types$type == "control") &
-                final_data$count_test >= min_proportion_samples * sum(sample_types$type == "test") &
+  final_data <- final_data[final_data$count_control >= min_prop_samples * sum(sample_types$type == "control") &
+                final_data$count_test >= min_prop_samples * sum(sample_types$type == "test") &
                 final_data$zero_count <= max_zero_prop * nrow(sample_types),]
   return(data.frame(final_data))
 
