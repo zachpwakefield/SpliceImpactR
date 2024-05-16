@@ -1,7 +1,7 @@
 differential_inclusion_HITindex <- function(test_names, control_names, et, cores = 2,
                                             outlier_threshold = c("4/n", "1", 1)[1],
-                                            min_prop_samples = .2,
-                                            minReads = 10, max_zero_prop = .8) {
+                                            min_prop_samples = .5,
+                                            minReads = 10, max_zero_prop = .5) {
 
 
   # Create sample type vector efficiently

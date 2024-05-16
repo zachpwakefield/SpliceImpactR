@@ -1,6 +1,6 @@
 differential_inclusion_rMATS <- function(control_names, test_names,
                                          stat_model_bool = T, outlier_bool = T, et, cores, outlier_threshold,
-                                         min_prop_samples = .2, minReads = 10, max_zero_prop = .8) {
+                                         min_prop_samples = .5, minReads = 10, max_zero_prop = .5) {
 
 
   sample_types <- data.table::data.table(sample_name = c(test_names, control_names),
