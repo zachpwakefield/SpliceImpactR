@@ -38,7 +38,9 @@ getfxnlASoutcome <- function(output_location,
                      pdir=pdir,
                      output_location=output_location)
 
-  initial_comparison <- getOverviewComparison(data_df, exon_type, output_location)
+  if (!(exon_type %in% c("HFE", "HLE"))) {
+    initial_comparison <- getOverviewComparison(data_df, exon_type, output_location)
+  }
 
   pfg <- getPaired(foreground = fg$proBed, et = exon_type, nucleotides = c_nucs, output_location = output_location, newGTF = newGTF, saveAlignments = F)
 

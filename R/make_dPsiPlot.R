@@ -14,7 +14,7 @@ make_dPsiPlot <- function(dpsi_df, thresh = .2, pdir) {
   lab_thresh <- dpsi_df %>% dplyr::arrange(desc(abs(delta.psi)), p.adj)
 
   # Create the dpsi change plot using ggplot2
-  deExons <- ggplot2::ggplot(dpsi_df,ggplot2:: aes(x = .data$delta.psi, y = -log(.data$p.adj), color = .data$col, label = .data$hgnc)) +
+  deExons <- ggplot2::ggplot(dpsi_df, ggplot2::aes(x = .data$delta.psi, y = -log(.data$p.adj), color = .data$col, label = .data$hgnc)) +
     ggplot2::geom_point(ggplot2::aes(shape = .data$type), size = 2, color = dpsi_df$col) +
     ggplot2::theme_classic() + ggplot2::ylab("-Log2(FDR)") +
     ggplot2::xlab("Delta Psi") +
@@ -24,7 +24,7 @@ make_dPsiPlot <- function(dpsi_df, thresh = .2, pdir) {
   diE <- data.frame(val = c(sum(dpsi_df$delta.psi < -1*(thresh) & dpsi_df$p.adj < .05), sum(dpsi_df$delta.psi > thresh & dpsi_df$p.adj < .05)),
                     type = c("-", "+"))
 
-  deExons_chart <- ggplot2::ggplot(diE ,ggplot2:: aes(x = .data$type, y = .data$val, fill = .data$type)) +
+  deExons_chart <- ggplot2::ggplot(diE, ggplot2::aes(x = .data$type, y = .data$val, fill = .data$type)) +
     ggplot2::geom_bar(stat="identity") + ggplot2::ylab("Count") + ggplot2::xlab("diExons") +
     ggplot2::theme_classic() + ggplot2::scale_fill_manual(values=c("brown", "chartreuse4"), breaks = c("-", "+")) +
     ggplot2::geom_text(aes(label = .data$val), vjust = 1.5, colour = "white", size = 5) +
