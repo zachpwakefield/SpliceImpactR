@@ -151,7 +151,6 @@ differential_inclusion_rMATS <- function(control_names, test_names,
   final_data$p.adj <- p.adjust(final_data$p.val, method = "fdr")
   final_data$p.adj[is.na(final_data$p.adj)] <- 1
   final_data$p.val[is.na(final_data$p.val)] <- 1
-  final_data$add_inf <- "none"
   final_data$type <- et
   fd2 <- final_data[final_data$count_control >= min_prop_samples * sum(sample_types$type == "control") &
                     final_data$count_test >= min_prop_samples * sum(sample_types$type == "test") &
@@ -160,6 +159,7 @@ differential_inclusion_rMATS <- function(control_names, test_names,
   idSplit <- strsplit(fd2$id, split = "#")
   fd2[, gene := unlist(lapply(idSplit, "[[", 1))]
   fd2[, exon := unlist(lapply(idSplit, "[[", 2))]
+  fd2[, add_inf := unlist(lapply(idSplit, "[[", 3))]
 
   stats_out <- data.frame(fd2[!duplicated(fd2),c(-1)] %>% dplyr::arrange(.data$gene))
 
