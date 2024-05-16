@@ -34,9 +34,6 @@ differential_inclusion_HITindex <- function(test_names, control_names, et, cores
   expanded_data[is.na(psi), psi := 0]  # Fill missing PSI values with 0
   expanded_data[is.na(nUP), nUP := 0]  # Fill missing PSI values with 0
   expanded_data[is.na(nDOWN), nDOWN := 0]  # Fill missing PSI values with 0
-  expanded_data[is.na(nFE), nFE := 0]  # Fill missing PSI values with 0
-  expanded_data[is.na(nTXPT), nTXPT := 0]  # Fill missing PSI values with 0
-  expanded_data$`sumR-L`[is.na(expanded_data$`sumR-L`)] <- 0
   psi_data <- expanded_data
 
   # Calculate additional columns needed for analysis
@@ -95,7 +92,7 @@ differential_inclusion_HITindex <- function(test_names, control_names, et, cores
 
   ), by = .(gene, exon)]
 
-  final_data <- final_data[!duplicated(final_data),-c(1:2)] %>% arrange(.data$gene)
+  final_data <- final_data[!duplicated(final_data),-c(1:2)] %>% dplyr::arrange(.data$gene)
 
   # Adjust p-values for multiple testing
   final_data$p.adj <- p.adjust(final_data$p.val, method = "fdr")

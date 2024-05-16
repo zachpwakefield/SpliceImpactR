@@ -161,7 +161,7 @@ differential_inclusion_rMATS <- function(control_names, test_names,
   fd2[, gene := unlist(lapply(idSplit, "[[", 1))]
   fd2[, exon := unlist(lapply(idSplit, "[[", 2))]
 
-  stats_out <- data.frame(fd2[!duplicated(fd2),c(-1)] %>% arrange(.data$gene))
+  stats_out <- data.frame(fd2[!duplicated(fd2),c(-1)] %>% dplyr::arrange(.data$gene))
 
   if (et == "A5SS" | et == "A3SS" | et == "MXE") {
     # extract paired results for naturally paired output

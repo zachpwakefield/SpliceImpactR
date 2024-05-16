@@ -67,7 +67,7 @@ getfxnlASoutcome <- function(output_location,
 
 
   gD <- getData(fg = fg, bg = bg, pfg=pfg, cores = cores, pfam = pfam, output_location = output_location,
-                fdr_use = .05, min_sample_success = 3, engine = "Pfam", topViz = 15)
+                fdr_use = .05, min_sample_success = 2, engine = "Pfam", topViz = 15)
 
   if (nrow(pfg$paired_proBed) > 1) {
     tti <- getTTI(paired_foreground = pfg$paired_proBed, background = bg$proBed,
