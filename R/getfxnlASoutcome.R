@@ -8,19 +8,18 @@ getfxnlASoutcome <- function(output_location,
 
   if (exon_type %in% c("AFE", "HFE")) {
       diHIT <- differential_inclusion_HITindex(test_names = test_group, control_names = control_group, et = "AFE",
-                                               cores = cores,stat_model_bool = boolUse, outlier_bool = boolUse,
+                                               cores = cores,
                                                outlier_threshold = outlier_handle, minReads = 10)
 
       diAS <- diHIT[diHIT$type == "AFE",]
   } else if (exon_type %in% c("ALE", "HLE")) {
       diHIT <- differential_inclusion_HITindex(test_names = test_group, control_names = control_group, et = "ALE",
-                                               cores = cores,stat_model_bool = boolUse, outlier_bool = boolUse,
+                                               cores = cores,
                                                outlier_threshold = outlier_handle, minReads = 10)
 
       diAS <- diHIT[diHIT$type == "ALE",]
     } else {
     diAS <- differential_inclusion_rMATS(test_names = test_group, control_names = control_group,
-                                         stat_model_bool = boolUse, outlier_bool = boolUse,
                                          et = exon_type, cores = cores, outlier_threshold = outlier_handle,
                                          minReads = 10)
   }
