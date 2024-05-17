@@ -88,8 +88,8 @@ getData <- function(fg, bg, pfg, pfam, cores = cores,
     }
 
     if (length(fg_dom) == 0) {
-      print("No domains enriched")
-      return(NA)
+      print(paste0("No domains enriched in ", x, " set"))
+      return(list("none", data.frame(vals = 0, types = x), data.frame(vals = 0, types = x)))
     }
 
 
@@ -141,6 +141,7 @@ getData <- function(fg, bg, pfg, pfam, cores = cores,
 
   })
 
+
   lengthDist <- do.call(rbind, lapply(dataList, "[[", 2))
   changeNum <- do.call(rbind, lapply(dataList, "[[", 3))
 
@@ -163,6 +164,9 @@ getData <- function(fg, bg, pfg, pfam, cores = cores,
 
   # Generate enrichment plots for upregulated and downregulated genes
   eP <-lapply(1:2, function(x) {
+    if (dataList[[x]][1] == "none") {
+      return(NA)
+    }
     data <- lapply(dataList, "[[", 1)
 
     # Prepare data for plotting
