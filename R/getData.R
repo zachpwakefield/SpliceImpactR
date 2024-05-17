@@ -87,7 +87,10 @@ getData <- function(fg, bg, pfg, pfam, cores = cores,
       }))
     }
 
-
+    if (length(fg_dom) == 0) {
+      print("No domains enriched")
+      return(NA)
+    }
 
 
     fg_dom_li <- lapply(strsplit(fg_ip$protInfor, split = ';'), unique)
