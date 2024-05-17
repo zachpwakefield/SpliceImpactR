@@ -35,20 +35,10 @@ differential_inclusion_rMATS <- function(control_names, test_names,
     temp <- temp %>% dplyr::select('sample_name', 'GeneID', "chr", "strand", "X1stExonStart_0base", "X1stExonEnd", "X2ndExonStart_0base", "X2ndExonEnd", "upstreamES", "upstreamEE",
                                    "downstreamES", "downstreamEE", "IncLevel1", "IncLevel2", "IJC_SAMPLE_1", "SJC_SAMPLE_1", 'type')
 
-    correct_temp <- do.call(rbind, lapply(1:nrow(temp), function(x)
-      data.frame(sc_X1start = ifelse(temp$strand[x] == "+", temp$X1stExonStart_0base[x], temp$X2ndExonStart_0base[x]),
-                 sc_X1end = ifelse(temp$strand[x] == "+", temp$X1stExonEnd[x], temp$X2ndExonEnd[x]),
-                 sc_X2start = ifelse(temp$strand[x] == "+", temp$X2ndExonStart_0base[x], temp$X1stExonStart_0base[x]),
-                 sc_X2end = ifelse(temp$strand[x] == "+", temp$X2ndExonEnd[x], temp$X1stExonEnd[x])
-      )
-
-
-    )
-    )
-    temp$X1stExonStart_0base <- correct_temp$sc_X1start
-    temp$X1stExonEnd <- correct_temp$sc_X1end
-    temp$X2ndExonStart_0base <- correct_temp$sc_X2start
-    temp$X2ndExonEnd <- correct_temp$sc_X2end
+    temp[, X1stExonStart_0base := ifelse(strand == "+", X1stExonStart_0base, X2ndExonStart_0base)]
+    temp[, X1stExonEnd := ifelse(temp$strand == "+", temp$X1stExonEnd, temp$X2ndExonEnd)]
+    temp[, X2ndExonStart_0base := ifelse(temp$strand == "+", temp$X2ndExonStart_0base, temp$X1stExonStart_0base)]
+    temp[, X2ndExonEnd := ifelse(temp$strand == "+", temp$X2ndExonEnd, temp$X1stExonEnd)]
 
     temp$id <- paste0(temp$GeneID, "#", temp$chr, ":", temp$X1stExonStart_0base, "-", temp$X1stExonEnd, "#",
                       temp$strand, ";", temp$X2ndExonStart_0base, "-", temp$X2ndExonEnd, ";",
