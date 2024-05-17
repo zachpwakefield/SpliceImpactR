@@ -31,7 +31,8 @@ differential_inclusion_rMATS <- function(control_names, test_names,
                       temp$flankingES, "-", temp$flankingEE)
 
   } else if (et == "MXE") {
-    temp <- temp %>% dplyr::select('sample_name', 'GeneID', "chr", "strand", "1stExonStart_0base", "1stExonEnd", "2ndExonStart_0base", "2ndExonEnd", "upstreamES", "upstreamEE",
+    colnames(temp)[colnames(temp) %in% c("1stExonStart_0base", "1stExonEnd", "2ndExonStart_0base", "2ndExonEnd")] <- paste0("X", colnames(temp)[colnames(temp) %in% c("1stExonStart_0base", "1stExonEnd", "2ndExonStart_0base", "2ndExonEnd")])
+    temp <- temp %>% dplyr::select('sample_name', 'GeneID', "chr", "strand", "X1stExonStart_0base", "X1stExonEnd", "X2ndExonStart_0base", "X2ndExonEnd", "upstreamES", "upstreamEE",
                                    "downstreamES", "downstreamEE", "IncLevel1", "IncLevel2", "IJC_SAMPLE_1", "SJC_SAMPLE_1", 'type')
 
     correct_temp <- do.call(rbind, lapply(1:nrow(temp), function(x)
