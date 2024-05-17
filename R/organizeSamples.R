@@ -7,7 +7,7 @@
 # # rmats
 # # hit
 
-organizeSamples <- function(samples, output_location, cores = 1) {
+organizeSamples2 <- function(samples, output_location, cores = 1) {
 
   # Create a main directory to store all the data
   system(paste0("mkdir ", paste0(output_location, 'data/')))
@@ -67,7 +67,7 @@ organizeSamples <- function(samples, output_location, cores = 1) {
     )
 
     # Define the directory containing hit files and copy specific types of hit files to the sample directory
-    hit_dir <- paste0(y, 'hit/')
+    hit_dir <- paste0(y, 'hit-index/')
 
     # Copy exon hit files to the sample directory
     system(
