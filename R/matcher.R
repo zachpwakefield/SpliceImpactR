@@ -16,7 +16,7 @@ matcher <- function(ex_type, background = F, cores, redExon = redExon, minOverla
                  protein_coding_transcripts = protein_coding_transcripts)
     }))
   } else if (ex_type %in% c("AFE", "ALE", "HFE", "HLE")) {
-    gtf_filtered <- gtf[gtf$classification %in% c("first", "internal", "last")]
+    gtf_filtered <- gtf[gtf$classification %in% c("first", "internal", "last"),]
     if (ex_type == "HFE") {
       lim <- "first"
       gtf_filtered <- gtf[gtf$classification == lim,]
