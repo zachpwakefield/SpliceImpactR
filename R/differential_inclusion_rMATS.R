@@ -1,5 +1,4 @@
-differential_inclusion_rMATS <- function(control_names, test_names,
-                                         stat_model_bool = T, outlier_bool = T, et, cores, outlier_threshold,
+differential_inclusion_rMATS <- function(control_names, test_names, et, cores, outlier_threshold,
                                          min_prop_samples = .5, minReads = 10, max_zero_prop = .5) {
 
 

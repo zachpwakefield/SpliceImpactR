@@ -10,13 +10,13 @@ matcher <- function(ex_type, background = F, cores, redExon = redExon, minOverla
   transcript_starts <- setNames(gtf$start[gtf$classification == 'transcript'], gtf$transcriptID[gtf$classification == 'transcript'])
 
   if (background) {
-    gtf_filtered <- gtf
+    gtf_filtered <- gtf[gtf$classification %in% c("first", "internal", "last")]
     results <- unlist(parallel::mclapply(1:nrow(redExon), mc.cores = cores, function(i) {
       HITmatcher(i, redExon = redExon, gtf_filtered=gtf_filtered, minOverlap = minOverlap,
                  protein_coding_transcripts = protein_coding_transcripts)
     }))
   } else if (ex_type %in% c("AFE", "ALE", "HFE", "HLE")) {
-    gtf_filtered <- gtf #[gtf$classification == lim,]
+    gtf_filtered <- gtf[gtf$classification %in% c("first", "internal", "last")]
     if (ex_type == "HFE") {
       lim <- "first"
       gtf_filtered <- gtf[gtf$classification == lim,]

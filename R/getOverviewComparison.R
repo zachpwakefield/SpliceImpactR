@@ -78,11 +78,15 @@ getOverviewComparison <- function(data_df, exon_type, output_location, plot = T)
   ## Distribution of Isoforms
   ## Distribution of Isoforms
   if (exon_type %in% c("AFE", "ALE", "HFE", "HLE")) {
-    dASpg <- lapply(data_list, function(x) as.numeric(table(x$gene)))
+    if (exon_type %in% c("AFE", "HFE")) {
+      dASpg <- lapply(data_list, function(x) as.numeric(table(x$gene[x$AFEPSI > 0 & x$AFEPSI < 1 & !is.na(x$AFEPSI)])))
+    } else if (exon_type %in% c("ALE", "HLE")) {
+      dASpg <- lapply(data_list, function(x) as.numeric(table(x$gene[x$SALEPSI > 0 & x$SALEPSI < 1 & !is.na(x$SALEPSI)])))
+    }
 
   } else {
     dASpg <- lapply(data_list, function(x) {
-      as.numeric(table(x$geneSymbol[x$IncLevel1 > 0 & x$IncLevel1 < 1]))
+      as.numeric(table(x$geneSymbol[x$IncLevel1 > 0 & x$IncLevel1 < 1 & !is.na(x$IncLevel1)]))
 
     })
   }
