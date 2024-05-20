@@ -52,19 +52,17 @@ differential_inclusion_HITindex <- function(test_names, control_names, et, cores
 
   # Linear modeling and Cook's distance for outlier detection if enabled
   psi_data[, valid_group := .N > 1 && data.table::uniqueN(type) > 1, by = .(gene, exon)]
-  if (outlier_bool) {
-    psi_data[psi_data$valid_group, cooks_d := {
-      model <- lm(psi_adjusted ~ type, data = .SD)
-      cooks.distance(model)
-    }, by = .(gene, exon)]
+  psi_data[psi_data$valid_group, cooks_d := {
+    model <- lm(psi_adjusted ~ type, data = .SD)
+    cooks.distance(model)
+  }, by = .(gene, exon)]
 
-    # Determine the threshold for outliers
-    threshold <- switch(outlier_threshold,
-                        "4/n" = 4 / nrow(sample_types),
-                        "1" = 1,
-                        as.numeric(outlier_threshold))
-    psi_data <- psi_data[cooks_d <= threshold & valid_group]
-  }
+  # Determine the threshold for outliers
+  threshold <- switch(outlier_threshold,
+                      "4/n" = 4 / nrow(sample_types),
+                      "1" = 1,
+                      as.numeric(outlier_threshold))
+  psi_data <- psi_data[cooks_d <= threshold & valid_group]
   psi_data[, valid_group := .N > 1 && uniqueN(type) > 1, by = .(gene, exon)]
   psi_data[psi_data$valid_group, c("LR_stat", "p.val") := {
     reduced_model <- lm(psi_adjusted ~ 1, data = .SD)

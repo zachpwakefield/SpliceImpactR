@@ -97,20 +97,19 @@ differential_inclusion_rMATS <- function(control_names, test_names,
 
   # Linear modeling and Cook's distance for outlier detection if enabled
   psi_data[, valid_group := .N > 1 && data.table::uniqueN(type) > 1, by = .(id)]
-  if (outlier_bool) {
-    psi_data[psi_data$valid_group, cooks_d := {
-      model <- lm(psi_adjusted ~ type, data = .SD)
-      cooks.distance(model)
-    }, by = .(id)]
+  psi_data[psi_data$valid_group, cooks_d := {
+    model <- lm(psi_adjusted ~ type, data = .SD)
+    cooks.distance(model)
+  }, by = .(id)]
 
-    psi_data[is.na(psi_data$cooks_d)] <- 0
-    # Determine the threshold for outliers
-    threshold <- switch(outlier_threshold,
-                        "4/n" = 4 / nrow(sample_types),
-                        "1" = 1,
-                        as.numeric(outlier_threshold))
-    psi_data <- psi_data[cooks_d <= threshold & valid_group]
-  }
+  psi_data[is.na(psi_data$cooks_d)] <- 0
+  # Determine the threshold for outliers
+  threshold <- switch(outlier_threshold,
+                      "4/n" = 4 / nrow(sample_types),
+                      "1" = 1,
+                      as.numeric(outlier_threshold))
+  psi_data <- psi_data[cooks_d <= threshold & valid_group]
+
   psi_data[, valid_group := .N > 1 && uniqueN(type) > 1, by = .(id)]
   psi_data[psi_data$valid_group, c("LR_stat", "p.val") := {
     reduced_model <- lm(psi_adjusted ~ 1, data = .SD)
