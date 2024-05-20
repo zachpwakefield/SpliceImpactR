@@ -1,7 +1,7 @@
 fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", "RI", "A5SS", "A3SS"),
                           output_directory, data_directory,
                           data_df, outlier_handle,
-                          cutoff = .2, cores = 6,
+                          cutoff = .2, cores = 6, bg_pre = NA,
                           tti_location = "/projectnb/evolution/zwakefield/allison_mettl/analysis/sir/", mOverlap = .01) {
   system(paste0("mkdir ",  output_directory))
   pdir <- system.file(package="SpliceImpactR")
@@ -17,15 +17,19 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
   control_group <- data_df$sample_names[data_df$utc == "control"]
   test_group <- data_df$sample_names[data_df$utc == "test"]
 
-  bg_input <- gsub("[^/]*$", "", c(control_group, test_group))
-  bg <- getBackground(input=bg_input,
-                      mOverlap = .01,
-                      cores = cores,
-                      nC = length(control_group),
-                      nE = length(test_group),
-                      exon_type = as_types[1],
-                      pdir = pdir,
-                      output_location = output_directory)
+  if (is.na(bg_pre)) {
+    bg_input <- gsub("[^/]*$", "", c(control_group, test_group))
+    bg <- getBackground(input=bg_input,
+                        mOverlap = .01,
+                        cores = cores,
+                        nC = length(control_group),
+                        nE = length(test_group),
+                        exon_type = as_types[1],
+                        pdir = pdir,
+                        output_location = output_directory)
+  } else {
+    bg <- bg_pre
+  }
   lapply(as_types, function(x) {
     print(paste0(x, " analysis..."))
     system(paste0("mkdir ",  paste0(output_directory, x, "/")))
