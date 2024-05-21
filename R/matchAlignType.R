@@ -45,9 +45,6 @@ matchAlignType <- function(proBed, protCode, nucleotides, output_location, saveA
   alignType <- unlist(lapply(alignmentTypes, "[[", 2))
 
 
-  # Print a table of protein categories for diagnostic purposes
-  print(table(alignType))
-
   # Add matching information to the 'proBed' dataframe
   proBed$prop <- rep(pMatch, each = 2)
   proBed$matchType <- rep(alignType, each = 2)

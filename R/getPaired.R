@@ -168,6 +168,9 @@ getPaired <- function(foreground, et, nucleotides, newGTF, cores = 4, output_loc
     print(propCoding)
     dev.off()
 
+    # Print a table of protein categories for diagnostic purposes
+    print(table(combined_rows_df_expanded$alignType/2))
+
     # Return the combined dataframe of exon pairs with their corresponding rows from the input dataframe
     # exon_pairs is minimal information
     # combined_rows is maximal information
