@@ -44,7 +44,9 @@ getfxnlASoutcome <- function(output_location,
 
   pfg <- getPaired(foreground = fg$proBed, et = exon_type, nucleotides = c_nucs, output_location = output_location, newGTF = newGTF, saveAlignments = F)
 
-  length_comparison <- getLengthComparison(data_df, pfg$paired_proBed, output_location)
+  if (nrow(pfg$paired_proBed) > 1) {
+    length_comparison <- getLengthComparison(data_df, pfg$paired_proBed, output_location)
+  }
 
   if (tti_location == "") {
     iDDI <- init_ddi(pdir = pdir, output_location = output_location, ppidm_class = "Gold_Standard", removeDups = T)
