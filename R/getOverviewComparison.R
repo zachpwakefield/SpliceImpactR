@@ -7,7 +7,7 @@
 #' @return 4 individual plots and 1 combined plot.
 #' @examples
 #' getOverviewComparison(c("path_control1", "path_control2"), c("path_test1", "path_test2"), "AFE", "path_to_output")
-getOverviewComparison <- function(data_df, exon_type, output_location, plot = T) {
+getOverviewComparison <- function(data_df, exon_type, output_location, plot = T, minReads = 10) {
   sample_types <- list()
 
   for (i in 1:nrow(data_df)) {
@@ -75,24 +75,75 @@ getOverviewComparison <- function(data_df, exon_type, output_location, plot = T)
       ggplot2::ylab(paste0("Mean ", exon_type, " \n per gene"))
   }
 
-  ## Distribution of Isoforms
-  ## Distribution of Isoforms
   if (exon_type %in% c("AFE", "ALE", "HFE", "HLE")) {
     if (exon_type %in% c("AFE", "HFE")) {
-      dASpg <- lapply(data_list, function(x) as.numeric(table(x$gene[x$AFEPSI > 0 & x$AFEPSI < 1 & !is.na(x$AFEPSI)])))
+      idForDist <- lapply(data_list, function(x) {
+        y <- x[!is.na(x$AFEPSI) & x$AFEPSI > 0 & ((x$nUP + x$nDOWN) > minReads),]
+        paste0(y$gene, "#", y$exon)
+      })
     } else if (exon_type %in% c("ALE", "HLE")) {
-      dASpg <- lapply(data_list, function(x) as.numeric(table(x$gene[x$SALEPSI > 0 & x$SALEPSI < 1 & !is.na(x$SALEPSI)])))
+      idForDist <- lapply(data_list, function(x) {
+        y <- x[!is.na(x$ALEPSI) & x$ALEPSI > 0 & ((x$nUP + x$nDOWN) > minReads),]
+        paste0(y$gene, "#", y$exon)
+      })
     }
 
   } else {
-    dASpg <- lapply(data_list, function(x) {
-      as.numeric(table(x$geneSymbol[x$IncLevel1 > 0 & x$IncLevel1 < 1 & !is.na(x$IncLevel1)]))
 
+    getRMATSid <- function(temp, et) {
+      temp <- data.table::data.table(temp)
+      if (et == "SE") {
+        temp <- temp %>% dplyr::select('GeneID', "chr", "strand", "exonStart_0base", "exonEnd", "upstreamES", "upstreamEE", "downstreamES", "downstreamEE", "IncLevel1", "IJC_SAMPLE_1", "SJC_SAMPLE_1")
+        temp$id <- paste0(temp$GeneID, "#", temp$chr, ":", temp$exonStart_0base, "-", temp$exonEnd, "#",
+                          temp$strand, ";", temp$upstreamES, "-", temp$upstreamEE, ";",
+                          temp$downstreamES, "-", temp$downstreamEE)
+
+      } else if (et == "A3SS" | et == "A5SS") {
+        temp <- temp %>% dplyr::select('GeneID', "chr", "strand", "longExonStart_0base", "longExonEnd", "shortES", "shortEE", "flankingES", "flankingEE", "IncLevel1", "IncLevel2", "IJC_SAMPLE_1", "SJC_SAMPLE_1")
+        temp$id <- paste0(temp$GeneID, "#", temp$chr, ":", temp$longExonStart_0base, "-", temp$longExonEnd, "#",
+                          temp$strand, ";", temp$shortES, "-", temp$shortEE, ";",
+                          temp$flankingES, "-", temp$flankingEE)
+
+      } else if (et == "MXE") {
+        colnames(temp)[colnames(temp) %in% c("1stExonStart_0base", "1stExonEnd", "2ndExonStart_0base", "2ndExonEnd")] <- paste0("X", colnames(temp)[colnames(temp) %in% c("1stExonStart_0base", "1stExonEnd", "2ndExonStart_0base", "2ndExonEnd")])
+        temp <- temp %>% dplyr::select('GeneID', "chr", "strand", "X1stExonStart_0base", "X1stExonEnd", "X2ndExonStart_0base", "X2ndExonEnd", "upstreamES", "upstreamEE",
+                                       "downstreamES", "downstreamEE", "IncLevel1", "IncLevel2", "IJC_SAMPLE_1", "SJC_SAMPLE_1")
+
+        temp[, X1stExonStart_0base := ifelse(strand == "+", X1stExonStart_0base, X2ndExonStart_0base)]
+        temp[, X1stExonEnd := ifelse(temp$strand == "+", temp$X1stExonEnd, temp$X2ndExonEnd)]
+        temp[, X2ndExonStart_0base := ifelse(temp$strand == "+", temp$X2ndExonStart_0base, temp$X1stExonStart_0base)]
+        temp[, X2ndExonEnd := ifelse(temp$strand == "+", temp$X2ndExonEnd, temp$X1stExonEnd)]
+
+        temp$id <- paste0(temp$GeneID, "#", temp$chr, ":", temp$X1stExonStart_0base, "-", temp$X1stExonEnd, "#",
+                          temp$strand, ";", temp$X2ndExonStart_0base, "-", temp$X2ndExonEnd, ";",
+                          temp$upstreamES, "-", temp$upstreamEE, ";",
+                          temp$downstreamES, "-", temp$downstreamEE)
+
+      } else if (et == "RI") {
+        temp <- temp %>% dplyr::select('GeneID', "chr", "strand", "riExonStart_0base", "riExonEnd", "upstreamES", "upstreamEE", "downstreamES", "downstreamEE", "IncLevel1",
+                                       "IncLevel2", "IJC_SAMPLE_1", "SJC_SAMPLE_1")
+        temp$id <- paste0(temp$GeneID, "#", temp$chr, ":", temp$riExonStart_0base, "-", temp$riExonEnd, "#",
+                          temp$strand, ";", temp$upstreamES, "-", temp$upstreamEE, ";",
+                          temp$downstreamES, "-", temp$downstreamEE)
+
+      }
+      return(data.frame(temp))
+    }
+
+
+    idForDist <- lapply(data_list, function(x) {
+      y <- x[!is.na(x$IncLevel1) & x$IncLevel1 > 0.03 & x$IncLevel1 < .97 & ((x$IJC_SAMPLE_1 + x$SJC_SAMPLE_1) > minReads),]
+      getRMATSid(temp = y, et = exon_type)$id
     })
   }
-  dfdASpg <- data.frame(ASpg = unlist(dASpg),
-                        type = unlist(lapply(1:length(dASpg), function(x) rep(unlist(lapply(sample_list, "[[", 2))[x], length(dASpg[[x]])))),
-                        type_label = unlist(lapply(1:length(dASpg), function(x) rep(unlist(lapply(sample_list, "[[", 3))[x], length(dASpg[[x]])))))
+
+  distSummTest <- as.numeric(table(unlist(lapply(strsplit(unique(unlist(idForDist[unlist(lapply(sample_list, "[[", 2)) == "test"])), split = "#"), "[[", 1))))
+  distSummControl <- as.numeric(table(unlist(lapply(strsplit(unique(unlist(idForDist[unlist(lapply(sample_list, "[[", 2)) == "control"])), split = "#"), "[[", 1))))
+
+  dfdASpg <- data.frame(ASpg = c(distSummControl, distSummTest),
+                        type = c(rep("control", length(distSummControl)), rep("test", length(distSummTest))),
+                        type_label = c(rep(unique(data_df$phenotype_names[data_df$utc == "control"]), length(distSummControl)), rep(unique(data_df$phenotype_names[data_df$utc == "test"]), length(distSummTest))))
+
 
   p3 <- ggplot2::ggplot(dfdASpg, ggplot2::aes(y = .data$ASpg, fill = .data$type_label)) +
     ggplot2::geom_histogram(binwidth = 1) + ggplot2::theme_bw() +
@@ -105,7 +156,7 @@ getOverviewComparison <- function(data_df, exon_type, output_location, plot = T)
     ggplot2::facet_wrap(ggplot2::vars(.data$type_label), strip.position = "bottom") +
     ggplot2::scale_fill_manual(values=c("brown", "chartreuse4")) +
     ggplot2::xlab(paste0("Gene count")) +
-    ggplot2::ylab(paste0(exon_type, " count per gene")) +
+    ggplot2::ylab(paste0(exon_type, " count per gene ")) +
     ggplot2::theme(strip.background=ggplot2::element_rect(colour="black",
                                                  fill="white"),
           axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1))
@@ -115,7 +166,8 @@ getOverviewComparison <- function(data_df, exon_type, output_location, plot = T)
   dfECDF <- data.frame(val = unlist(psiVals),
                        type = unlist(lapply(1:length(psiVals), function(x) rep(unlist(lapply(sample_list, "[[", 2))[x], length(psiVals[[x]])))))
 
-  dfECDF <- dfECDF[dfECDF$val < 1 & dfECDF$val > 0,]
+  dfECDF <- dfECDF[dfECDF$val < 1 & dfECDF$val > 0 & !is.na(dfECDF$val),]
+  dfECDF <- dfECDF[!is.na(dfECDF$val),]
   p4 <- ggplot2::ggplot(dfECDF, ggplot2::aes(x = val, colour = type, fill = type)) +
     ggplot2::stat_ecdf(geom = "step") + ggplot2::theme_bw() + ggplot2::scale_color_manual(breaks=c("control","test"),
                                                                                           values=c("brown", "chartreuse4")) + ggplot2::xlab("PSI") + ggplot2::ylab(paste0(exon_type, " PSI eCDF"))
