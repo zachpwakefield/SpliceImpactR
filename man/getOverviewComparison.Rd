@@ -5,21 +5,21 @@
 \title{Get comparison between phenotypes: count of AS event, count of AS event per gene, ECDF compare and save to Foreground subdir}
 \usage{
 getOverviewComparison(
-  control_names,
-  test_names,
+  data_df,
   exon_type,
   output_location,
-  plot = T
+  plot = T,
+  minReads = 10
 )
 }
 \arguments{
-\item{control_names}{paths of control samples}
-
-\item{test_names}{paths of test samples}
-
 \item{exon_type}{type of AS being investigated}
 
 \item{output_location}{location where everything is being saved}
+
+\item{control_names}{paths of control samples}
+
+\item{test_names}{paths of test samples}
 }
 \value{
 4 individual plots and 1 combined plot.

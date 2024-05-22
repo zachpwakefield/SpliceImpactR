@@ -32,4 +32,4 @@ Imports:
   hypeR,
   BiocManager,
   rtracklayer
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.3

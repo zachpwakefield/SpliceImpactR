@@ -1,9 +1,16 @@
-## This function associates transcripts from background and foreground datasets with Pfam protein domains,
-## using a reference file that maps transcripts to protein codes. It outputs two files containing Pfam domain
-## information for the foreground and background datasets.
-
-
-getPfam <- function(background, foreground, pdir, output_location, cores) {
+#' get the pfam domains for each protein
+#'
+#' @param foreground output from getForeground
+#' @param background output from getBackground
+#' @param pdir directory of package
+#' @param output_location location to make background directory
+#' @param cores number of requested cores
+#' @return figures and dataframes with paired data
+#' @import dplyr
+#' @importFrom readr read_tsv write_tsv
+#' @importFrom parallel mclapply
+#' @export
+getPfam <- function(background, foreground, pdir, output_location, cores = 1) {
   # Load the Pfam reference data, which maps transcripts to protein codes
   pfam_hg38 <- readr::read_tsv(paste0(pdir, '/protein_code_from_gencodev43_headerFix.txt.tsv'), col_names = F)
 

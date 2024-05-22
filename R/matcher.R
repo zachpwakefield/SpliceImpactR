@@ -1,3 +1,13 @@
+#' matches the given locations to annotations and transcripts
+#'
+#' @param background whether making background or not
+#' @param redExon input of simplified exon coords internally
+#' @param ex_type type of exon being queried
+#' @param minOverlap minimum overlap to classify as matched to annotation
+#' @param cores number of requested cores
+#' @return figures and dataframes with paired data
+#' @importFrom parallel mclapply
+#' @export
 matcher <- function(ex_type, background = F, cores, redExon = redExon, minOverlap=minOverlap) {
 
   gtf_transcripts <- gtf[gtf$classification == 'transcript',]
@@ -63,6 +73,10 @@ matcher <- function(ex_type, background = F, cores, redExon = redExon, minOverla
   }
   return(results)
 }
+
+#' specific matcher for HIT
+#'
+#' @export
 HITmatcher <- function(i, redExon = redExon, gtf_filtered=gtf_filtered, minOverlap = minOverlap,
                        protein_coding_transcripts = protein_coding_transcripts) {
 
@@ -111,6 +125,9 @@ HITmatcher <- function(i, redExon = redExon, gtf_filtered=gtf_filtered, minOverl
   } else {return(0)}
 }
 
+#' specific matcher for SE
+#'
+#' @export
 SEmatcher <- function(i, below_thresh = .2, redExon = redExon, minOverlap = minOverlap,
                       gtf_transcripts = gtf_transcripts,
                       gtf_exons = gtf_exons,
@@ -207,6 +224,9 @@ SEmatcher <- function(i, below_thresh = .2, redExon = redExon, minOverlap = minO
   }
 }
 
+#' specific matcher for MXE
+#'
+#' @export
 MXmatcher <- function(i, below_thresh = .2, redExon = redExon, minOverlap = minOverlap,
                       gtf_transcripts = gtf_transcripts,
                       gtf_exons = gtf_exons,
@@ -305,6 +325,9 @@ MXmatcher <- function(i, below_thresh = .2, redExon = redExon, minOverlap = minO
   }
 }
 
+#' specific matcher for A5SS/A3SS
+#'
+#' @export
 ASmatcher <- function(i, below_thresh = .2, redExon = redExon, minOverlap = minOverlap,
                       gtf_transcripts = gtf_transcripts,
                       gtf_exons = gtf_exons,
@@ -422,7 +445,9 @@ ASmatcher <- function(i, below_thresh = .2, redExon = redExon, minOverlap = minO
   }
 }
 
-
+#' specific matcher for RI
+#'
+#' @export
 RImatcher <- function(i, below_thresh = .2, redExon = redExon, minOverlap = minOverlap,
                       gtf_transcripts = gtf_transcripts,
                       gtf_exons = gtf_exons,

@@ -1,4 +1,19 @@
-getBackground <- function(input, mOverlap, cores, nC, nE, exon_type, pdir, output_location) {
+#' getBackground set of transcripts in samples
+#'
+#' @param input the path containing the .exon file
+#' @param mOverlap overlap to identify a match to annotation
+#' @param exon_type placeholder for other functions
+#' @param pdir location of the package
+#' @param output_location location to make background directory
+#' @return matched : matched transcripts dataframe, bed : bed file of the matched transcripts
+#' proBed : output for further functions with protein code and protein info,
+#' proFast : fasta file of proteins identified in proBed
+#' @importFrom dplyr arrange first left_join group_by summarise
+#' @importFrom tidyr separate
+#' @examples
+#' differential_inclusion_HITindex(test_names, control_names, "AFE", cores = 2, outlier_threshold = "1", minReads = 10)
+#' @export
+getBackground <- function(input, mOverlap, cores, exon_type, pdir, output_location) {
   ## extract all first exons and create combined data.frame with gene, location
   files <- paste(input, unlist(lapply(input, function(x) list.files(x)[grep('[.]exon', list.files(x))])), sep = "")
 

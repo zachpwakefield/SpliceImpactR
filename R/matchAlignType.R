@@ -1,3 +1,15 @@
+#' getPaired helper function to identify align classifications
+#'
+#' @param proBed proBed from getForeground in getPaired
+#' @param protCode protein code for each protein / transcript / exon associated
+#' @param nucleotides get_c_nucs from setup
+#' @param saveAlignments whether to save alignment output pdf
+#' @param output_location output location
+#'
+#' @return altered probed and alignment info
+#' @importFrom Biostrings AAStringSet
+#' @importFrom msa msaPrettyPrint msa
+#' @export
 matchAlignType <- function(proBed, protCode, nucleotides, output_location, saveAlignments = T) {
 
   df <- dplyr::left_join(proBed, nucleotides$transDF, by = c("transcript" = "transcriptID")) # transcripts

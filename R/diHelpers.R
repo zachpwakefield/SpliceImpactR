@@ -1,0 +1,42 @@
+#' add colors to differential inclusion analysis for plotting
+#'
+#' @param matched from matcher function
+#' @param color_thresh the threshold to color by, default of .2
+#' @return the input dataframe with
+#' @examples
+#' diColor(diHIT_output, color_thresh = .2)
+#' @export
+diColor <- function(de_df, color_thresh = .2) {
+  de_df$col <- "#A7A9AC"
+  de_df$col[de_df$delta.psi <= -(color_thresh) & de_df$p.adj < .05] <- 'brown'
+  de_df$col[de_df$delta.psi >= color_thresh & de_df$p.adj < .05] <- 'chartreuse4'
+  return(de = de_df)
+}
+
+#' filter using minimums for identifying events in control/test and max proportion of zeros allowed
+#'
+#' @param final_data from diHIT or diRMATS
+#' @param nT number of test samples
+#' @param nC number of control samples
+#' @return a filtered di inclusion dataframe
+#' @examples
+#' qualityFilter(diHIT_output)
+#' @export
+qualityFilter <- function(df, nT, nC) {
+  df_filtered <- df[df$count_control >= min_prop_samples * nC &
+                      df$count_test >= min_prop_samples * nT &
+                      df$zero_count <= max_zero_prop * (nC+nT),]
+  return(df_filtered)
+}
+
+#' filter using delta psi and fdr
+#'
+#' @param final_data from diHIT or diRMATS (or post filtering)
+#' @return a filtered di inclusion dataframe
+#' @examples
+#' significanceFilter(diHIT_output, fdr = .05, d.psi = .1)
+#' @export
+significanceFilter <- function(df, fdr = .05, d.psi = .1) {
+  df_filtered <- df[abs(df$delta.psi) >= d.psi & df$p.adj <= fdr]
+  return(df_filtered)
+}

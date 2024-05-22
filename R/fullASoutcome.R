@@ -1,9 +1,22 @@
+#' Extract differentially included AFE, ALE from HIT Index data
+#'
+#' @param as_types a vector of the type of alternative splicing events that are being investigated
+#' @param output_directory the path (ending with '/') that the output is desired
+#' @param data_directory the path to the data, in the format specified by organizeSamples
+#' @param outlier_handle value to threshold the outlier detection
+#' @param cutoff diInclusion cutoff to use to identify significance
+#' @param cutoff diInclusion cutoff to use to identify significance
+#' @param bg_pre if bg was made earlier, param to give premade bg
+#' @param tti_location location of previously made transcript-transcript interactions network
+#' @param mOverlap minimum overlap to call an exon as matched to annotation
+#' @return nothing in R, output to the output_directory
+#' @export
 fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", "RI", "A5SS", "A3SS"),
                           output_directory, data_directory,
                           data_df, outlier_handle,
-                          cutoff = .2, cores = 6, bg_pre = NA,
-                          tti_location = "/projectnb/evolution/zwakefield/allison_mettl/analysis/sir/", mOverlap = .01) {
-  system(paste0("mkdir ",  output_directory))
+                          cutoff = .1, cores = 1, bg_pre = NA,
+                          tti_location = "/projectnb/evolution/zwakefield/allison_mettl/analysis/sir/", mOverlap = .05) {
+  system2(paste0("mkdir ",  output_directory))
   pdir <- system.file(package="SpliceImpactR")
   ##get bg for all classes
 
@@ -21,10 +34,8 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
   if (bg_param) {
     bg_input <- gsub("[^/]*$", "", c(control_group, test_group))
     bg <- getBackground(input=bg_input,
-                        mOverlap = .01,
+                        mOverlap = mOverlap,
                         cores = cores,
-                        nC = length(control_group),
-                        nE = length(test_group),
                         exon_type = as_types[1],
                         pdir = pdir,
                         output_location = output_directory)

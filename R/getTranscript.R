@@ -1,8 +1,14 @@
-## This function searches for specific exon types within a given GTF file, comparing them to a set of exons provided (redExon) based on the exon type specified.
-## It uses the Jaccard index to determine the overlap between the exons in the GTF file and the provided exons, filtering based on a minimum overlap threshold.
-
-
-getTranscriptForeground <- function(gtf = gtf, redExon = redExon, ex_type = exon_type, minOverlap = .5, cores) {
+#' gets the transcripts to match to each as event or exon
+#'
+#' @param gtf gtf from get_gtf from setup
+#' @param redExon input of simplified exon coords internally
+#' @param exon_type type of exon being queried
+#' @param minOverlap minimum overlap to classify as matched to annotation
+#' @param cores number of requested cores
+#' @return figures and dataframes with paired data
+#' @import dplyr
+#' @export
+getTranscriptForeground <- function(gtf = gtf, redExon = redExon, ex_type = exon_type, minOverlap = .05, cores = 1) {
 
   # Print a message indicating the start of the search for the specified exon type
   print(paste("searching for ", ex_type, "...", sep = ""))
@@ -43,10 +49,17 @@ getTranscriptForeground <- function(gtf = gtf, redExon = redExon, ex_type = exon
   return(matched = matched) # Return the matched data
 }
 
-## This function identifies transcripts from a background dataset that correspond to a specified set of exons,
-## based on exon type and minimum overlap criteria. It computes the Jaccard index to determine the best match.
-
-getTranscriptBackground <- function(gtf = gtf, redExon = redExon, ex_type = exon_type, minOverlap = .5, cores) {
+#' gets the transcripts to match to each as event or exon
+#'
+#' @param gtf gtf from get_gtf from setup
+#' @param redExon input of simplified exon coords internally
+#' @param exon_type type of exon being queried
+#' @param minOverlap minimum overlap to classify as matched to annotation
+#' @param cores number of requested cores
+#' @return figures and dataframes with paired data
+#' @import dplyr
+#' @export
+getTranscriptBackground <- function(gtf = gtf, redExon = redExon, ex_type = exon_type, minOverlap = .05, cores) {
 
   # Parallel computation for each exon in redExon using multiple cores
   results <- matcher(ex_type = ex_type, background = T, cores = cores, redExon = redExon, minOverlap = minOverlap)

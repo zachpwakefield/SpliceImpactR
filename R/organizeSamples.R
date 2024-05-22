@@ -2,12 +2,15 @@
 ## It is designed to work within a specific directory structure that includes 'rmats' and 'hit' folders.
 
 
-## if in structure:
-# sample
-# # rmats
-# # hit
+#' This function organizes sample data by creating directories for each sample and copying specific files into them.
+#' It is designed to work within a specific directory structure that includes 'rmats' and 'hit' folders.
+#' ## if in structure:
+#' sample
+#' # rmats
+#' # hit-index
+#' @export
 
-organizeSamples2 <- function(samples, output_location, cores = 1) {
+organizeSamples <- function(samples, output_location, cores = 1) {
 
   # Create a main directory to store all the data
   system(paste0("mkdir ", paste0(output_location, 'data/')))

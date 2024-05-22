@@ -1,14 +1,29 @@
+#' get Foreground differentially included transcripts in samples
+#'
+#' @param input diExon info from the differentially included functions
+#' @param mOverlap overlap to identify a match to annotation
+#' @param exon_type placeholder for other functions
+#' @param thresh delta psi threshold to filter
+#' @param fdr adj p to filter for
+#' @param pdir location of the package
+#' @param output_location location to make background directory
+#' @return matched : matched transcripts dataframe, bed : bed file of the matched transcripts
+#' proBed : output for further functions with protein code and protein info,
+#' proFast : fasta file of proteins identified in proBed
+#' @importFrom dplyr arrange first left_join group_by summarise
+#' @importFrom tidyr separate
+#' @export
 getForeground <- function(input, test_names, control_names, thresh, fdr,
-                          mOverlap, nC, nE, exon_type, pdir,
-                          output_location, cores) {
+                          mOverlap,exon_type, pdir,
+                          output_location, cores = 1) {
 
   ## If using foreground set, read in diExon file and extract differentially included exons using diff_info()
   df <- input
-  df.l <- diff_info(df, numCont = nC, numExp = nE, exon_type = exon_type,
-              cores = cores, test_names = test_names, control_names = control_names)
+  df.l <- diColor(df, color_thresh = .2)
 
   ## Filter df.l for paired analysis
-  bdf.l <- df.l[abs(df.l$delta.psi) >= thresh & df.l$p.adj <= fdr,]
+  qdf.l <- qualityFilter(df.l, nT = length(test_names), nC = length(control_names))
+  bdf.l <- significanceFilter(qdf.l)
 
   ## Make volcano plot with make_lfcPlot()
   lfcPlot <- make_dPsiPlot(df.l, thresh = thresh, pdir = pdir)

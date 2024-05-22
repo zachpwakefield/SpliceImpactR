@@ -1,7 +1,19 @@
-differential_inclusion_HITindex <- function(test_names, control_names, et, cores = 2,
-                                            outlier_threshold = c("4/n", "1", 1)[1],
-                                            min_prop_samples = .5,
-                                            minReads = 10, max_zero_prop = .5) {
+#' Extract differentially included AFE, ALE from HIT Index data
+#'
+#' @param test_names a vector of test_names
+#' @param control_names a vector of control_names
+#' @param et string of the exon_type
+#' @param cores the number of cores requested
+#' @param outlier_threshold the thresholding of the cooks distance, no outlier removal is "Inf"
+#' @return a dataframe with differential inclusion information
+#' @import data.table
+#' @importFrom dplyr arrange
+#' @examples
+#' differential_inclusion_HITindex(test_names, control_names, "AFE", cores = 2, outlier_threshold = "1", minReads = 10)
+#' @export
+differential_inclusion_HITindex <- function(test_names, control_names, et, cores = 1,
+                                            outlier_threshold = c("4/n", "1", "Inf")[1],
+                                            minReads = 10) {
 
 
   # Create sample type vector efficiently
@@ -98,9 +110,7 @@ differential_inclusion_HITindex <- function(test_names, control_names, et, cores
   final_data$p.val[is.na(final_data$p.val)] <- 1
   final_data$add_inf <- "none"
   final_data$type <- et
-  final_data <- final_data[final_data$count_control >= min_prop_samples * sum(sample_types$type == "control") &
-                final_data$count_test >= min_prop_samples * sum(sample_types$type == "test") &
-                final_data$zero_count <= max_zero_prop * nrow(sample_types),]
+
   return(data.frame(final_data))
 
 }

@@ -1,3 +1,13 @@
+#' Get bed file format from matched transcripts / exons / events for foreground and background separately
+#'
+#' @param matched from matcher function
+#' @param output_location location where everything is being saved
+#' @param cores # of cores requested
+#' @return a bed file
+#' @importFrom dplyr filter select rename left_join mutate
+#' @examples
+#' bedifyForeground(matched, output_location, 6)
+#' @export
 bedifyForeground <- function(matched, outname, cores) {
 
   # Ensure gtf is filtered for "exon" type entries and select relevant columns upfront
@@ -30,7 +40,16 @@ bedifyForeground <- function(matched, outname, cores) {
   return(bed)
 }
 
-
+#' Get bed file format from matched transcripts / exons / events for foreground and background separately
+#'
+#' @param matched from matcher function
+#' @param output_location location where everything is being saved
+#' @param cores # of cores requested
+#' @return a bed file
+#' @importFrom dplyr filter select rename left_join mutate
+#' @examples
+#' bedifyBackground(matched, output_location, 6)
+#' @export
 bedifyBackground <- function(matched, outname, cores) {
 
   # Ensure gtf is filtered for "exon" type entries and select relevant columns upfront

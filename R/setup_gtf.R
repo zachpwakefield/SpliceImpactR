@@ -1,4 +1,10 @@
-setup_gtf <- function(gtf_location, cores = cores) {
+#' setting up gtf with exon labels, first, internal, last, hybrid, etc
+#' @param gtf_location location of gtf file
+#' @param cores number of cores requested
+#' @importFrom rtracklayer import
+#'
+#' @export
+setup_gtf <- function(gtf_location, cores = 1) {
   gtf <- rtracklayer::import(gtf_location)
   gtf_df=as.data.frame(gtf)
   pcgtf <- gtf_df[gtf_df$gene_type == "protein_coding",]

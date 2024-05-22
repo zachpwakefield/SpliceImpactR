@@ -1,6 +1,21 @@
-## This function retrieves and processes data for domain enrichment analysis using various protein domain databases.
-## It compares domain occurrences in foreground (differentially expressed) and background datasets to identify enriched domains.
-
+#' idenitify enriched domains across phenotype
+#'
+#' @param fg foreground from getForeground
+#' @param bg background from getBackground
+#' @param pfam pfam from getPfam
+#' @param cores the number of cores requested
+#' @param fdr_use the fdr to set as a threshold
+#' @param min_sample_success the number of appearances of a domain in the sample set to visualize
+#' @param engine pfam only for now
+#' @param repeatingDomains whether to identify repeating domains being enriched or not
+#' @param topViz the max number of domains to put in each visualization
+#' @param output_location location to make background directory
+#' @return the data and the enrichment plots
+#' @importFrom dplyr arrange filter
+#' @importFrom stats phyper p.adjust
+#' @importFrom ggplot2 scale_fill_manual theme_classic ggplot aes xlab ylab theme geom_bar geom_boxplot theme_classic coord_flip theme_bw ggtitle element_blank element_line
+#' @importFrom ggpubr ggarrange
+#' @export
 getData <- function(fg, bg, pfg, pfam, cores = cores,
                     output_location, fdr_use, min_sample_success,
                     engine = c("FunFam","Gene3D","CDD","PANTHER","SMART","ProSiteProfiles","Pfam","SUPERFAMILY","MobiDBLite","Coils","PRINTS","ProSitePatterns","PIRSF","NCBIfam","Hamap")[7],

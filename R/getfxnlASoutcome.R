@@ -1,9 +1,23 @@
+#' Full run of the pipeline for a single alternative splicing event type
+#'
+#' @param test_group the paths of one phenotype
+#' @param control_group the paths of one phenotype
+#' @param data_df dataframe with sample paths, type, and phenotype
+#' @param mOverlap overlap to identify a match to annotation
+#' @param exon_type type of exon being investigated
+#' @param output_location location to make  directory
+#' @param cutoff cutoff for significance of differential inclusion
+#' @param bg whether bg preran or needs making
+#' @param tti_location location of previuously made tti or ""
+#' @param full_pipe if TRUE, doesn't save output to R, only writes to output_location
+#' @return nothing or all output from pipeline
+#' @export
 getfxnlASoutcome <- function(output_location,
                              test_group,control_group,data_df,
-                             exon_type, cutoff = .25, outlier_handle = "4/n",
-                             cores = 4,
-                             tti_location = "", full_pipe = T, bg = NA, mOverlap = .01) {
-  system(paste0("mkdir ",  output_location))
+                             exon_type, cutoff = .1, outlier_handle = "4/n",
+                             cores = 1,
+                             tti_location = "", full_pipe = TRUE, bg = NA, mOverlap = .05) {
+  system2(paste0("mkdir ",  output_location))
   pdir <- system.file(package="SpliceImpactR")
 
   if (exon_type %in% c("AFE", "HFE")) {
@@ -32,8 +46,6 @@ getfxnlASoutcome <- function(output_location,
                      fdr=.05,
                      mOverlap=mOverlap,
                      cores=cores,
-                     nC=length(control_group),
-                     nE=length(test_group),
                      exon_type=exon_type,
                      pdir=pdir,
                      output_location=output_location)
@@ -59,8 +71,6 @@ getfxnlASoutcome <- function(output_location,
     bg <- getBackground(input=bg_input,
                         mOverlap = mOverlap,
                         cores = cores,
-                        nC = length(control_group),
-                        nE = length(test_group),
                         exon_type = exon_type,
                         pdir = pdir,
                         output_location = output_location)

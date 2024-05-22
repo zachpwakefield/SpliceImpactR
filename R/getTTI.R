@@ -1,6 +1,30 @@
+#' gets the tti interactions with various helper functions to do so
+#'
+#' @param paired_foreground from getPaired
+#' @param background proBed from getBackground
+#' @param pdir the directory of the package
+#' @param steps the number of steps for viz
+#' @param max_vertices_for_viz max number of vertices to plot, saves time and space
+#' @param fdr fdr to cut off for geneset enrichment
+#' @param plot_bool bool to make output plots of not
+#' @param ppidm_class threshold of ppidm sets to use
+#' @param write_graphs save full graph interactions for each with signfiicant changes
+#' @param output_location location to make output
+#' @param tti_location if init_tti already performed, location of output or ""
+#' @param minOverlap minimum overlap to classify as matched to annotation
+#' @param cores number of requested cores
+#' @return differences between each tti pair and the overall results
+#' @importFrom igraph graph_from_edgelist V make_ego_graph write_graph simplify E layout.fruchterman.reingold
+#' @importFrom tidyr crossing
+#' @importFrom readr read_csv
+#' @importFrom parallel mclapply
+#' @importFrom dplyr select relocate
+#' @importFrom hypeR msigdb_gsets hypeR hyp_dots
+#' @export
 getTTI <- function(paired_foreground, background, pdir = pdir, steps = 1, max_vertices_for_viz = 5000,
                    fdr = .05, plot_bool = T, ppidm_class = c("Gold", "Silver", "Bronze")[1],
-                   write_igraphs = T, ddi = "Gold", output_location = output_location, tti_location = output_location) {
+                   write_igraphs = T,
+                   output_location = output_location, tti_location = output_location) {
   # Create a directory for storing plots if plot_bool is TRUE
   if (plot_bool) {
     system(paste0("mkdir ", output_location, "tti"))
@@ -119,8 +143,8 @@ getTTI <- function(paired_foreground, background, pdir = pdir, steps = 1, max_ve
               results = results))
 }
 
-
-
+#' graph helper function
+#' @export
 getTTIiGraphPlot <- function(paired_transcript, gene, steps, full_graph, max_vertices_for_viz, plot_bool, output_location) {
   # Create ego graphs for each of the paired transcripts
   eg <- igraph::make_ego_graph(
@@ -192,7 +216,8 @@ getTTIiGraphPlot <- function(paired_transcript, gene, steps, full_graph, max_ver
   names(tti_graphs) <- paired_transcript
   return(tti_graphs)
 }
-
+#' enrichment helper function
+#' @export
 getEnrichmentTTI <- function(current_transcript, t_impacts, fdr, transGeneProt,
                              backgroundGenes, steps, plot_bool, output_location) {
 
@@ -264,8 +289,22 @@ getEnrichmentTTI <- function(current_transcript, t_impacts, fdr, transGeneProt,
 }
 
 
-# Initiate the TTI network using this function. This can be very time consuming
-init_ddi <- function(pdir, output_location, ppidm_class = c("Gold_Standard", "Gold", "Silver", "Bronze")[1], removeDups = T, cores = 10) {
+#' initiates tti network for entire genome, can be very time consumng
+#'
+#' @param pdir the directory of the package
+#' @param ppidm_class threshold of ppidm sets to use
+#' @param output_location location to make output
+#' @param cores number of requested cores
+#' @param removeDups takes a longer time to init, but faster down the line and saves a lot of memory to remove duplcate vertices
+#' @return overall tti network
+#' @importFrom igraph graph_from_edgelist V make_ego_graph write_graph simplify E layout.fruchterman.reingold
+#' @importFrom tidyr crossing
+#' @importFrom readr read_csv
+#' @importFrom parallel mclapply
+#' @importFrom dplyr select relocate
+#' @importFrom hypeR msigdb_gsets hypeR hyp_dots
+#' @export
+init_ddi <- function(pdir, output_location, ppidm_class = c("Gold_Standard", "Gold", "Silver", "Bronze")[1], removeDups = T, cores = 1) {
   # Read in the protein coding data from the package directory
   pfam_in <- read.delim(paste0(pdir, '/protein_code_from_gencodev43_headerFix.txt.tsv'),
                         header = F)
@@ -333,7 +372,7 @@ init_ddi <- function(pdir, output_location, ppidm_class = c("Gold_Standard", "Go
   # If removeDups == T (F would save time), sort out duplicated rows through sorting rows
   if (removeDups) {
     # Sort and deduplicate the transcript pairs [This can be time consuming]
-    list_noDups <- mclapply(1:nrow(tti), mc.cores = cores, function(x) {
+    list_noDups <- parallel::mclapply(1:nrow(tti), mc.cores = cores, function(x) {
       sort(as.character(tti[x,]))
     })
     list_noDuplicates <- list_noDups[!duplicated(list_noDups)]

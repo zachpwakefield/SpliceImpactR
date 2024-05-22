@@ -1,7 +1,8 @@
-# get_c_trans
-# input: directory containing f_protein_code_from_gencodev43.txt, default should be package directory or: system.file(package="domainEnrichment")
-# output: f_protein_code_from_gencodev43.txt lines
-
+#' setting up translations
+#' @param translations_location location of translations file
+#' @importFrom rtracklayer import
+#'
+#' @export
 get_c_trans <- function(translations_location) {
   c_trans_pre <- readr::read_lines(translations_location)
   transcript_title <- c(grep(">", c_trans_pre), (length(c_trans_pre)+1))
@@ -12,6 +13,12 @@ get_c_trans <- function(translations_location) {
   return(c_trans)
 }
 
+#' setting up transcriptions
+#' @param transcripts_location location of transcripts file
+#' @importFrom rtracklayer import
+#' @importFrom readr read_lines
+#'
+#' @export
 get_c_nucs <- function(transcripts_location) {
   nc <- readr::read_lines("/projectnb2/evolution/zwakefield/Annotations/hg38_gencode/gencode.v45.pc_transcripts.fa")
   transcript_title <- c(grep(">", nc), (length(nc)+1))
@@ -31,10 +38,11 @@ get_c_nucs <- function(transcripts_location) {
   return(list(c_trans = c_trans, transDF = transDF))
 }
 
-# get_gtf
-# input: directory containing all the gtf files, default should be package directory or: system.file(package="domainEnrichment")
-# output: cg csv
-
+#' wrapper for setup_gtf
+#' @param location location of gtf file
+#' @param cores number of cores requested
+#'
+#' @export
 get_gtf <- function(location, cores) {
   cg <- setup_gtf(location, cores = cores)
   return(cg)

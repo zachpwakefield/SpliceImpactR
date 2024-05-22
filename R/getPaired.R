@@ -1,4 +1,19 @@
-getPaired <- function(foreground, et, nucleotides, newGTF, cores = 4, output_location, saveAlignments = T) {
+#' get paired as events / exons
+#'
+#' @param foreground proBed from getForeground
+#' @param nucleotides made from setup get_c_nucs
+#' @param et exon_type being investigated
+#' @param pdir location of the package
+#' @param output_location location to make background directory
+#' @param cores number of requested cores
+#' @param saveAlignments bool to save alignment pdfs
+#' @param newGTF from setup get_gtf
+#' @return figures and dataframes with paired data
+#' @import dplyr
+#' @importFrom ggplot2 ggplot aes geom_histogram after_stat geom_density scale_fill_manual theme_classic xlab ylab
+#' @importFrom ggpubr ggarrange
+#' @export
+getPaired <- function(foreground, et, nucleotides, newGTF, cores = 1, output_location, saveAlignments = T) {
   # Create a unique identifier for each exon
   foreground <- foreground %>%
     dplyr::mutate(exon_id = paste0(chr, ":", start, "-", stop))

@@ -4,10 +4,12 @@
 \alias{getLengthComparison}
 \title{Get comparison between length across isoform swaps due to AS}
 \usage{
-getLengthComparison(paired_df, output_location)
+getLengthComparison(data_df, paired_df, output_location)
 }
 \arguments{
-\item{paired_df}{output df from getPaired}
+\item{data_df}{df with paths, phenotype names, class}
+
+\item{paired_df}{from getPaired df}
 
 \item{output_location}{location where everything is being saved}
 }
@@ -15,8 +17,9 @@ getLengthComparison(paired_df, output_location)
 1 combined plot.
 }
 \description{
-Get comparison between length across isoform swaps due to AS
+Uses the paired results to identify any potential changes in lengths across phenotype
 }
 \examples{
-getOverviewComparison(paired_combined_rows, output_path)
+getLengthComparison(data_df, paired_df from pfg, output_path)
+
 }

@@ -1,5 +1,19 @@
-differential_inclusion_rMATS <- function(control_names, test_names, et, cores, outlier_threshold,
-                                         min_prop_samples = .5, minReads = 10, max_zero_prop = .5) {
+#' Extract differentially included AS events from HIT Index data
+#'
+#' @param test_names a vector of test_names
+#' @param control_names a vector of control_names
+#' @param et string of the exon_type
+#' @param cores the number of cores requested
+#' @param outlier_threshold the thresholding of the cooks distance, no outlier removal is "Inf"
+#' @return a dataframe with differential inclusion information
+#' @import data.table
+#' @importFrom dplyr arrange select
+#' @examples
+#' differential_inclusion_rMATS(test_names, control_names, "AFE", cores = 2, outlier_threshold = "1", minReads = 10)
+#' @export
+differential_inclusion_rMATS <- function(control_names, test_names, et, cores = 1,
+                                         outlier_threshold = c("4/n", "1", "Inf")[1],
+                                         minReads = 10) {
 
 
   sample_types <- data.table::data.table(sample_name = c(test_names, control_names),
@@ -141,9 +155,7 @@ differential_inclusion_rMATS <- function(control_names, test_names, et, cores, o
   final_data$p.adj[is.na(final_data$p.adj)] <- 1
   final_data$p.val[is.na(final_data$p.val)] <- 1
   final_data$type <- et
-  fd2 <- final_data[final_data$count_control >= min_prop_samples * sum(sample_types$type == "control") &
-                    final_data$count_test >= min_prop_samples * sum(sample_types$type == "test") &
-                    final_data$zero_count <= max_zero_prop * nrow(sample_types),]
+  fd2 <- final_data
 
   idSplit <- strsplit(fd2$id, split = "#")
   fd2[, gene := unlist(lapply(idSplit, "[[", 1))]

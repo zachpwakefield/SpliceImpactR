@@ -1,10 +1,16 @@
+#' Return both shift and specific results for a given alignment
+#'
+#' @return both specific and shift results
+#' @export
 frameShiftDetectorSum <- function(df, i) {
   pB_nuc <- unlist(c(fsDirectSpecific(df$code[i], df$code[i+1]),
              fsDirectShift(df$code[i], df$code[i+1])))
   return(pB_nuc)
 }
 
-
+#' Idenfity continuous indels
+#'
+#' @return continuous indels
 findContinuousIndels <- function(indels) {
   diffs <- diff(indels)
   breaks <- which(diffs > 1)
@@ -12,6 +18,12 @@ findContinuousIndels <- function(indels) {
   continuousRegions
 }
 
+#' Align and classify 2 sequences using specific method -- using nucleotides finding indels of non-3 multiples or leads or non-3
+#'
+#' @return both specific and shift results
+#' @importFrom msa msa msaConsensusSequence
+#' @importFrom Biostrings DNAStringSet
+#' @export
 fsDirectSpecific <- function(seq1, seq2) {
   alignment <- msa::msaConsensusSequence(msa::msa(Biostrings::DNAStringSet(c(seq1, seq2)),
                                                   substitutionMatrix =
@@ -37,6 +49,12 @@ fsDirectSpecific <- function(seq1, seq2) {
   } else {return(c("FrameShift", alignScore))}
 }
 
+#' Align and classify 2 sequences using shift method,
+#'
+#' @return both specific and shift results
+#' @importFrom msa msa msaConsensusSequence
+#' @importFrom Biostrings DNAStringSet pairwiseAlignment
+#' @export
 fsDirectShift <- function(seq1, seq2) {
 
   seqUse <- c(seq1, seq2)[which.min(c(nchar(seq1), nchar(seq2)))]

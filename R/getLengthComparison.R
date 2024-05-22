@@ -1,10 +1,20 @@
 #' Get comparison between length across isoform swaps due to AS
 #'
-#' @param paired_df output df from getPaired
+#' @param data_df df with paths, phenotype names, class
+#' @param paired_df from getPaired df
 #' @param output_location location where everything is being saved
+#'
 #' @return 1 combined plot.
+#'
+#' @description
+#' Uses the paired results to identify any potential changes in lengths across phenotype
+#'
 #' @examples
-#' getOverviewComparison(paired_combined_rows, output_path)
+#' getLengthComparison(data_df, paired_df from pfg, output_path)
+#'
+#' @importFrom ggpubr ggpaired ggarrange stat_compare_means
+#' @importFrom ggplot2 xlab ylab aes ggplot element_blank geom_density element_line theme geom_density scale_y_continuous scale_fill_manual coord_flip ggplot_build geom_bar theme_bw
+#' @export
 getLengthComparison <- function(data_df, paired_df, output_location) {
 
   paired_df$protLength <- nchar(paired_df$prot)
