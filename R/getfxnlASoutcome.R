@@ -53,7 +53,8 @@ getfxnlASoutcome <- function(output_location,
     tti_location <- output_location
   }
 
-  if (is.na(bg)) {
+  bg_param <- suppressWarnings(is.na(bg_pre))
+  if (bg_param) {
     bg_input <- gsub("[^/]*$", "", c(control_group, test_group))
     bg <- getBackground(input=bg_input,
                         mOverlap = mOverlap,

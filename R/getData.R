@@ -45,15 +45,18 @@ getData <- function(fg, bg, pfg, pfam, cores = cores,
     protInf.o[protInf.o == ""] <- "none"
 
     # Construct final output data frames for background and foreground
+    indexRef <- unlist(lapply(s$id, function(x) {
+      which(x %in% gN)[1]
+      }))
     if (o == 2) {
       finOut <- data.frame(exon = gN,
-                           protein = s$prot[match(gN, s$id)],
+                           protein = s$prot[indexRef],
                            protInfor = protInf.o,
-                           delta.psi = s$delta.psi[match(gN, s$id)],
-                           p.adj = s$p.adj[match(gN, s$id)])
+                           delta.psi = s$delta.psi[indexRef],
+                           p.adj = s$p.adj[indexRef])
     } else {
       finOut <- data.frame(exon = gN,
-                           protein = s$prot[match(gN, s$id)],
+                           protein = s$prot[indexRef],
                            protInfor = protInf.o)
 
     }
