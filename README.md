@@ -87,7 +87,7 @@ functionOutcomes <- SpliceImpactR::fullASoutcome(output_directory = "/output_loc
 Contributions to SpliceImpactR are welcome, including bug reports, feature requests, and pull requests. Please see CONTRIBUTING.md for guidelines on how to contribute.
 
 ## Support
-If you encounter any problems or have suggestions, please file an issue on the GitHub issue tracker.
+If you encounter any problems or have suggestions, please file an issue on the GitHub issue tracker. Or contact zachpw@bu.edu
 
 ## License
 SpliceImpactR is available under the 
