@@ -19,7 +19,3 @@ getLengthComparison(data_df, paired_df, output_location)
 \description{
 Uses the paired results to identify any potential changes in lengths across phenotype
 }
-\examples{
-getLengthComparison(data_df, paired_df from pfg, output_path)
-
-}
