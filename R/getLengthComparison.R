@@ -11,6 +11,7 @@
 #'
 #' @importFrom ggpubr ggpaired ggarrange stat_compare_means
 #' @importFrom ggplot2 xlab ylab aes ggplot element_blank geom_density element_line theme geom_density scale_y_continuous scale_fill_manual coord_flip ggplot_build geom_bar theme_bw
+#' @importFrom grDevices dev.off pdf
 #' @export
 getLengthComparison <- function(data_df, paired_df, output_location) {
 

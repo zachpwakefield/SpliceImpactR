@@ -8,6 +8,8 @@
 #' @return a dataframe with differential inclusion information
 #' @import data.table
 #' @importFrom dplyr arrange
+#' @importFrom stats cooks.distance lm logLik pchisq setNames start
+#' @importFrom utils data read.csv read.delim read.table write.csv
 #' @examples
 #' differential_inclusion_HITindex(test_names, control_names, "AFE", cores = 2, outlier_threshold = "1", minReads = 10)
 #' @export
