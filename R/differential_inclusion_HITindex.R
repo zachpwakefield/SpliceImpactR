@@ -15,7 +15,6 @@ differential_inclusion_HITindex <- function(test_names, control_names, et, cores
                                             outlier_threshold = c("4/n", "1", "Inf")[1],
                                             minReads = 10) {
 
-
   # Create sample type vector efficiently
   sample_types <- data.table::data.table(sample_name = c(test_names, control_names),
                                          type = rep(c("test", "control"), c(length(test_names), length(control_names))))
