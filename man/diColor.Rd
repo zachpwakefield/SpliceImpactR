@@ -17,6 +17,3 @@ the input dataframe with
 \description{
 add colors to differential inclusion analysis for plotting
 }
-\examples{
-diColor(diHIT_output, color_thresh = .2)
-}

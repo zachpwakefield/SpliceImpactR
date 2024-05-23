@@ -3,8 +3,6 @@
 #' @param matched from matcher function
 #' @param color_thresh the threshold to color by, default of .2
 #' @return the input dataframe with
-#' @examples
-#' diColor(diHIT_output, color_thresh = .2)
 #' @export
 diColor <- function(de_df, color_thresh = .2) {
   de_df$col <- "#A7A9AC"
