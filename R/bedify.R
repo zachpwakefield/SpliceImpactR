@@ -6,8 +6,6 @@
 #' @param gtf gtf dataframe from setup_gtf
 #' @return a bed file
 #' @importFrom dplyr filter select rename left_join mutate
-#' @examples
-#' bedifyForeground(matched, output_location, 6)
 #' @export
 bedifyForeground <- function(matched, outname, cores, gtf) {
 
@@ -49,8 +47,6 @@ bedifyForeground <- function(matched, outname, cores, gtf) {
 #' @param gtf gtf dataframe from setup_gtf
 #' @return a bed file
 #' @importFrom dplyr filter select rename left_join mutate
-#' @examples
-#' bedifyBackground(matched, output_location, 6)
 #' @export
 bedifyBackground <- function(matched, outname, cores, gtf) {
 

@@ -21,6 +21,3 @@ a bed file
 \description{
 Get bed file format from matched transcripts / exons / events for foreground and background separately
 }
-\examples{
-bedifyBackground(matched, output_location, 6)
-}
