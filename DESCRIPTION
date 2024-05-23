@@ -2,14 +2,15 @@ Package: SpliceImpactR
 Type: Package
 Title: An R pacakge to identify functional impacts due to alternative splicing events 
 Version: 0.1.0
-Author: Zachary Wakefield
-Maintainer: Zachary Wakefield <zachpw@bu.edut>
+Authors@R: person("Zachary", "Wakefield",
+  email = zachpw@bu.edu,
+  role = c("cre", "aut"))
 Description: SpliceImpactR employs 4 primary methods—differential inclusion analysis, 
   primary sequence analysis, domain analysis, and isoform-specific domain-derived protein-protein 
   interactions (ISPPI) —to elucidate the proteomic consequences of AS events.
 License: What license is it under?
 Encoding: UTF-8
-LazyData: true
+LazyData: TRUE
 Imports: 
   tidyverse, 
   methods, 
