@@ -9,9 +9,6 @@
 #' @description
 #' Uses the paired results to identify any potential changes in lengths across phenotype
 #'
-#' @examples
-#' getLengthComparison(data_df, paired_df from pfg, output_path)
-#'
 #' @importFrom ggpubr ggpaired ggarrange stat_compare_means
 #' @importFrom ggplot2 xlab ylab aes ggplot element_blank geom_density element_line theme geom_density scale_y_continuous scale_fill_manual coord_flip ggplot_build geom_bar theme_bw
 #' @export
