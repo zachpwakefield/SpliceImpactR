@@ -58,27 +58,24 @@ getTranscriptForeground <- function(gtf, redExon, ex_type, minOverlap = .05, cor
 #' @keywords internal
 getTranscriptBackground <- function(gtf, redExon, ex_type, minOverlap = .05, cores = 1) {
 
-  # Parallel computation for each exon in redExon using multiple cores
-  results <- matcher(ex_type = ex_type, background = TRUE, cores = cores, redExon = redExon, minOverlap = minOverlap)
+    # Parallel computation for each exon in redExon using multiple cores
+    results <- matcher(ex_type = ex_type, background = TRUE, cores = cores, redExon = redExon, minOverlap = minOverlap)
 
-  # Double for convenience if not AFE/ALE
-  compliment_redExon <- redExon[rep(1:nrow(redExon), each = 1),]
+    # Filter out 0s
+    valid_results <- results[results != 0]
 
-  # Filter out 0s and ensure results are unique to minimize redundant operations
-  valid_results <- results[results != 0]
+    # subset the gtf dataframe
+    filtered_gtf <- gtf[gtf$rownum %in% valid_results, ]
 
-  # Directly subset the gtf dataframe without parallelization if not necessary
-  filtered_gtf <- gtf[gtf$rownum %in% valid_results, ]
+    # maintaining order, match valid_results to gtf rownum
+    out_matched <- gtf[match(valid_results, gtf$rownum), ]
 
-  # Ensure gtf is a data.frame or a tibble for this operation
-  out_matched <- gtf[match(valid_results, gtf$rownum), ]
+    # Add additional information to the matched data for further analysis
+    out_matched$input_id <- paste(compliment_redExon$geneR, ";", compliment_redExon$chr, ":", compliment_redExon$start, "-", compliment_redExon$stop, sep = "")[results != 0]
+    matched <- out_matched %>% dplyr::relocate(input_id)
 
-  # Add additional information to the matched data for further analysis
-  out_matched$input_id <- paste(compliment_redExon$geneR, ";", compliment_redExon$chr, ":", compliment_redExon$start, "-", compliment_redExon$stop, sep = "")[results != 0]
-  matched <- out_matched %>% dplyr::relocate(input_id)
-
-  # Add additional information to the matched data for further foreground analysis
-  matched$add_inf <- compliment_redExon$add_inf[results != 0]
+    # Add additional information to the matched data for further foreground analysis
+    matched$add_inf <- compliment_redExon$add_inf[results != 0]
 
 
   return(matched = matched) # Return the matched data

@@ -10,7 +10,6 @@ Description: SpliceImpactR employs 4 primary methods—differential inclusion an
   interactions (ISPPI) —to elucidate the proteomic consequences of AS events.
 License: What license is it under?
 Encoding: UTF-8
-LazyData: TRUE
 Imports: 
   readr,
   ggpubr, 

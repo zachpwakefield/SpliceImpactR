@@ -1,4 +1,5 @@
-#' Get bed file format from matched transcripts / exons / events for foreground and background separately
+#' Get bed file format from matched transcripts / exons / events
+#' for foreground and background separately
 #'
 #' @param matched from matcher function
 #' @param output_location location where everything is being saved
@@ -39,7 +40,8 @@ bedifyForeground <- function(matched, outname, cores, gtf) {
     return(bed)
 }
 
-#' Get bed file format from matched transcripts / exons / events for foreground and background separately
+#' Get bed file format from matched transcripts / exons / events
+#' for foreground and background separately
 #'
 #' @param matched from matcher function
 #' @param output_location location where everything is being saved

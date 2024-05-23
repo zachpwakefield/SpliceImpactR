@@ -30,21 +30,35 @@ differential_inclusion_rMATS <- function(control_names, test_names, et, cores = 
 
   temp <- psi_data
   if (et == "SE") {
-    temp <- temp %>% dplyr::select('sample_name', 'GeneID', "chr", "strand", "exonStart_0base", "exonEnd", "upstreamES", "upstreamEE", "downstreamES", "downstreamEE", "IncLevel1", "IJC_SAMPLE_1", "SJC_SAMPLE_1", 'type')
+    temp <- temp %>% dplyr::select('sample_name', 'GeneID',
+                                   "chr", "strand", "exonStart_0base",
+                                   "exonEnd", "upstreamES", "upstreamEE",
+                                   "downstreamES", "downstreamEE", "IncLevel1",
+                                   "IJC_SAMPLE_1", "SJC_SAMPLE_1", 'type')
     temp$id <- paste0(temp$GeneID, "#", temp$chr, ":", temp$exonStart_0base, "-", temp$exonEnd, "#",
                       temp$strand, ";", temp$upstreamES, "-", temp$upstreamEE, ";",
                       temp$downstreamES, "-", temp$downstreamEE)
 
   } else if (et == "A3SS" | et == "A5SS") {
-    temp <- temp %>% dplyr::select('sample_name', 'GeneID', "chr", "strand", "longExonStart_0base", "longExonEnd", "shortES", "shortEE", "flankingES", "flankingEE", "IncLevel1", "IncLevel2", "IJC_SAMPLE_1", "SJC_SAMPLE_1", 'type')
+    temp <- temp %>% dplyr::select('sample_name', 'GeneID', "chr", "strand",
+                                   "longExonStart_0base", "longExonEnd",
+                                   "shortES", "shortEE", "flankingES", "flankingEE",
+                                   "IncLevel1", "IncLevel2", "IJC_SAMPLE_1",
+                                   "SJC_SAMPLE_1", 'type')
     temp$id <- paste0(temp$GeneID, "#", temp$chr, ":", temp$longExonStart_0base, "-", temp$longExonEnd, "#",
                       temp$strand, ";", temp$shortES, "-", temp$shortEE, ";",
                       temp$flankingES, "-", temp$flankingEE)
 
   } else if (et == "MXE") {
-    colnames(temp)[colnames(temp) %in% c("1stExonStart_0base", "1stExonEnd", "2ndExonStart_0base", "2ndExonEnd")] <- paste0("X", colnames(temp)[colnames(temp) %in% c("1stExonStart_0base", "1stExonEnd", "2ndExonStart_0base", "2ndExonEnd")])
-    temp <- temp %>% dplyr::select('sample_name', 'GeneID', "chr", "strand", "X1stExonStart_0base", "X1stExonEnd", "X2ndExonStart_0base", "X2ndExonEnd", "upstreamES", "upstreamEE",
-                                   "downstreamES", "downstreamEE", "IncLevel1", "IncLevel2", "IJC_SAMPLE_1", "SJC_SAMPLE_1", 'type')
+    colnames(temp)[colnames(temp) %in% c("1stExonStart_0base", "1stExonEnd",
+                                         "2ndExonStart_0base", "2ndExonEnd")] <- paste0("X",
+                                                                                        colnames(temp)[colnames(temp) %in%
+                                                                                                         c("1stExonStart_0base", "1stExonEnd", "2ndExonStart_0base", "2ndExonEnd")])
+    temp <- temp %>% dplyr::select('sample_name', 'GeneID', "chr", "strand",
+                                   "X1stExonStart_0base", "X1stExonEnd", "X2ndExonStart_0base",
+                                   "X2ndExonEnd", "upstreamES", "upstreamEE",
+                                   "downstreamES", "downstreamEE", "IncLevel1",
+                                   "IncLevel2", "IJC_SAMPLE_1", "SJC_SAMPLE_1", 'type')
 
     temp[, X1stExonStart_0base := ifelse(strand == "+", X1stExonStart_0base, X2ndExonStart_0base)]
     temp[, X1stExonEnd := ifelse(temp$strand == "+", temp$X1stExonEnd, temp$X2ndExonEnd)]
@@ -57,7 +71,9 @@ differential_inclusion_rMATS <- function(control_names, test_names, et, cores = 
                       temp$downstreamES, "-", temp$downstreamEE)
 
   } else if (et == "RI") {
-    temp <- temp %>% dplyr::select('sample_name', 'GeneID', "chr", "strand", "riExonStart_0base", "riExonEnd", "upstreamES", "upstreamEE", "downstreamES", "downstreamEE", "IncLevel1",
+    temp <- temp %>% dplyr::select('sample_name', 'GeneID', "chr", "strand",
+                                   "riExonStart_0base", "riExonEnd", "upstreamES",
+                                   "upstreamEE", "downstreamES", "downstreamEE", "IncLevel1",
                                    "IncLevel2", "IJC_SAMPLE_1", "SJC_SAMPLE_1", 'type')
     temp$id <- paste0(temp$GeneID, "#", temp$chr, ":", temp$riExonStart_0base, "-", temp$riExonEnd, "#",
                       temp$strand, ";", temp$upstreamES, "-", temp$upstreamEE, ";",
@@ -181,7 +197,8 @@ differential_inclusion_rMATS <- function(control_names, test_names, et, cores = 
 
 
 paired_rMATS_helper <- function(df, type) {
-  swapped_exon <- paste0(unlist(lapply(strsplit(df$exon, split = ":"), "[[", 1)), ":", unlist(lapply(strsplit(df$add_inf, split = ";"), "[[", 2)))
+  swapped_exon <- paste0(unlist(lapply(strsplit(df$exon, split = ":"), "[[", 1)), ":",
+                         unlist(lapply(strsplit(df$add_inf, split = ";"), "[[", 2)))
   mod_df <- do.call(rbind, lapply(1:nrow(df), function(x) {
     i_df <- data.frame(gene = c(df$gene[x], df$gene[x]),
                        exon = c(df$exon[x], swapped_exon[x]),

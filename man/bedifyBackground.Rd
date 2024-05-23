@@ -2,7 +2,8 @@
 % Please edit documentation in R/bedify.R
 \name{bedifyBackground}
 \alias{bedifyBackground}
-\title{Get bed file format from matched transcripts / exons / events for foreground and background separately}
+\title{Get bed file format from matched transcripts / exons / events
+for foreground and background separately}
 \usage{
 bedifyBackground(matched, outname, cores, gtf)
 }
@@ -19,6 +20,7 @@ bedifyBackground(matched, outname, cores, gtf)
 a bed file
 }
 \description{
-Get bed file format from matched transcripts / exons / events for foreground and background separately
+Get bed file format from matched transcripts / exons / events
+for foreground and background separately
 }
 \keyword{internal}

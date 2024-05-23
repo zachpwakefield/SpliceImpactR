@@ -52,13 +52,14 @@ differential_inclusion_HITindex <- function(test_names, control_names, et, cores
   psi_data[, `:=` (
     nDiff = if (et == "AFE") nDOWN - nUP else nUP - nDOWN,
     valid_reads = (nUP + nDOWN >= minReads),
-    psi_adjusted = fifelse((nUP + nDOWN >= minReads), psi, 0)
+    psi_adjusted = data.table::fifelse((nUP + nDOWN >= minReads), psi, 0)
   )]
 
   psi_data[, has_nonzero_psi := any(psi_adjusted > 0), by = .(sample_name, gene)]
   psi_data <- psi_data[psi_data$has_nonzero_psi]
 
-  psi_data[, c("psi_adjusted", "nDiff", "nUP", "nDOWN", "HITindex") := lapply(.SD, function(x) data.table::fifelse(is.na(x), 0, x)),
+  psi_data[, c("psi_adjusted", "nDiff", "nUP", "nDOWN", "HITindex") := lapply(.SD,
+                                                                              function(x) data.table::fifelse(is.na(x), 0, x)),
            .SDcols = c("psi_adjusted", "nDiff", "nUP", "nDOWN", "HITindex")]
 
 
