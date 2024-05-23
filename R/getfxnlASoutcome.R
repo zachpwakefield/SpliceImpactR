@@ -8,6 +8,7 @@
 #' @param output_location location to make  directory
 #' @param cutoff cutoff for significance of differential inclusion
 #' @param bg whether bg preran or needs making
+#' @param gtf gtf data frame from setup_gtf
 #' @param tti_location location of previuously made tti or ""
 #' @param full_pipe if TRUE, doesn't save output to R, only writes to output_location
 #' @return nothing or all output from pipeline
@@ -16,7 +17,7 @@ getfxnlASoutcome <- function(output_location,
                              test_group,control_group,data_df,
                              exon_type, cutoff = .1, outlier_handle = "4/n",
                              cores = 1,
-                             tti_location = "", full_pipe = TRUE, bg = NA, mOverlap = .05) {
+                             tti_location = "", full_pipe = TRUE, bg = NA, mOverlap = .05, gtf) {
   system2(paste0("mkdir ",  output_location))
   pdir <- system.file(package="SpliceImpactR")
 
@@ -48,7 +49,7 @@ getfxnlASoutcome <- function(output_location,
                      cores=cores,
                      exon_type=exon_type,
                      pdir=pdir,
-                     output_location=output_location)
+                     output_location=output_location, gtf=gtf)
 
   if (!(exon_type %in% c("HFE", "HLE"))) {
     initial_comparison <- getOverviewComparison(data_df, exon_type, output_location)
@@ -73,7 +74,7 @@ getfxnlASoutcome <- function(output_location,
                         cores = cores,
                         exon_type = exon_type,
                         pdir = pdir,
-                        output_location = output_location)
+                        output_location = output_location, gtf=gtf)
   }
 
 

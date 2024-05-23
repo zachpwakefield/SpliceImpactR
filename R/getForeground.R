@@ -5,6 +5,7 @@
 #' @param exon_type placeholder for other functions
 #' @param thresh delta psi threshold to filter
 #' @param fdr adj p to filter for
+#' @param gtf gtf dataframe from setup_gtf
 #' @param pdir location of the package
 #' @param output_location location to make background directory
 #' @return matched : matched transcripts dataframe, bed : bed file of the matched transcripts
@@ -15,7 +16,7 @@
 #' @export
 getForeground <- function(input, test_names, control_names, thresh, fdr,
                           mOverlap,exon_type, pdir,
-                          output_location, cores = 1) {
+                          output_location, cores = 1, gtf) {
 
   ## If using foreground set, read in diExon file and extract differentially included exons using diff_info()
   df <- input
