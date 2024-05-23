@@ -19,7 +19,7 @@
 getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
                     output_location, fdr_use = .05, min_sample_success = 3,
                     engine = c("FunFam","Gene3D","CDD","PANTHER","SMART","ProSiteProfiles","Pfam","SUPERFAMILY","MobiDBLite","Coils","PRINTS","ProSitePatterns","PIRSF","NCBIfam","Hamap")[7],
-                    repeatingDomains = F, topViz = 15) {
+                    repeatingDomains = FALSE, topViz = 15) {
 
   ## extract bed, fasta, and interproscan files from output_location
   tf <- list.files(output_location)
@@ -91,7 +91,7 @@ getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
 
 
     # Extract key values for phyper() hypergeometric
-    if (repeatingDomains == F) {
+    if (repeatingDomains == FALSE) {
       bg_dom <- unlist(lapply(interproscan_results[[1]]$protInfor, function(dom) {
         unique(unlist(strsplit(dom, split = ";")))
       }))
@@ -199,7 +199,7 @@ getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
     pp$category <- "background"
     colnames(pp)[2] <- c("proportion")
     df <- rbind(sp, pp)
-    df <- df[df$rel_prop >= ifelse(nrow(df) > topViz, sort(df$rel_prop, decreasing = T)[topViz], max(df$rel_prop)),]
+    df <- df[df$rel_prop >= ifelse(nrow(df) > topViz, sort(df$rel_prop, decreasing = TRUE)[topViz], max(df$rel_prop)),]
     # Create and save enrichment plots using ggplot2
     enrichmentPlot <- ggplot2::ggplot(data=df, ggplot2::aes(x=domain, y=proportion, fill=category)) +
       ggplot2::geom_bar(stat="identity", position=ggplot2::position_dodge())+

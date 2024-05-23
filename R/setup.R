@@ -24,10 +24,12 @@ get_c_nucs <- function(transcripts_location) {
   transcript_title <- c(grep(">", nc), (length(nc)+1))
   splitF <- strsplit(nc[(transcript_title[1:(length(transcript_title)-1)])], split = "[|]")
   cdsL <- unlist(lapply(splitF, function(x) grep("CDS:", x)))
-  tts <- gsub(">", "", unlist(lapply(strsplit(unlist(lapply(strsplit(nc[transcript_title[1:(length(transcript_title)-1)]], split = "[|]"), "[[", 1)), split = "[.]"), "[[", 1)))
+  tts <- gsub(">", "", unlist(lapply(strsplit(unlist(lapply(strsplit(nc[transcript_title[1:(length(transcript_title)-1)]],
+                                                                     split = "[|]"), "[[", 1)), split = "[.]"), "[[", 1)))
   cds_locs <- unlist(lapply(1:(length(transcript_title)-1), function(x) {
-    strsplit(unlist(lapply(strsplit(unlist(lapply(strsplit(nc[transcript_title[x]], split = "[|]"), "[[", cdsL[x])), split = ":"), "[[", 2)), split = "[-]")
-  }), recursive = F)
+    strsplit(unlist(lapply(strsplit(unlist(lapply(strsplit(nc[transcript_title[x]], split = "[|]"), "[[", cdsL[x])),
+                                    split = ":"), "[[", 2)), split = "[-]")
+  }), recursive = FALSE)
   c_trans <- unlist(lapply(1:(length(transcript_title)-1), function(x) {
     c(tts[x], substr(paste(nc[(transcript_title[x]+1):(transcript_title[x+1]-1)], collapse = ""),
                      as.numeric(cds_locs[[x]][1]), as.numeric(cds_locs[[x]][2]) ))

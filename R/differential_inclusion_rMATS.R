@@ -86,7 +86,7 @@ differential_inclusion_rMATS <- function(control_names, test_names, et, cores = 
   # Ensure each sample has all gene/exon combinations that appear in any sample
   # expanded_data <- all_gene_exons[, .(sample_name = sample_types$sample_name), by = .(id)]
   # expanded_data <- merge(expanded_data, temp, by = c("sample_name", "id"), all.x = TRUE)
-  expanded_data <- merge(temp, sample_types, by = c("sample_name"), all.x = T)
+  expanded_data <- merge(temp, sample_types, by = c("sample_name"), all.x = TRUE)
 
   expanded_data$type <- expanded_data$type.y
   expanded_data$type.y <- NULL
@@ -95,7 +95,7 @@ differential_inclusion_rMATS <- function(control_names, test_names, et, cores = 
   expanded_data[is.na(IJC), IJC := 0]  # Fill missing PSI values with 0
   expanded_data[is.na(SJC), SJC := 0]  # Fill missing PSI values with 0
   expanded_data[is.na(psi_adjusted), psi_adjusted := 0]  # Fill missing PSI values with 0
-  expanded_data[is.na(valid_reads), valid_reads := T]  # Fill missing PSI values with 0
+  expanded_data[is.na(valid_reads), valid_reads := TRUE]  # Fill missing PSI values with 0
 
   psi_data <- expanded_data
 

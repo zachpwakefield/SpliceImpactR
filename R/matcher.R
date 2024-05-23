@@ -8,7 +8,7 @@
 #' @return figures and dataframes with paired data
 #' @importFrom parallel mclapply
 #' @keywords internal
-matcher <- function(ex_type, background = F, cores = 1, redExon, minOverlap=.05) {
+matcher <- function(ex_type, background = FALSE, cores = 1, redExon, minOverlap=.05) {
 
   gtf_transcripts <- gtf[gtf$classification == 'transcript',]
   gtf_exons <- gtf[!(gtf$classification %in% c('gene', 'transcript')),]
@@ -404,7 +404,8 @@ ASmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
     abs(gtf_transcripts$start[gtf_transcripts$transcriptID == tid]-
           gtf_transcripts$stop[gtf_transcripts$transcriptID == tid])
   }))
-  exclusion_rownum <- gtf_transcripts$rownum[gtf_transcripts$transcriptID == exclusion[which.max(exclusion_lengths)] & gtf_transcripts$chr == redExon$chr[i]]
+  exclusion_rownum <- gtf_transcripts$rownum[gtf_transcripts$transcriptID == exclusion[which.max(exclusion_lengths)] &
+                                               gtf_transcripts$chr == redExon$chr[i]]
   # Skip if no exclusion
   if (length(exclusion) == 0) {return(c(0, 0))}
 

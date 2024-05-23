@@ -56,14 +56,16 @@ getfxnlASoutcome <- function(output_location,
     initial_comparison <- getOverviewComparison(data_df, exon_type, output_location)
   }
 
-  pfg <- getPaired(foreground = fg$proBed, et = exon_type, nucleotides = c_nucs, output_location = output_location, newGTF = newGTF, saveAlignments = F)
+  pfg <- getPaired(foreground = fg$proBed, et = exon_type, nucleotides = c_nucs,
+                   output_location = output_location, newGTF = newGTF, saveAlignments = FALSE)
 
   if (nrow(pfg$paired_proBed) > 1) {
     length_comparison <- getLengthComparison(data_df, pfg$paired_proBed, output_location)
   }
 
   if (tti_location == "") {
-    iDDI <- init_ddi(pdir = pdir, output_location = output_location, ppidm_class = "Gold_Standard", removeDups = T)
+    iDDI <- init_ddi(pdir = pdir, output_location = output_location,
+                     ppidm_class = "Gold_Standard", removeDups = TRUE)
     tti_location <- output_location
   }
 
@@ -92,9 +94,9 @@ getfxnlASoutcome <- function(output_location,
                   steps=1,
                   max_vertices_for_viz = 5000,
                   fdr = .05,
-                  plot_bool = T,
+                  plot_bool = TRUE,
                   ppidm_class = "Gold_Standard",
-                  write_igraphs = T,
+                  write_igraphs = TRUE,
                   output_location = output_location,
                   tti_location = tti_location)
   } else {

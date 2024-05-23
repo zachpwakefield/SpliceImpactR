@@ -114,8 +114,8 @@ setup_gtf <- function(gtf_location, cores = 1) {
   }), recursive = F), recursive = F)
 
   interM_first <- hybrid_first_extract_duo[!is.na(hybrid_first_extract_duo)]
-  hybrid_first_extract <- unlist(interM_first[seq(1, length(interM_first), by = 2)], recursive = F)
-  hybrid_first_extract_transcripts <- unlist(interM_first[seq(2, length(interM_first), by = 2)], recursive = F)
+  hybrid_first_extract <- unlist(interM_first[seq(1, length(interM_first), by = 2)], recursive = FALSE)
+  hybrid_first_extract_transcripts <- unlist(interM_first[seq(2, length(interM_first), by = 2)], recursive = FALSE)
 
   hybrid_last_extract_duo <- unlist(unlist(parallel::mclapply(1:(length(gene_indices)-1), mc.cores = cores, function(x) {
     tr_in_gene <- pcgtf[(gene_indices[x]+1):(gene_indices[x+1]-1),]
@@ -134,11 +134,11 @@ setup_gtf <- function(gtf_location, cores = 1) {
         } else {return(NA)}
       })
     } else {return(NA)}
-  }), recursive = F), recursive = F)
+  }), recursive = FALSE), recursive = FALSE)
 
   interM_last <- hybrid_last_extract_duo[!is.na(hybrid_last_extract_duo)]
-  hybrid_last_extract <- unlist(interM_last[seq(1, length(interM_last), by = 2)], recursive = F)
-  hybrid_last_extract_transcripts <- unlist(interM_last[seq(2, length(interM_last), by = 2)], recursive = F)
+  hybrid_last_extract <- unlist(interM_last[seq(1, length(interM_last), by = 2)], recursive = FALSE)
+  hybrid_last_extract_transcripts <- unlist(interM_last[seq(2, length(interM_last), by = 2)], recursive = FALSE)
 
 
   pcgtf$HFE <- "non-hybrid"

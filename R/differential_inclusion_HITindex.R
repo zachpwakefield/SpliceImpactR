@@ -39,7 +39,7 @@ differential_inclusion_HITindex <- function(test_names, control_names, et, cores
   # Ensure each sample has all gene/exon combinations that appear in any sample
   expanded_data <- all_gene_exons[, .(sample_name = sample_types$sample_name), by = .(gene, exon, strand)]
   expanded_data <- merge(expanded_data, psi_data, by = c("sample_name", "gene", "exon", "strand"), all.x = TRUE)
-  expanded_data <- merge(expanded_data, sample_types, by = "sample_name", all.x = T)
+  expanded_data <- merge(expanded_data, sample_types, by = "sample_name", all.x = TRUE)
   expanded_data$type <- expanded_data$type.y
   expanded_data$type.y <- NULL
   expanded_data$type.x <- NULL

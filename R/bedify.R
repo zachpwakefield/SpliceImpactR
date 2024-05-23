@@ -6,7 +6,7 @@
 #' @param gtf gtf dataframe from setup_gtf
 #' @return a bed file
 #' @importFrom dplyr filter select rename left_join mutate
-#' @export
+#' @keywords internal
 bedifyForeground <- function(matched, outname, cores, gtf) {
 
     ## Ensure gtf is filtered for "exon" type entries and select relevant columns upfront
@@ -47,7 +47,7 @@ bedifyForeground <- function(matched, outname, cores, gtf) {
 #' @param gtf gtf dataframe from setup_gtf
 #' @return a bed file
 #' @importFrom dplyr filter select rename left_join mutate
-#' @export
+#' @keywords internal
 bedifyBackground <- function(matched, outname, cores, gtf) {
 
     ## Ensure gtf is filtered for "exon" type entries and select relevant columns upfront

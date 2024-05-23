@@ -16,7 +16,7 @@ getDomainData(
   engine = c("FunFam", "Gene3D", "CDD", "PANTHER", "SMART", "ProSiteProfiles", "Pfam",
     "SUPERFAMILY", "MobiDBLite", "Coils", "PRINTS", "ProSitePatterns", "PIRSF",
     "NCBIfam", "Hamap")[7],
-  repeatingDomains = F,
+  repeatingDomains = FALSE,
   topViz = 15
 )
 }

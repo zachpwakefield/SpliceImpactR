@@ -71,7 +71,8 @@ getLengthComparison <- function(data_df, paired_df, output_location) {
 
   maxVal <- round(max(ggplot2::ggplot_build(changeDistribution_temp)$data[[1]]$y), 3)
 
-  changeDistribution <- changeDistribution_temp + ggplot2::scale_y_continuous(breaks=seq(0,maxVal, maxVal)) + ggplot2::coord_flip() + ggplot2::ylab("Density") +
+  changeDistribution <- changeDistribution_temp + ggplot2::scale_y_continuous(breaks=seq(0,maxVal, maxVal)) +
+    ggplot2::coord_flip() + ggplot2::ylab("Density") +
     ggplot2::xlab("Change in Protein Length") +
     ggplot2::theme(panel.grid.major = ggplot2::element_blank(),
                    panel.grid.minor = ggplot2::element_blank(),
@@ -79,7 +80,8 @@ getLengthComparison <- function(data_df, paired_df, output_location) {
                    axis.line = ggplot2::element_line(colour = "black"))
 
 
-  proteinCodingPlot <- ggplot2::ggplot(dfPC, ggplot2::aes(x = .data$count, y = .data$type, fill = .data$type)) + ggplot2::geom_bar(stat="identity") + ggplot2::theme_bw() +
+  proteinCodingPlot <- ggplot2::ggplot(dfPC, ggplot2::aes(x = .data$count, y = .data$type, fill = .data$type)) +
+    ggplot2::geom_bar(stat="identity") + ggplot2::theme_bw() +
     ggplot2::scale_fill_manual(values=c("brown", "deeppink4", "chartreuse4", "azure4"), breaks = c("bothPC",
                                                                                                    unique(data_df$phenotype_names[data_df$utc == "control"]),
                                                                                                    unique(data_df$phenotype_names[data_df$utc == "test"]),

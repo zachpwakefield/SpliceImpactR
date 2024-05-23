@@ -21,3 +21,4 @@ a bed file
 \description{
 Get bed file format from matched transcripts / exons / events for foreground and background separately
 }
+\keyword{internal}

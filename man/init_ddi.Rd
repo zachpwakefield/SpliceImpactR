@@ -8,7 +8,7 @@ init_ddi(
   pdir,
   output_location,
   ppidm_class = c("Gold_Standard", "Gold", "Silver", "Bronze")[1],
-  removeDups = T,
+  removeDups = TRUE,
   cores = 1
 )
 }

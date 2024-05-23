@@ -3,6 +3,7 @@
 #' @param matched from matcher function
 #' @param color_thresh the threshold to color by, default of .2
 #' @return the input dataframe with
+#' @keywords internal
 diColor <- function(de_df, color_thresh = .2) {
   de_df$col <- "#A7A9AC"
   de_df$col[de_df$delta.psi <= -(color_thresh) & de_df$p.adj < .05] <- 'brown'
@@ -18,6 +19,7 @@ diColor <- function(de_df, color_thresh = .2) {
 #' @param min_prop_samples min proportion of samples needed to not be counted as outliers
 #' @param max_zero_prop max number of zeros in to count an exon
 #' @return a filtered di inclusion dataframe
+#' @keywords internal
 qualityFilter <- function(df, nT, nC, min_prop_samples = 0.5, max_zero_prop = 0.5) {
   df_filtered <- df[df$count_control >= min_prop_samples * nC &
                       df$count_test >= min_prop_samples * nT &
@@ -31,6 +33,7 @@ qualityFilter <- function(df, nT, nC, min_prop_samples = 0.5, max_zero_prop = 0.
 #' @param fdr fdr threshold
 #' @param d.psi delta psi threshold
 #' @return a filtered di inclusion dataframe
+#' @keywords internal
 significanceFilter <- function(df, fdr = .05, d.psi = .1) {
   df_filtered <- df[abs(df$delta.psi) >= d.psi & df$p.adj <= fdr]
   return(df_filtered)

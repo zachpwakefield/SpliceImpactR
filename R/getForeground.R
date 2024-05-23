@@ -35,8 +35,10 @@ getForeground <- function(input, test_names, control_names, thresh = .1, fdr = .
   ## Make data.frame with gene, location of each exon on total foreground
   redExon <- data.frame(geneR = unlist(lapply(strsplit(bdf.l$gene, split = "[.]"), "[[", 1)),
                         chr = sapply(strsplit(bdf.l$exon, split = ":"), "[[", 1),
-                        start = as.numeric(sapply(strsplit(sapply(strsplit(bdf.l$exon, split = ":"), "[[", 2), split = "[-]"), "[[", 1)),
-                        stop = as.numeric(sapply(strsplit(sapply(strsplit(bdf.l$exon, split = ":"), "[[", 2), split = "[-]"), "[[", 2)),
+                        start = as.numeric(sapply(strsplit(sapply(strsplit(bdf.l$exon, split = ":"),
+                                                                  "[[", 2), split = "[-]"), "[[", 1)),
+                        stop = as.numeric(sapply(strsplit(sapply(strsplit(bdf.l$exon, split = ":"),
+                                                                 "[[", 2), split = "[-]"), "[[", 2)),
                         delta.psi = bdf.l$delta.psi,
                         p.adj = bdf.l$p.adj,
                         add_inf = bdf.l$add_inf

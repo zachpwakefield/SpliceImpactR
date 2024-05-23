@@ -161,12 +161,12 @@ getTTIiGraphPlot <- function(paired_transcript, gene, steps, full_graph, max_ver
   e2g <- eg[[2]]  # Ego graph for the second transcript
 
   # Simplify the ego graphs by removing loops and keeping multiple edges
-  e1g <- igraph::simplify(e1g, remove.multiple = F, remove.loops = T)
-  e2g <- igraph::simplify(e2g, remove.multiple = F, remove.loops = T)
+  e1g <- igraph::simplify(e1g, remove.multiple = FALSE, remove.loops = TRUE)
+  e2g <- igraph::simplify(e2g, remove.multiple = FALSE, remove.loops = TRUE)
 
   # Set edge curvature to FALSE for both graphs
-  igraph::E(e1g)$curved <- F
-  igraph::E(e2g)$curved <- F
+  igraph::E(e1g)$curved <- FALSE
+  igraph::E(e2g)$curved <- FALSE
 
   # Set default vertex and edge colors to 'azure4' for both graphs
   igraph::V(e1g)$color <- rep("azure4", length(igraph::V(e1g)))
@@ -304,7 +304,7 @@ getEnrichmentTTI <- function(current_transcript, t_impacts, fdr, transGeneProt,
 #' @importFrom dplyr select relocate
 #' @importFrom hypeR msigdb_gsets hypeR hyp_dots
 #' @export
-init_ddi <- function(pdir, output_location, ppidm_class = c("Gold_Standard", "Gold", "Silver", "Bronze")[1], removeDups = T, cores = 1) {
+init_ddi <- function(pdir, output_location, ppidm_class = c("Gold_Standard", "Gold", "Silver", "Bronze")[1], removeDups = TRUE, cores = 1) {
   # Read in the protein coding data from the package directory
   pfam_in <- read.delim(paste0(pdir, '/protein_code_from_gencodev43_headerFix.txt.tsv'),
                         header = F)
@@ -369,7 +369,6 @@ init_ddi <- function(pdir, output_location, ppidm_class = c("Gold_Standard", "Go
     }
   }, mc.cores = cores))
 
-  # If removeDups == T (F would save time), sort out duplicated rows through sorting rows
   if (removeDups) {
     # Sort and deduplicate the transcript pairs [This can be time consuming]
     list_noDups <- parallel::mclapply(1:nrow(tti), mc.cores = cores, function(x) {

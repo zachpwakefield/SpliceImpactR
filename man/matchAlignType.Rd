@@ -9,7 +9,7 @@ matchAlignType(
   protCode,
   nucleotides,
   output_location,
-  saveAlignments = T
+  saveAlignments = TRUE
 )
 }
 \arguments{

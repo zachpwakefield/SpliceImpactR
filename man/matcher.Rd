@@ -4,7 +4,7 @@
 \alias{matcher}
 \title{matches the given locations to annotations and transcripts}
 \usage{
-matcher(ex_type, background = F, cores = 1, redExon, minOverlap = 0.05)
+matcher(ex_type, background = FALSE, cores = 1, redExon, minOverlap = 0.05)
 }
 \arguments{
 \item{ex_type}{type of exon being queried}
