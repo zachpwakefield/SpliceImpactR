@@ -30,16 +30,14 @@ getBackground <- function(input, mOverlap, cores, exon_type, pdir, output_locati
   ## Remove duplicate rows
   redExon <- redExon[!duplicated(redExon),]
 
-  print("exon loaded...")
+  message("background exons loaded, matching now...")
 
   ## Use getTranscriptBackground() to extract total and (if background = F) paired transcripts matched to input exons
   matched <- getTranscriptBackground(gtf = gtf, redExon = redExon, ex_type = exon_type, minOverlap = mOverlap, cores = cores)
-  print("exons matched, bed-ifying...")
 
   ## Use bedifyBackground() to extract the total or matched (if background = F) bed file
 
   bed <- bedifyBackground(matched, outname = output_location, cores = cores, gtf=gtf)
-  print("done bed-ifying...")
 
   ## extract unique transcript names as trans and all transcript names as possT
   trans <- str_extract(unique(bed$name), "^[^#]*")
@@ -48,7 +46,6 @@ getBackground <- function(input, mOverlap, cores, exon_type, pdir, output_locati
   possT <- str_extract(bed$name, "^[^#]*")
 
 
-  print("Finding annotated proteins...")
   ## Find annotated proteins for transcripts if possible
   protCode <- c_trans[match(trans, c_trans) + 1]
   protCode[is.na(protCode)]<- "none"
@@ -56,7 +53,6 @@ getBackground <- function(input, mOverlap, cores, exon_type, pdir, output_locati
   merger <- data.frame(name = unique(bed$name),
                        prot = protCode)
 
-  print("Making output data...")
   ## Make dataframe proBed for output of matched transcripts with protein code
   bed_summary <- bed %>%
     dplyr::group_by(.data$name) %>%
@@ -90,6 +86,7 @@ getBackground <- function(input, mOverlap, cores, exon_type, pdir, output_locati
   write_csv(matched,  paste0(output_location, "Background/", "bgmatched.csv"))
   write_csv(bed,  paste0(output_location, "Background/", "bgbed.csv"))
 
+  message("Background complete...")
   return(list(matched = matched,
               bed = bed,
               proBed = proBed,

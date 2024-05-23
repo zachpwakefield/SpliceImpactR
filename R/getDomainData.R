@@ -106,7 +106,8 @@ getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
     }
 
     if (length(fg_dom) == 0) {
-      print(paste0("No domains enriched in ", x, " set"))
+      noneFound <- paste0("No domains enriched in ", x, " set")
+      message(noneFound)
       return(list("none", data.frame(vals = 0, types = x), data.frame(vals = 0, types = x)))
     }
 
@@ -190,7 +191,7 @@ getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
     # Prepare data for plotting
     sp <- data[[x]][data[[x]]$fdr <= fdr_use & data[[x]]$sample_successes >= min_sample_success,c(1, 6, 11)]
     if (nrow(sp) == 0) {
-      print("Lower min_sample_success and/or increase fdr, none meet criteria")
+      message("Lower min_sample_success and/or increase fdr, none meet criteria")
       return(NA)
     }
     sp$category <- "foreground"
@@ -221,8 +222,6 @@ getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
 
   })
 
-  # Return the enrichment plot object for display
-  # print(eP)
 
   # Return a list containing the domain enrichment data and plots
   return(list(data=data,

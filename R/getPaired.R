@@ -13,7 +13,7 @@
 #' @importFrom ggplot2 ggplot aes geom_histogram after_stat geom_density scale_fill_manual theme_classic xlab ylab
 #' @importFrom ggpubr ggarrange
 #' @export
-getPaired <- function(foreground, et, nucleotides, newGTF, cores = 1, output_location, saveAlignments = T) {
+getPaired <- function(foreground, et, nucleotides, newGTF, cores = 1, output_location, saveAlignments = TRUE) {
   # Create a unique identifier for each exon
   foreground <- foreground %>%
     dplyr::mutate(exon_id = paste0(chr, ":", start, "-", stop))
@@ -71,7 +71,7 @@ getPaired <- function(foreground, et, nucleotides, newGTF, cores = 1, output_loc
   }
 
     if (length(exon_pairs_list) == 0) {
-      print("No paired exons found")
+      message("No paired exons found")
       return(NA)
     } else {
 
@@ -184,7 +184,7 @@ getPaired <- function(foreground, et, nucleotides, newGTF, cores = 1, output_loc
     dev.off()
 
     # Print a table of protein categories for diagnostic purposes
-    print(table(combined_rows_df_expanded$alignType)/2)
+    message(table(combined_rows_df_expanded$alignType)/2)
 
     # Return the combined dataframe of exon pairs with their corresponding rows from the input dataframe
     # exon_pairs is minimal information

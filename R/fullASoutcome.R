@@ -25,8 +25,10 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
   # Annotate control / test groups
   data_df$utc <- "control"
   data_df$utc[data_df$phenotype_names == unique(data_df$phenotype_names)[2]] <- "test"
-  print(paste0(unique(data_df$phenotype_names)[1], ": control group"))
-  print(paste0(unique(data_df$phenotype_names)[2], ": test group"))
+  messageControl <- paste0(unique(data_df$phenotype_names)[1], ": control group")
+  messageTest <- paste0(unique(data_df$phenotype_names)[2], ": test group")
+  message(messageControl)
+  message(messageTest)
 
 
   control_group <- data_df$sample_names[data_df$utc == "control"]
@@ -45,7 +47,8 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
     bg <- bg_pre
   }
   lapply(as_types, function(x) {
-    print(paste0(x, " analysis..."))
+    messageOut <- paste0(x, " analysis...")
+    message(messageOut)
     system(paste0("mkdir ",  paste0(output_directory, x, "/")))
 
     fAS <- getfxnlASoutcome(output_location = paste0(output_directory, x, "/"),

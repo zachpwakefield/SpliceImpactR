@@ -10,9 +10,6 @@
 #' @keywords internal
 getTranscriptForeground <- function(gtf, redExon, ex_type, minOverlap = .05, cores = 1) {
 
-  # Print a message indicating the start of the search for the specified exon type
-  print(paste("searching for ", ex_type, "...", sep = ""))
-
   # Parallel computation for each exon in redExon using multiple cores
   results <- matcher(ex_type = ex_type, cores = cores, redExon = redExon,  minOverlap=minOverlap)
 
@@ -62,7 +59,7 @@ getTranscriptForeground <- function(gtf, redExon, ex_type, minOverlap = .05, cor
 getTranscriptBackground <- function(gtf, redExon, ex_type, minOverlap = .05, cores = 1) {
 
   # Parallel computation for each exon in redExon using multiple cores
-  results <- matcher(ex_type = ex_type, background = T, cores = cores, redExon = redExon, minOverlap = minOverlap)
+  results <- matcher(ex_type = ex_type, background = TRUE, cores = cores, redExon = redExon, minOverlap = minOverlap)
 
   # Double for convenience if not AFE/ALE
   compliment_redExon <- redExon[rep(1:nrow(redExon), each = 1),]

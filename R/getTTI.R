@@ -22,8 +22,8 @@
 #' @importFrom hypeR msigdb_gsets hypeR hyp_dots
 #' @export
 getTTI <- function(paired_foreground, background, pdir, steps = 1, max_vertices_for_viz = 5000,
-                   fdr = .05, plot_bool = T, ppidm_class = c("Gold", "Silver", "Bronze")[1],
-                   write_igraphs = T,
+                   fdr = .05, plot_bool = TRUE, ppidm_class = c("Gold", "Silver", "Bronze")[1],
+                   write_igraphs = TRUE,
                    output_location, tti_location) {
   # Create a directory for storing plots if plot_bool is TRUE
   if (plot_bool) {
@@ -60,7 +60,7 @@ getTTI <- function(paired_foreground, background, pdir, steps = 1, max_vertices_
   el_reduce <- edgeList_Matrix[(edgeList_Matrix[,1] %in% possible_transcripts & edgeList_Matrix[,2] %in% possible_transcripts),]
 
   # Create an undirected graph from the reduced edgelist
-  g <- igraph::graph_from_edgelist(el_reduce, directed = F)
+  g <- igraph::graph_from_edgelist(el_reduce, directed = FALSE)
 
 
   # Analyze differences between paired transcripts in the foreground group
@@ -92,7 +92,7 @@ getTTI <- function(paired_foreground, background, pdir, steps = 1, max_vertices_
 
         # Get iGraph plots for the transcripts
         # if (g1_check | g2_check) {
-        tti_igraph <- getTTIiGraphPlot(paired_foreground$transcript[c(tr, tr+1)], gene = paired_foreground$gene[tr], full_graph = g, steps = steps, max_vertices_for_viz = max_vertices_for_viz, plot_bool = T, output_location = output_location)
+        tti_igraph <- getTTIiGraphPlot(paired_foreground$transcript[c(tr, tr+1)], gene = paired_foreground$gene[tr], full_graph = g, steps = steps, max_vertices_for_viz = max_vertices_for_viz, plot_bool = TRUE, output_location = output_location)
         # }
 
         # Perform enrichment analysis for unique vertices
@@ -202,13 +202,13 @@ getTTIiGraphPlot <- function(paired_transcript, gene, steps, full_graph, max_ver
       print(igraph::plot.igraph(e1g,vertex.size=3,vertex.label=NA,main=paired_transcript[1],
                                 layout=igraph::layout.fruchterman.reingold(e1g, niter=10000)))
       dev.off()
-    } else {print("number of vertices exceeds max vertices for plotting set (max_vertices_for_viz)")}
+    } else {message("number of vertices exceeds max vertices for plotting set (max_vertices_for_viz)")}
     if (length(igraph::V(e2g)) <= max_vertices_for_viz) {
       pdf(paste0(output_location, "tti/", gene, "_", paired_transcript[2], "_", steps, 'steps_tti_graph.pdf'))
       print(igraph::plot.igraph(e2g,vertex.size=3,vertex.label=NA,main=paired_transcript[2],
                                 layout=igraph::layout.fruchterman.reingold(e2g, niter=10000)))
       dev.off()
-    } else {print("number of vertices exceeds max vertices for plotting set (max_vertices_for_viz)")}
+    } else {message("number of vertices exceeds max vertices for plotting set (max_vertices_for_viz)")}
   }
 
   # Return the list of ego graphs for the paired transcripts
@@ -307,7 +307,7 @@ getEnrichmentTTI <- function(current_transcript, t_impacts, fdr, transGeneProt,
 init_ddi <- function(pdir, output_location, ppidm_class = c("Gold_Standard", "Gold", "Silver", "Bronze")[1], removeDups = TRUE, cores = 1) {
   # Read in the protein coding data from the package directory
   pfam_in <- read.delim(paste0(pdir, '/protein_code_from_gencodev43_headerFix.txt.tsv'),
-                        header = F)
+                        header = FALSE)
 
   # Extract the transcript ID from the first column
   pfam_in$transcriptID <- unlist(lapply(strsplit(pfam_in$V1, split = "#"),
@@ -379,7 +379,7 @@ init_ddi <- function(pdir, output_location, ppidm_class = c("Gold_Standard", "Go
                              b = unlist(lapply(list_noDuplicates, "[[", 2)))
   }
   # Create an undirected graph from the deduplicated transcript pairs
-  g <- igraph::graph_from_edgelist(as.matrix(tti), directed = F)
+  g <- igraph::graph_from_edgelist(as.matrix(tti), directed = FALSE)
 
   # Write the graph edgelist to a file
   write_graph(

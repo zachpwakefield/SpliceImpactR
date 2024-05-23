@@ -45,6 +45,5 @@ make_dPsiPlot <- function(dpsi_df, thresh = .1, pdir) {
 
 
   comb_plot <- ggpubr::ggarrange(deExons_chart, deExons, widths = c(1, 2.5))
-  print("delta psi plot done!") # Print completion message
   return(comb_plot) # Return the ggplot2 object for the plot
 }

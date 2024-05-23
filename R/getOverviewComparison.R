@@ -6,7 +6,7 @@
 #' @param output_location location where everything is being saved
 #' @return 4 individual plots and 1 combined plot.
 #' @export
-getOverviewComparison <- function(data_df, exon_type, output_location, plot = T, minReads = 10) {
+getOverviewComparison <- function(data_df, exon_type, output_location, plot = TRUE, minReads = 10) {
   sample_types <- list()
 
   for (i in 1:nrow(data_df)) {
@@ -17,20 +17,20 @@ getOverviewComparison <- function(data_df, exon_type, output_location, plot = T,
   sample_list <- c(sample_types[which(unlist(lapply(sample_types, "[[", 2)) == "control")], sample_types[which(unlist(lapply(sample_types, "[[", 2)) == "test")])
 
   # Load PSI values for each sample and splicing event type
-  data_list <- lapply(sample_list, function(x) read.table(paste0(x[1], paste0(".", exon_type, "PSI")), header = T, sep = '\t'))
+  data_list <- lapply(sample_list, function(x) read.table(paste0(x[1], paste0(".", exon_type, "PSI")), header = TRUE, sep = '\t'))
 
   ## Number of AS across phenotype
   if (exon_type %in% c("AFE", "ALE", "HFE", "HLE")) {
     colNameInc <- "PSI"
     nASE <- lapply(data_list, function(x) {
-      vals <- x[,grep(colNameInc, colnames(x), fixed = T)]
+      vals <- x[,grep(colNameInc, colnames(x), fixed = TRUE)]
       vals <- vals[!is.na(vals)]
       length(vals)
     })
   } else {
     colNameInc <- "IncLevel1"
     nASE <- lapply(data_list, function(x) {
-      vals <- x[,grep(colNameInc, colnames(x), fixed = T)]
+      vals <- x[,grep(colNameInc, colnames(x), fixed = TRUE)]
       vals <- vals[!is.na(vals)]
       length(vals[vals > 0 & vals < 1])
     })

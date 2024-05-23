@@ -68,8 +68,8 @@ setup_gtf <- function(gtf_location, cores = 1) {
     if (sum(min_gtf$type == "exon") == 1) {
       list(min_gtf$rowname[which(min_gtf$type == "exon")])
     } else {
-      s <- sort(min_gtf$rowname[firstExonID(min_gtf)], decreasing = ifelse(unique(min_gtf$strand)[1] == "+", T, F))[1]
-      e <- sort(min_gtf$rowname[lastExonID(min_gtf)], decreasing = ifelse(unique(min_gtf$strand)[1] == "+", F, T))[1]
+      s <- sort(min_gtf$rowname[firstExonID(min_gtf)], decreasing = ifelse(unique(min_gtf$strand)[1] == "+", TRUE, FALSE))[1]
+      e <- sort(min_gtf$rowname[lastExonID(min_gtf)], decreasing = ifelse(unique(min_gtf$strand)[1] == "+", FALSE, TRUE))[1]
       i <- min_gtf$rowname[!min_gtf$rowname %in% c(s, e) & min_gtf$type == "exon" & min_gtf$rowname %in% seq(s+1, e-1)]
       utr <- min_gtf$rowname[!(min_gtf$rowname %in% c(i, s, e)) & min_gtf$type == "exon"]
       list(s, e, i, utr)
@@ -111,7 +111,7 @@ setup_gtf <- function(gtf_location, cores = 1) {
         } else {return(NA)}
       })
     } else {return(NA)}
-  }), recursive = F), recursive = F)
+  }), recursive = FALSE), recursive = FALSE)
 
   interM_first <- hybrid_first_extract_duo[!is.na(hybrid_first_extract_duo)]
   hybrid_first_extract <- unlist(interM_first[seq(1, length(interM_first), by = 2)], recursive = FALSE)

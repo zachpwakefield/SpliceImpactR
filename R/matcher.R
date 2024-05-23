@@ -358,9 +358,9 @@ ASmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
   # Extract set difference between two sets of coords
   idSS <- function(start1, stop1, start2, stop2) {
     if (stop1-stop2 == 0) {
-      return(sort(c(start1, start2), decreasing=F)-c(0, 1))
+      return(sort(c(start1, start2), decreasing=FALSE)-c(0, 1))
     } else {
-      return(sort(c(stop1, stop2), decreasing = F)+c(1, 0))}}
+      return(sort(c(stop1, stop2), decreasing =FALSE)+c(1, 0))}}
 
 
   # Assign values directly without unnecessary lapply and unlist

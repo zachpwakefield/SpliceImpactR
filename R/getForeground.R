@@ -45,16 +45,11 @@ getForeground <- function(input, test_names, control_names, thresh = .1, fdr = .
   )
 
 
-  print("exon loaded...")
-
   ## Use getTranscriptForeground() to extract total and (if background = F) paired transcripts matched to input exons
   matched <- getTranscriptForeground(gtf = gtf, redExon = redExon, ex_type = exon_type, minOverlap = mOverlap, cores = cores)
-  print("exons matched, bed-ifying...")
 
   ## Use bedifyForeground() to extract the  bed file
-
   bed <- bedifyForeground(matched, outname = output_location, cores = cores, gtf=gtf)
-  print("done bed-ifying...")
 
   ## extract uniqiue transcript names as trans and all trancript names as possT
   trans <- str_extract(unique(bed$name), "^[^#]*")
@@ -62,17 +57,13 @@ getForeground <- function(input, test_names, control_names, thresh = .1, fdr = .
   # For all names
   possT <- str_extract(bed$name, "^[^#]*")
 
-  print("Finding annotated proteins...")
   ## Find annotated proteins for transcripts if possible
-
-
   protCode <- c_trans[match(trans, c_trans) + 1]
   protCode[is.na(protCode)]<- "none"
 
   merger <- data.frame(name = unique(bed$name),
                        prot = protCode)
 
-  print("Making output data...")
   ## Make dataframe proBed for output of matched transcripts with protein code
   bed_summary <- bed %>%
     dplyr::group_by(name) %>%
@@ -82,10 +73,6 @@ getForeground <- function(input, test_names, control_names, thresh = .1, fdr = .
                      add_inf = dplyr::first(add_inf),
                      .groups = 'drop')
 
-
-
-  # Assuming 'protCode' is already defined and in the correct order for the unique 'bed$name'
-  # If 'protCode' needs to be matched by 'bed$name', ensure that step is handled accordingly
 
   # Create the initial 'proBed' data frame without the need for 'lapply' or 'unique'
   proBed <- bed_summary %>% dplyr::left_join(merger, by='name') %>%

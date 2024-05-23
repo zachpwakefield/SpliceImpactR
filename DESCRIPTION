@@ -12,29 +12,19 @@ License: What license is it under?
 Encoding: UTF-8
 LazyData: TRUE
 Imports: 
-  tidyverse, 
-  methods, 
   readr,
   ggpubr, 
-  xlsx, 
-  ggsignif, 
-  ComplexHeatmap, 
-  pracma, 
-  ensembldb, 
-  EnsDb.Hsapiens.v86, 
   msa, 
-  stringr, 
-  ORFik, 
-  GenomicFeatures, 
   data.table, 
   Biostrings, 
   parallel, 
   igraph, 
-  biomaRt, 
   hypeR,
-  BiocManager,
   rtracklayer,
   tidyr,
   ggplot2,
-  dplyr
+  dplyr,
+  grDevices,
+  stats
+  utils
 RoxygenNote: 7.2.3
