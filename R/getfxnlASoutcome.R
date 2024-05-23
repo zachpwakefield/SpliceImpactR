@@ -95,7 +95,6 @@ getfxnlASoutcome <- function(output_location,
                   plot_bool = T,
                   ppidm_class = "Gold_Standard",
                   write_igraphs = T,
-                  ddi = "Gold",
                   output_location = output_location,
                   tti_location = tti_location)
   } else {

@@ -119,7 +119,7 @@ HITmatcher <- function(i, redExon, gtf_filtered, minOverlap,
   ## If multiple best, use length of matched exon
   else if (gtf_min$jaccard[1] == gtf_min$jaccard[2]) {
 
-    c_gtf <- gtf_min[gtf_min$jaccard == max(gtf_min$jaccard),] %>% dplyr::arrange(desc(length_jacc))
+    c_gtf <- gtf_min[gtf_min$jaccard == max(gtf_min$jaccard),] %>% dplyr::arrange(desc(.data$length_jacc))
 
     return(c_gtf$rownum[1])
   } else {return(0)}
@@ -166,7 +166,9 @@ SEmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
     all(jacc_indices < threshold)
   }
   # Compute intersections more efficiently
-  possible_exclusion_transcripts <- Reduce(intersect, c(lapply(jaccard_indices[2:3], function(jacc) unique(gtf_filtered$transcriptID[jacc$jaccard_index > minOverlap])), list(gtf_filtered$transcriptID[sapply(gtf_filtered$transcriptID, function(x) is_below_threshold(x, threshold = below_thresh))])))
+  possible_exclusion_transcripts <- Reduce(intersect, c(lapply(jaccard_indices[2:3], function(jacc) unique(gtf_filtered$transcriptID[jacc$jaccard_index > minOverlap])),
+                                                        list(gtf_filtered$transcriptID[sapply(gtf_filtered$transcriptID, function(x)
+                                                          is_below_threshold(x, threshold = below_thresh))])))
 
 
   # Further refine to only include those that are also in the protein coding transcripts, if necessary
@@ -189,7 +191,7 @@ SEmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
   gtf_filtered$jaccard <- jaccard_indices[[1]]$jaccard_index
   gtf_filtered$length_jacc <- jaccard_indices[[1]]$length_jacc
 
-  gtf_filtered <- subset(gtf_filtered, jaccard > minOverlap & classification == "internal" & transcriptID %in% inclusion)
+  gtf_filtered <- subset(gtf_filtered, .data$jaccard > .data$minOverlap & .data$classification == "internal" & .data$transcriptID %in% inclusion)
 
   if (nrow(gtf_filtered) == 0) return(c(0, 0)) # Skip if no entries found
 
@@ -214,7 +216,7 @@ SEmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
     # Ensure start_distances is a vector if it's not due to subsetting a single element
     start_distances <- as.numeric(start_distances)
 
-    c_gtf <- gtf_min[start_distances == min(start_distances),] %>% dplyr::arrange(desc(length_jacc))
+    c_gtf <- gtf_min[start_distances == min(start_distances),] %>% dplyr::arrange(desc(.data$length_jacc))
 
     inclusion_rownum <- c_gtf$rownum[1]
 
@@ -247,7 +249,7 @@ MXmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
   excl_stop <- up_down[2]
 
   # Filter for computational efficiency at the beginning to minimize dataset size
-  gtf_filtered <- subset(gtf_exons, classification == "internal" & geneID == geneR & chr == redExon$chr[i])
+  gtf_filtered <- subset(gtf_exons, .data$classification == "internal" & .data$geneID == geneR & .data$chr == redExon$chr[i])
   if (nrow(gtf_filtered) <= 1) return(c(0, 0)) # Skip if less than 2 relevant gtf entries found
 
   # Calculate Jaccard index for inclusion and finds intersect with exclusion of second exon
@@ -290,7 +292,7 @@ MXmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
   gtf_filtered$jaccard <- inclusion_indices$jaccard_index
   gtf_filtered$length_jacc <- inclusion_indices$length_jacc
 
-  gtf_filtered <- subset(gtf_filtered, jaccard > minOverlap & classification == "internal" & transcriptID %in% inclusion)
+  gtf_filtered <- subset(gtf_filtered, .data$jaccard > .data$minOverlap & .data$classification == "internal" & .data$transcriptID %in% inclusion)
 
   if (nrow(gtf_filtered) == 0) return(c(0, 0)) # Skip if no entries found
 
@@ -315,7 +317,7 @@ MXmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
     # Ensure start_distances is a vector if it's not due to subsetting a single element
     start_distances <- as.numeric(start_distances)
 
-    c_gtf <- gtf_min[start_distances == min(start_distances),] %>% dplyr::arrange(desc(length_jacc))
+    c_gtf <- gtf_min[start_distances == min(start_distances),] %>% dplyr::arrange(desc(.data$length_jacc))
 
     inclusion_rownum <- c_gtf$rownum[1]
 

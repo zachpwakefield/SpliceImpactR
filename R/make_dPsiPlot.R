@@ -24,7 +24,7 @@ make_dPsiPlot <- function(dpsi_df, thresh = .1, pdir) {
                          gene_id_to_name[gene_ids],
                          dpsi_df$gene)
   # Prepare the data for labeling in the plot, sorting by absolute log fold change and adjusted p-value
-  lab_thresh <- dpsi_df %>% dplyr::arrange(desc(abs(delta.psi)), p.adj)
+  lab_thresh <- dpsi_df %>% dplyr::arrange(desc(abs(.data$delta.psi)), .data$p.adj)
 
   # Create the dpsi change plot using ggplot2
   deExons <- ggplot2::ggplot(dpsi_df, ggplot2::aes(x = .data$delta.psi, y = -log(.data$p.adj), color = .data$col, label = .data$hgnc)) +
