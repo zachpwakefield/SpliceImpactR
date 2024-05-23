@@ -4,12 +4,14 @@
 \alias{bedifyForeground}
 \title{Get bed file format from matched transcripts / exons / events for foreground and background separately}
 \usage{
-bedifyForeground(matched, outname, cores)
+bedifyForeground(matched, outname, cores, gtf)
 }
 \arguments{
 \item{matched}{from matcher function}
 
 \item{cores}{# of cores requested}
+
+\item{gtf}{gtf dataframe from setup_gtf}
 
 \item{output_location}{location where everything is being saved}
 }

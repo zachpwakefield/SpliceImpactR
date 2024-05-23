@@ -3,12 +3,13 @@
 #' @param matched from matcher function
 #' @param output_location location where everything is being saved
 #' @param cores # of cores requested
+#' @param gtf gtf dataframe from setup_gtf
 #' @return a bed file
 #' @importFrom dplyr filter select rename left_join mutate
 #' @examples
 #' bedifyForeground(matched, output_location, 6)
 #' @export
-bedifyForeground <- function(matched, outname, cores) {
+bedifyForeground <- function(matched, outname, cores, gtf) {
 
   # Ensure gtf is filtered for "exon" type entries and select relevant columns upfront
   gtf_exons_limited <- gtf %>%
@@ -45,12 +46,13 @@ bedifyForeground <- function(matched, outname, cores) {
 #' @param matched from matcher function
 #' @param output_location location where everything is being saved
 #' @param cores # of cores requested
+#' @param gtf gtf dataframe from setup_gtf
 #' @return a bed file
 #' @importFrom dplyr filter select rename left_join mutate
 #' @examples
 #' bedifyBackground(matched, output_location, 6)
 #' @export
-bedifyBackground <- function(matched, outname, cores) {
+bedifyBackground <- function(matched, outname, cores, gtf) {
 
   # Ensure gtf is filtered for "exon" type entries and select relevant columns upfront
   gtf_exons_limited <- gtf %>%
