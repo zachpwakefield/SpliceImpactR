@@ -7,7 +7,11 @@
 significanceFilter(df, fdr = 0.05, d.psi = 0.1)
 }
 \arguments{
-\item{final_data}{from diHIT or diRMATS (or post filtering)}
+\item{df}{from diHIT or diRMATS (or post filtering)}
+
+\item{fdr}{fdr threshold}
+
+\item{d.psi}{delta psi threshold}
 }
 \value{
 a filtered di inclusion dataframe

@@ -7,6 +7,8 @@
 #' @param fdr adj p to filter for
 #' @param gtf gtf dataframe from setup_gtf
 #' @param pdir location of the package
+#' @param max_zero_prop max number of zeros in to count an exon
+#' @param min_prop_samples min proportion of samples needed to not be counted as outliers
 #' @param output_location location to make background directory
 #' @return matched : matched transcripts dataframe, bed : bed file of the matched transcripts
 #' proBed : output for further functions with protein code and protein info,
@@ -14,17 +16,18 @@
 #' @importFrom dplyr arrange first left_join group_by summarise
 #' @importFrom tidyr separate
 #' @export
-getForeground <- function(input, test_names, control_names, thresh, fdr,
+getForeground <- function(input, test_names, control_names, thresh = .1, fdr = .05,
                           mOverlap,exon_type, pdir,
-                          output_location, cores = 1, gtf) {
+                          output_location, cores = 1, gtf, max_zero_prop = .5, min_prop_samples = .5) {
 
   ## If using foreground set, read in diExon file and extract differentially included exons using diff_info()
   df <- input
   df.l <- diColor(df, color_thresh = .2)
 
   ## Filter df.l for paired analysis
-  qdf.l <- qualityFilter(df.l, nT = length(test_names), nC = length(control_names))
-  bdf.l <- significanceFilter(qdf.l)
+  qdf.l <- qualityFilter(df.l, nT = length(test_names), nC = length(control_names),
+                         min_prop_samples = min_prop_samples, max_zero_prop = max_zero_prop)
+  bdf.l <- significanceFilter(qdf.l, fdr = fdr, d.psi = thresh)
 
   ## Make volcano plot with make_lfcPlot()
   lfcPlot <- make_dPsiPlot(df.l, thresh = thresh, pdir = pdir)
@@ -48,7 +51,7 @@ getForeground <- function(input, test_names, control_names, thresh, fdr,
 
   ## Use bedifyForeground() to extract the  bed file
 
-  bed <- bedifyForeground(matched, outname = output_location, cores = cores)
+  bed <- bedifyForeground(matched, outname = output_location, cores = cores, gtf=gtf)
   print("done bed-ifying...")
 
   ## extract uniqiue transcript names as trans and all trancript names as possT

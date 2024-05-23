@@ -18,11 +18,13 @@ diColor <- function(de_df, color_thresh = .2) {
 #' @param final_data from diHIT or diRMATS
 #' @param nT number of test samples
 #' @param nC number of control samples
+#' @param min_prop_samples min proportion of samples needed to not be counted as outliers
+#' @param max_zero_prop max number of zeros in to count an exon
 #' @return a filtered di inclusion dataframe
 #' @examples
 #' qualityFilter(diHIT_output)
 #' @export
-qualityFilter <- function(df, nT, nC) {
+qualityFilter <- function(df, nT, nC, min_prop_samples = 0.5, max_zero_prop = 0.5) {
   df_filtered <- df[df$count_control >= min_prop_samples * nC &
                       df$count_test >= min_prop_samples * nT &
                       df$zero_count <= max_zero_prop * (nC+nT),]
@@ -31,7 +33,9 @@ qualityFilter <- function(df, nT, nC) {
 
 #' filter using delta psi and fdr
 #'
-#' @param final_data from diHIT or diRMATS (or post filtering)
+#' @param df from diHIT or diRMATS (or post filtering)
+#' @param fdr fdr threshold
+#' @param d.psi delta psi threshold
 #' @return a filtered di inclusion dataframe
 #' @examples
 #' significanceFilter(diHIT_output, fdr = .05, d.psi = .1)

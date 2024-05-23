@@ -8,14 +8,16 @@ getForeground(
   input,
   test_names,
   control_names,
-  thresh,
-  fdr,
+  thresh = 0.1,
+  fdr = 0.05,
   mOverlap,
   exon_type,
   pdir,
   output_location,
   cores = 1,
-  gtf
+  gtf,
+  max_zero_prop = 0.5,
+  min_prop_samples = 0.5
 )
 }
 \arguments{
@@ -34,6 +36,10 @@ getForeground(
 \item{output_location}{location to make background directory}
 
 \item{gtf}{gtf dataframe from setup_gtf}
+
+\item{max_zero_prop}{max number of zeros in to count an exon}
+
+\item{min_prop_samples}{min proportion of samples needed to not be counted as outliers}
 }
 \value{
 matched : matched transcripts dataframe, bed : bed file of the matched transcripts

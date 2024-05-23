@@ -4,6 +4,7 @@
 #' @param mOverlap overlap to identify a match to annotation
 #' @param exon_type placeholder for other functions
 #' @param pdir location of the package
+#' @param gtf gtf dataframe from setup_gtf
 #' @param output_location location to make background directory
 #' @return matched : matched transcripts dataframe, bed : bed file of the matched transcripts
 #' proBed : output for further functions with protein code and protein info,
@@ -39,7 +40,7 @@ getBackground <- function(input, mOverlap, cores, exon_type, pdir, output_locati
 
   ## Use bedifyBackground() to extract the total or matched (if background = F) bed file
 
-  bed <- bedifyBackground(matched, outname = output_location, cores = cores)
+  bed <- bedifyBackground(matched, outname = output_location, cores = cores, gtf=gtf)
   print("done bed-ifying...")
 
   ## extract unique transcript names as trans and all transcript names as possT
