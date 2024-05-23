@@ -6,9 +6,15 @@
 \usage{
 fsDirectSpecific(seq1, seq2)
 }
+\arguments{
+\item{seq1}{first nuc sequence}
+
+\item{seq2}{second nuc sequence}
+}
 \value{
 both specific and shift results
 }
 \description{
 Align and classify 2 sequences using specific method -- using nucleotides finding indels of non-3 multiples or leads or non-3
 }
+\keyword{internal}

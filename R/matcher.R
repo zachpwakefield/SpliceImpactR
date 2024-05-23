@@ -7,7 +7,7 @@
 #' @param cores number of requested cores
 #' @return figures and dataframes with paired data
 #' @importFrom parallel mclapply
-#' @export
+#' @keywords internal
 matcher <- function(ex_type, background = F, cores = 1, redExon, minOverlap=.05) {
 
   gtf_transcripts <- gtf[gtf$classification == 'transcript',]

@@ -6,9 +6,13 @@
 \usage{
 findContinuousIndels(indels)
 }
+\arguments{
+\item{indels}{the indels from an alignment}
+}
 \value{
 continuous indels
 }
 \description{
 Idenfity continuous indels
 }
+\keyword{internal}

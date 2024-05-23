@@ -3,7 +3,7 @@
 #' @param cores number of cores requested
 #' @importFrom rtracklayer import
 #'
-#' @export
+#' @keywords internal
 setup_gtf <- function(gtf_location, cores = 1) {
   gtf <- rtracklayer::import(gtf_location)
   gtf_df <- as.data.frame(gtf)

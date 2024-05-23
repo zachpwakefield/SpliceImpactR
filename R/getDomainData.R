@@ -16,7 +16,7 @@
 #' @importFrom ggplot2 scale_fill_manual theme_classic ggplot aes xlab ylab theme geom_bar geom_boxplot theme_classic coord_flip theme_bw ggtitle element_blank element_line
 #' @importFrom ggpubr ggarrange
 #' @export
-getData <- function(fg, bg, pfg, pfam, cores = 1,
+getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
                     output_location, fdr_use = .05, min_sample_success = 3,
                     engine = c("FunFam","Gene3D","CDD","PANTHER","SMART","ProSiteProfiles","Pfam","SUPERFAMILY","MobiDBLite","Coils","PRINTS","ProSitePatterns","PIRSF","NCBIfam","Hamap")[7],
                     repeatingDomains = F, topViz = 15) {

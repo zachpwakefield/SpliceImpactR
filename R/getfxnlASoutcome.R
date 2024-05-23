@@ -83,7 +83,7 @@ getfxnlASoutcome <- function(output_location,
   pfam <- getPfam(foreground = fg, background = bg, pdir = pdir, cores = cores, output_location = output_location)
 
 
-  gD <- getData(fg = fg, bg = bg, pfg=pfg, cores = cores, pfam = pfam, output_location = output_location,
+  gD <- getDomainData(fg = fg, bg = bg, pfg=pfg, cores = cores, pfam = pfam, output_location = output_location,
                 fdr_use = .05, min_sample_success = 2, engine = "Pfam", topViz = 15)
 
   if (nrow(pfg$paired_proBed) > 1) {

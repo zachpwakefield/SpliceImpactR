@@ -9,3 +9,4 @@ calculate_jaccard(start1, stop1, start2, stop2)
 \description{
 calculates jaccard between sequences
 }
+\keyword{internal}

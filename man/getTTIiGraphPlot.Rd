@@ -17,3 +17,4 @@ getTTIiGraphPlot(
 \description{
 graph helper function
 }
+\keyword{internal}

@@ -11,7 +11,7 @@
 #' proFast : fasta file of proteins identified in proBed
 #' @importFrom dplyr arrange first left_join group_by summarise
 #' @importFrom tidyr separate
-#' @export
+#' @keywords internal
 getBackground <- function(input, mOverlap, cores, exon_type, pdir, output_location, gtf) {
   ## extract all first exons and create combined data.frame with gene, location
   files <- paste(input, unlist(lapply(input, function(x) list.files(x)[grep('[.]exon', list.files(x))])), sep = "")

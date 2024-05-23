@@ -19,3 +19,4 @@ differences between each tti pair and the overall results
 \description{
 gets the tti interactions with various helper functions to do so
 }
+\keyword{internal}

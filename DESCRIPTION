@@ -1,7 +1,7 @@
 Package: SpliceImpactR
 Type: Package
 Title: An R pacakge to identify functional impacts due to alternative splicing events 
-Version: 0.1.0
+Version: 0.99.0
 Authors@R: person("Zachary", "Wakefield",
   email = "zachpw@bu.edu",
   role = c("cre", "aut"))

@@ -7,7 +7,7 @@
 #' @param cores number of requested cores
 #' @return figures and dataframes with paired data
 #' @import dplyr
-#' @export
+#' @keywords internal
 getTranscriptForeground <- function(gtf, redExon, ex_type, minOverlap = .05, cores = 1) {
 
   # Print a message indicating the start of the search for the specified exon type
@@ -58,7 +58,7 @@ getTranscriptForeground <- function(gtf, redExon, ex_type, minOverlap = .05, cor
 #' @param cores number of requested cores
 #' @return figures and dataframes with paired data
 #' @import dplyr
-#' @export
+#' @keywords internal
 getTranscriptBackground <- function(gtf, redExon, ex_type, minOverlap = .05, cores = 1) {
 
   # Parallel computation for each exon in redExon using multiple cores

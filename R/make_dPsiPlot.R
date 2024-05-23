@@ -10,7 +10,7 @@
 #' @importFrom ggplot2 ggplot aes geom_point theme_classic ylab xlab theme geom_text scale_fill_manual geom_bar
 #' @importFrom ggpubr ggarrange
 #' @importFrom dplyr select relocate
-#' @export
+#' @keywords internal
 make_dPsiPlot <- function(dpsi_df, thresh = .1, pdir) {
 
   # Map Ensembl IDs in the lfc_df to HGNC symbols using the conversion table

@@ -14,3 +14,4 @@ setup_gtf(gtf_location, cores = 1)
 \description{
 setting up gtf with exon labels, first, internal, last, hybrid, etc
 }
+\keyword{internal}

@@ -27,3 +27,4 @@ proFast : fasta file of proteins identified in proBed
 \description{
 getBackground set of transcripts in samples
 }
+\keyword{internal}
