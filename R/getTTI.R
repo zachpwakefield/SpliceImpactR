@@ -21,10 +21,10 @@
 #' @importFrom dplyr select relocate
 #' @importFrom hypeR msigdb_gsets hypeR hyp_dots
 #' @export
-getTTI <- function(paired_foreground, background, pdir = pdir, steps = 1, max_vertices_for_viz = 5000,
+getTTI <- function(paired_foreground, background, pdir, steps = 1, max_vertices_for_viz = 5000,
                    fdr = .05, plot_bool = T, ppidm_class = c("Gold", "Silver", "Bronze")[1],
                    write_igraphs = T,
-                   output_location = output_location, tti_location = output_location) {
+                   output_location, tti_location) {
   # Create a directory for storing plots if plot_bool is TRUE
   if (plot_bool) {
     system(paste0("mkdir ", output_location, "tti"))

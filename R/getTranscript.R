@@ -8,7 +8,7 @@
 #' @return figures and dataframes with paired data
 #' @import dplyr
 #' @export
-getTranscriptForeground <- function(gtf = gtf, redExon = redExon, ex_type = exon_type, minOverlap = .05, cores = 1) {
+getTranscriptForeground <- function(gtf, redExon, ex_type, minOverlap = .05, cores = 1) {
 
   # Print a message indicating the start of the search for the specified exon type
   print(paste("searching for ", ex_type, "...", sep = ""))
@@ -59,7 +59,7 @@ getTranscriptForeground <- function(gtf = gtf, redExon = redExon, ex_type = exon
 #' @return figures and dataframes with paired data
 #' @import dplyr
 #' @export
-getTranscriptBackground <- function(gtf = gtf, redExon = redExon, ex_type = exon_type, minOverlap = .05, cores) {
+getTranscriptBackground <- function(gtf, redExon, ex_type, minOverlap = .05, cores = 1) {
 
   # Parallel computation for each exon in redExon using multiple cores
   results <- matcher(ex_type = ex_type, background = T, cores = cores, redExon = redExon, minOverlap = minOverlap)

@@ -27,6 +27,3 @@ proFast : fasta file of proteins identified in proBed
 \description{
 getBackground set of transcripts in samples
 }
-\examples{
-differential_inclusion_HITindex(test_names, control_names, "AFE", cores = 2, outlier_threshold = "1", minReads = 10)
-}

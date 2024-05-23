@@ -30,6 +30,3 @@ a dataframe with differential inclusion information
 \description{
 Extract differentially included AS events from HIT Index data
 }
-\examples{
-differential_inclusion_rMATS(test_names, control_names, "AFE", cores = 2, outlier_threshold = "1", minReads = 10)
-}

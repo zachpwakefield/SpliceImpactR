@@ -4,13 +4,7 @@
 \alias{getTranscriptBackground}
 \title{gets the transcripts to match to each as event or exon}
 \usage{
-getTranscriptBackground(
-  gtf = gtf,
-  redExon = redExon,
-  ex_type = exon_type,
-  minOverlap = 0.05,
-  cores
-)
+getTranscriptBackground(gtf, redExon, ex_type, minOverlap = 0.05, cores = 1)
 }
 \arguments{
 \item{gtf}{gtf from get_gtf from setup}

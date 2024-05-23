@@ -7,15 +7,15 @@
 getTTI(
   paired_foreground,
   background,
-  pdir = pdir,
+  pdir,
   steps = 1,
   max_vertices_for_viz = 5000,
   fdr = 0.05,
   plot_bool = T,
   ppidm_class = c("Gold", "Silver", "Bronze")[1],
   write_igraphs = T,
-  output_location = output_location,
-  tti_location = output_location
+  output_location,
+  tti_location
 )
 }
 \arguments{

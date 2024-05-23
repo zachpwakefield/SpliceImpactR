@@ -27,6 +27,3 @@ getOverviewComparison(
 \description{
 Get comparison between phenotypes: count of AS event, count of AS event per gene, ECDF compare and save to Foreground subdir
 }
-\examples{
-getOverviewComparison(c("path_control1", "path_control2"), c("path_test1", "path_test2"), "AFE", "path_to_output")
-}

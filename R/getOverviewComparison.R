@@ -5,8 +5,7 @@
 #' @param exon_type type of AS being investigated
 #' @param output_location location where everything is being saved
 #' @return 4 individual plots and 1 combined plot.
-#' @examples
-#' getOverviewComparison(c("path_control1", "path_control2"), c("path_test1", "path_test2"), "AFE", "path_to_output")
+#' @export
 getOverviewComparison <- function(data_df, exon_type, output_location, plot = T, minReads = 10) {
   sample_types <- list()
 

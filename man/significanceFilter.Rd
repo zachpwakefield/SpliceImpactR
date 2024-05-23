@@ -19,6 +19,3 @@ a filtered di inclusion dataframe
 \description{
 filter using delta psi and fdr
 }
-\examples{
-significanceFilter(diHIT_output, fdr = .05, d.psi = .1)
-}

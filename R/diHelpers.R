@@ -19,8 +19,6 @@ diColor <- function(de_df, color_thresh = .2) {
 #' @param min_prop_samples min proportion of samples needed to not be counted as outliers
 #' @param max_zero_prop max number of zeros in to count an exon
 #' @return a filtered di inclusion dataframe
-#' @examples
-#' qualityFilter(diHIT_output)
 #' @export
 qualityFilter <- function(df, nT, nC, min_prop_samples = 0.5, max_zero_prop = 0.5) {
   df_filtered <- df[df$count_control >= min_prop_samples * nC &
@@ -35,8 +33,6 @@ qualityFilter <- function(df, nT, nC, min_prop_samples = 0.5, max_zero_prop = 0.
 #' @param fdr fdr threshold
 #' @param d.psi delta psi threshold
 #' @return a filtered di inclusion dataframe
-#' @examples
-#' significanceFilter(diHIT_output, fdr = .05, d.psi = .1)
 #' @export
 significanceFilter <- function(df, fdr = .05, d.psi = .1) {
   df_filtered <- df[abs(df$delta.psi) >= d.psi & df$p.adj <= fdr]

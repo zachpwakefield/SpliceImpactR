@@ -7,12 +7,12 @@
 SEmatcher(
   i,
   below_thresh = 0.2,
-  redExon = redExon,
-  minOverlap = minOverlap,
-  gtf_transcripts = gtf_transcripts,
-  gtf_exons = gtf_exons,
-  protein_coding_transcripts = protein_coding_transcripts,
-  transcript_starts = transcript_starts
+  redExon,
+  minOverlap = 0.05,
+  gtf_transcripts,
+  gtf_exons,
+  protein_coding_transcripts,
+  transcript_starts
 )
 }
 \description{

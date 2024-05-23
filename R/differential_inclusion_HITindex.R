@@ -10,8 +10,6 @@
 #' @importFrom dplyr arrange
 #' @importFrom stats cooks.distance lm logLik pchisq setNames start
 #' @importFrom utils data read.csv read.delim read.table write.csv
-#' @examples
-#' differential_inclusion_HITindex(test_names, control_names, "AFE", cores = 2, outlier_threshold = "1", minReads = 10)
 #' @export
 differential_inclusion_HITindex <- function(test_names, control_names, et, cores = 1,
                                             outlier_threshold = c("4/n", "1", "Inf")[1],

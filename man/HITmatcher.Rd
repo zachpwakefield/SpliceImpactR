@@ -4,13 +4,7 @@
 \alias{HITmatcher}
 \title{specific matcher for HIT}
 \usage{
-HITmatcher(
-  i,
-  redExon = redExon,
-  gtf_filtered = gtf_filtered,
-  minOverlap = minOverlap,
-  protein_coding_transcripts = protein_coding_transcripts
-)
+HITmatcher(i, redExon, gtf_filtered, minOverlap, protein_coding_transcripts)
 }
 \description{
 specific matcher for HIT

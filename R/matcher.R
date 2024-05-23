@@ -8,7 +8,7 @@
 #' @return figures and dataframes with paired data
 #' @importFrom parallel mclapply
 #' @export
-matcher <- function(ex_type, background = F, cores, redExon = redExon, minOverlap=minOverlap) {
+matcher <- function(ex_type, background = F, cores = 1, redExon, minOverlap=.05) {
 
   gtf_transcripts <- gtf[gtf$classification == 'transcript',]
   gtf_exons <- gtf[!(gtf$classification %in% c('gene', 'transcript')),]
@@ -77,8 +77,8 @@ matcher <- function(ex_type, background = F, cores, redExon = redExon, minOverla
 #' specific matcher for HIT
 #'
 #' @export
-HITmatcher <- function(i, redExon = redExon, gtf_filtered=gtf_filtered, minOverlap = minOverlap,
-                       protein_coding_transcripts = protein_coding_transcripts) {
+HITmatcher <- function(i, redExon, gtf_filtered, minOverlap,
+                       protein_coding_transcripts) {
 
   # Initiate geneR, start, stop
   geneR <- redExon$geneR[i]
@@ -128,11 +128,11 @@ HITmatcher <- function(i, redExon = redExon, gtf_filtered=gtf_filtered, minOverl
 #' specific matcher for SE
 #'
 #' @export
-SEmatcher <- function(i, below_thresh = .2, redExon = redExon, minOverlap = minOverlap,
-                      gtf_transcripts = gtf_transcripts,
-                      gtf_exons = gtf_exons,
-                      protein_coding_transcripts = protein_coding_transcripts,
-                      transcript_starts = transcript_starts) {
+SEmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
+                      gtf_transcripts,
+                      gtf_exons,
+                      protein_coding_transcripts,
+                      transcript_starts) {
 
   # Initiate geneR, start, stop
   geneR <- redExon$geneR[i]
@@ -227,11 +227,11 @@ SEmatcher <- function(i, below_thresh = .2, redExon = redExon, minOverlap = minO
 #' specific matcher for MXE
 #'
 #' @export
-MXmatcher <- function(i, below_thresh = .2, redExon = redExon, minOverlap = minOverlap,
-                      gtf_transcripts = gtf_transcripts,
-                      gtf_exons = gtf_exons,
-                      protein_coding_transcripts = protein_coding_transcripts,
-                      transcript_starts = transcript_starts) {
+MXmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
+                      gtf_transcripts,
+                      gtf_exons,
+                      protein_coding_transcripts,
+                      transcript_starts) {
 
   # Initiate geneR, start, stop
   geneR <- redExon$geneR[i]
@@ -328,11 +328,11 @@ MXmatcher <- function(i, below_thresh = .2, redExon = redExon, minOverlap = minO
 #' specific matcher for A5SS/A3SS
 #'
 #' @export
-ASmatcher <- function(i, below_thresh = .2, redExon = redExon, minOverlap = minOverlap,
-                      gtf_transcripts = gtf_transcripts,
-                      gtf_exons = gtf_exons,
-                      protein_coding_transcripts = protein_coding_transcripts,
-                      transcript_starts = transcript_starts) {
+ASmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
+                      gtf_transcripts,
+                      gtf_exons,
+                      protein_coding_transcripts,
+                      transcript_starts) {
 
   # Function to calculate Jaccard-like index more efficiently
   calculate_jaccard_like <- function(start1, stop1, start2, stop2) {
@@ -448,11 +448,11 @@ ASmatcher <- function(i, below_thresh = .2, redExon = redExon, minOverlap = minO
 #' specific matcher for RI
 #'
 #' @export
-RImatcher <- function(i, below_thresh = .2, redExon = redExon, minOverlap = minOverlap,
-                      gtf_transcripts = gtf_transcripts,
-                      gtf_exons = gtf_exons,
-                      protein_coding_transcripts = protein_coding_transcripts,
-                      transcript_starts = transcript_starts) {
+RImatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
+                      gtf_transcripts,
+                      gtf_exons,
+                      protein_coding_transcripts,
+                      transcript_starts) {
 
 
   # Function to calculate Jaccard-like index more efficiently
