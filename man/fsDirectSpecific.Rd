@@ -13,6 +13,8 @@ fsDirectSpecific(seq1, seq2)
 }
 \value{
 both specific and shift results
+
+alignment type
 }
 \description{
 Align and classify 2 sequences using specific method -- using nucleotides finding indels of non-3 multiples or leads or non-3

@@ -11,6 +11,9 @@ get_gtf(location, cores)
 
 \item{cores}{number of cores requested}
 }
+\value{
+annotated gtf dataframe
+}
 \description{
 wrapper for setup_gtf
 }

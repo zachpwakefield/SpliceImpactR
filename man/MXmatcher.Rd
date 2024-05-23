@@ -15,6 +15,9 @@ MXmatcher(
   transcript_starts
 )
 }
+\value{
+matched transcript rownumber
+}
 \description{
 specific matcher for MXE
 }

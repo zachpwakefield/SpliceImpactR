@@ -10,7 +10,7 @@
 #' @param repeatingDomains whether to identify repeating domains being enriched or not
 #' @param topViz the max number of domains to put in each visualization
 #' @param output_location location to make background directory
-#' @return the data and the enrichment plots
+#' @return the domain enrichment data and the enrichment plots
 #' @importFrom dplyr arrange filter
 #' @importFrom stats phyper p.adjust
 #' @importFrom ggplot2 scale_fill_manual theme_classic ggplot aes xlab ylab theme geom_bar geom_boxplot theme_classic coord_flip theme_bw ggtitle element_blank element_line

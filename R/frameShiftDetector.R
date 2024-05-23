@@ -27,6 +27,7 @@ findContinuousIndels <- function(indels) {
 #' @param seq2 second nuc sequence
 #' @importFrom msa msa msaConsensusSequence
 #' @importFrom Biostrings DNAStringSet
+#' @return alignment type
 #' @keywords internal
 fsDirectSpecific <- function(seq1, seq2) {
   alignment <- msa::msaConsensusSequence(msa::msa(Biostrings::DNAStringSet(c(seq1, seq2)),
@@ -58,6 +59,7 @@ fsDirectSpecific <- function(seq1, seq2) {
 #' @return both specific and shift results
 #' @importFrom msa msa msaConsensusSequence
 #' @importFrom Biostrings DNAStringSet pairwiseAlignment
+#' @return alignment type
 #' @export
 fsDirectShift <- function(seq1, seq2) {
 

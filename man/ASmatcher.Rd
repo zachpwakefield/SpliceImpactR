@@ -15,6 +15,9 @@ ASmatcher(
   transcript_starts
 )
 }
+\value{
+matched transcript rownumber
+}
 \description{
 specific matcher for A5SS/A3SS
 }

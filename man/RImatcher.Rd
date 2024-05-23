@@ -15,6 +15,9 @@ RImatcher(
   transcript_starts
 )
 }
+\value{
+matched transcript rownumber
+}
 \description{
 specific matcher for RI
 }

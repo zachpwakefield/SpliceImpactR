@@ -11,6 +11,9 @@ sample
 \usage{
 organizeSamples(samples, output_location, cores = 1)
 }
+\value{
+none, outputs to directories
+}
 \description{
 This function organizes sample data by creating directories for each sample and copying specific files into them.
 It is designed to work within a specific directory structure that includes 'rmats' and 'hit' folders.

@@ -8,6 +8,8 @@ fsDirectShift(seq1, seq2)
 }
 \value{
 both specific and shift results
+
+alignment type
 }
 \description{
 Align and classify 2 sequences using shift method,

@@ -15,6 +15,9 @@ getEnrichmentTTI(
   output_location
 )
 }
+\value{
+geneset enrichment from hypeR
+}
 \description{
 enrichment helper function
 }

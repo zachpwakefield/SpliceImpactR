@@ -8,6 +8,8 @@
 #' sample
 #' # rmats
 #' # hit-index
+#' @return none, outputs to directories
+
 #' @export
 
 organizeSamples <- function(samples, output_location, cores = 1) {

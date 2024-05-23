@@ -11,6 +11,9 @@ setup_gtf(gtf_location, cores = 1)
 
 \item{cores}{number of cores requested}
 }
+\value{
+annotated gtf
+}
 \description{
 setting up gtf with exon labels, first, internal, last, hybrid, etc
 }

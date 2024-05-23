@@ -11,9 +11,9 @@ getTTI(
   steps = 1,
   max_vertices_for_viz = 5000,
   fdr = 0.05,
-  plot_bool = T,
+  plot_bool = TRUE,
   ppidm_class = c("Gold", "Silver", "Bronze")[1],
-  write_igraphs = T,
+  write_igraphs = TRUE,
   output_location,
   tti_location
 )

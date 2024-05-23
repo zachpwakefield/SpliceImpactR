@@ -1,7 +1,7 @@
 #' setting up translations
 #' @param translations_location location of translations file
 #' @importFrom rtracklayer import
-#'
+#' @return modified protein code fasta
 #' @export
 get_c_trans <- function(translations_location) {
   c_trans_pre <- readr::read_lines(translations_location)
@@ -17,7 +17,7 @@ get_c_trans <- function(translations_location) {
 #' @param transcripts_location location of transcripts file
 #' @importFrom rtracklayer import
 #' @importFrom readr read_lines
-#'
+#' @return modified nucleotide code fasta
 #' @export
 get_c_nucs <- function(transcripts_location) {
   nc <- readr::read_lines("/projectnb2/evolution/zwakefield/Annotations/hg38_gencode/gencode.v45.pc_transcripts.fa")
@@ -43,7 +43,7 @@ get_c_nucs <- function(transcripts_location) {
 #' wrapper for setup_gtf
 #' @param location location of gtf file
 #' @param cores number of cores requested
-#'
+#' @return annotated gtf dataframe
 #' @export
 get_gtf <- function(location, cores) {
   cg <- setup_gtf(location, cores = cores)

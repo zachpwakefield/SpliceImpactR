@@ -6,6 +6,9 @@
 \usage{
 calculate_jaccard(start1, stop1, start2, stop2)
 }
+\value{
+jaccard index and alt jacc length
+}
 \description{
 calculates jaccard between sequences
 }

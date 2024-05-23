@@ -9,6 +9,9 @@ get_c_trans(translations_location)
 \arguments{
 \item{translations_location}{location of translations file}
 }
+\value{
+modified protein code fasta
+}
 \description{
 setting up translations
 }

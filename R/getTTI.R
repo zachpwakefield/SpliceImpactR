@@ -144,6 +144,7 @@ getTTI <- function(paired_foreground, background, pdir, steps = 1, max_vertices_
 }
 
 #' graph helper function
+#' @return tti igraphs
 #' @keywords internal
 getTTIiGraphPlot <- function(paired_transcript, gene, steps, full_graph, max_vertices_for_viz, plot_bool, output_location) {
   # Create ego graphs for each of the paired transcripts
@@ -217,6 +218,7 @@ getTTIiGraphPlot <- function(paired_transcript, gene, steps, full_graph, max_ver
   return(tti_graphs)
 }
 #' enrichment helper function
+#' @return geneset enrichment from hypeR
 #' @keywords internal
 getEnrichmentTTI <- function(current_transcript, t_impacts, fdr, transGeneProt,
                              backgroundGenes, steps, plot_bool, output_location) {

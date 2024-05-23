@@ -14,6 +14,9 @@ getTTIiGraphPlot(
   output_location
 )
 }
+\value{
+tti igraphs
+}
 \description{
 graph helper function
 }

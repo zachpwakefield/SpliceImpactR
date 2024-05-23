@@ -6,6 +6,9 @@
 \usage{
 HITmatcher(i, redExon, gtf_filtered, minOverlap, protein_coding_transcripts)
 }
+\value{
+matched transcript rownumber
+}
 \description{
 specific matcher for HIT
 }

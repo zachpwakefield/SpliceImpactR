@@ -8,7 +8,7 @@ getOverviewComparison(
   data_df,
   exon_type,
   output_location,
-  plot = T,
+  plot = TRUE,
   minReads = 10
 )
 }

@@ -42,7 +42,7 @@ getDomainData(
 \item{topViz}{the max number of domains to put in each visualization}
 }
 \value{
-the data and the enrichment plots
+the domain enrichment data and the enrichment plots
 }
 \description{
 idenitify enriched domains across phenotype

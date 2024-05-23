@@ -75,8 +75,7 @@ matcher <- function(ex_type, background = FALSE, cores = 1, redExon, minOverlap=
 }
 
 #' specific matcher for HIT
-#'
-#' @export
+#' @return matched transcript rownumber
 HITmatcher <- function(i, redExon, gtf_filtered, minOverlap,
                        protein_coding_transcripts) {
 
@@ -126,8 +125,7 @@ HITmatcher <- function(i, redExon, gtf_filtered, minOverlap,
 }
 
 #' specific matcher for SE
-#'
-#' @export
+#' @return matched transcript rownumber
 SEmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
                       gtf_transcripts,
                       gtf_exons,
@@ -227,8 +225,7 @@ SEmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
 }
 
 #' specific matcher for MXE
-#'
-#' @export
+#' @return matched transcript rownumber
 MXmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
                       gtf_transcripts,
                       gtf_exons,
@@ -328,8 +325,7 @@ MXmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
 }
 
 #' specific matcher for A5SS/A3SS
-#'
-#' @export
+#' @return matched transcript rownumber
 ASmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
                       gtf_transcripts,
                       gtf_exons,
@@ -449,8 +445,7 @@ ASmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
 }
 
 #' specific matcher for RI
-#'
-#' @export
+#' @return matched transcript rownumber
 RImatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
                       gtf_transcripts,
                       gtf_exons,

@@ -2,7 +2,7 @@
 #' @param gtf_location location of gtf file
 #' @param cores number of cores requested
 #' @importFrom rtracklayer import
-#'
+#' @return annotated gtf
 #' @keywords internal
 setup_gtf <- function(gtf_location, cores = 1) {
   gtf <- rtracklayer::import(gtf_location)

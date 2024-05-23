@@ -11,7 +11,7 @@ getPaired(
   newGTF,
   cores = 1,
   output_location,
-  saveAlignments = T
+  saveAlignments = TRUE
 )
 }
 \arguments{

@@ -9,6 +9,9 @@ get_c_nucs(transcripts_location)
 \arguments{
 \item{transcripts_location}{location of transcripts file}
 }
+\value{
+modified nucleotide code fasta
+}
 \description{
 setting up transcriptions
 }
