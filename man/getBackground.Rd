@@ -4,7 +4,7 @@
 \alias{getBackground}
 \title{getBackground set of transcripts in samples}
 \usage{
-getBackground(input, mOverlap, cores, exon_type, pdir, output_location)
+getBackground(input, mOverlap, cores, exon_type, pdir, output_location, gtf)
 }
 \arguments{
 \item{input}{the path containing the .exon file}

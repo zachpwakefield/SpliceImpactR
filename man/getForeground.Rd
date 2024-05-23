@@ -14,7 +14,8 @@ getForeground(
   exon_type,
   pdir,
   output_location,
-  cores = 1
+  cores = 1,
+  gtf
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ getForeground(
 \item{pdir}{location of the package}
 
 \item{output_location}{location to make background directory}
+
+\item{gtf}{gtf dataframe from setup_gtf}
 }
 \value{
 matched : matched transcripts dataframe, bed : bed file of the matched transcripts

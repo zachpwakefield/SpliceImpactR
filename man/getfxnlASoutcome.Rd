@@ -16,7 +16,8 @@ getfxnlASoutcome(
   tti_location = "",
   full_pipe = TRUE,
   bg = NA,
-  mOverlap = 0.05
+  mOverlap = 0.05,
+  gtf
 )
 }
 \arguments{
@@ -39,6 +40,8 @@ getfxnlASoutcome(
 \item{bg}{whether bg preran or needs making}
 
 \item{mOverlap}{overlap to identify a match to annotation}
+
+\item{gtf}{gtf data frame from setup_gtf}
 }
 \value{
 nothing or all output from pipeline

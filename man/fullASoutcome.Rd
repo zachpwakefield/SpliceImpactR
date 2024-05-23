@@ -14,7 +14,8 @@ fullASoutcome(
   cores = 1,
   bg_pre = NA,
   tti_location = "/projectnb/evolution/zwakefield/allison_mettl/analysis/sir/",
-  mOverlap = 0.05
+  mOverlap = 0.05,
+  gtf = gtf
 )
 }
 \arguments{
@@ -33,6 +34,8 @@ fullASoutcome(
 \item{tti_location}{location of previously made transcript-transcript interactions network}
 
 \item{mOverlap}{minimum overlap to call an exon as matched to annotation}
+
+\item{gtf}{gtf data_frame from setup_gtf}
 }
 \value{
 nothing in R, output to the output_directory
