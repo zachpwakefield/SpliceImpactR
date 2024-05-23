@@ -1,11 +1,12 @@
 Package: SpliceImpactR
 Type: Package
-Title: Identifies enriched domains from differentially included exons
+Title: An R pacakge to identify functional impacts due to alternative splicing events 
 Version: 0.1.0
 Author: Zachary Wakefield
 Maintainer: Zachary Wakefield <zachpw@bu.edut>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Description: SpliceImpactR employs 4 primary methods—differential inclusion analysis, 
+  primary sequence analysis, domain analysis, and isoform-specific domain-derived protein-protein 
+  interactions (ISPPI) —to elucidate the proteomic consequences of AS events.
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
@@ -31,5 +32,8 @@ Imports:
   biomaRt, 
   hypeR,
   BiocManager,
-  rtracklayer
+  rtracklayer,
+  tidyr,
+  ggplot2,
+  dplyr
 RoxygenNote: 7.2.3
