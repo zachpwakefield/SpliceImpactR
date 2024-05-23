@@ -6,7 +6,7 @@
 #' @export
 setup_gtf <- function(gtf_location, cores = 1) {
   gtf <- rtracklayer::import(gtf_location)
-  gtf_df=as.data.frame(gtf)
+  gtf_df <- as.data.frame(gtf)
   pcgtf <- gtf_df[gtf_df$gene_type == "protein_coding",]
   pcgtf$classification <- ""
   pcgtf$rowname <- 1:nrow(pcgtf)

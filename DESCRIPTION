@@ -3,7 +3,7 @@ Type: Package
 Title: An R pacakge to identify functional impacts due to alternative splicing events 
 Version: 0.1.0
 Authors@R: person("Zachary", "Wakefield",
-  email = zachpw@bu.edu,
+  email = "zachpw@bu.edu",
   role = c("cre", "aut"))
 Description: SpliceImpactR employs 4 primary methods—differential inclusion analysis, 
   primary sequence analysis, domain analysis, and isoform-specific domain-derived protein-protein 

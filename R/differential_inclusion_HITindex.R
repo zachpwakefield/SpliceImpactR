@@ -17,7 +17,8 @@ differential_inclusion_HITindex <- function(test_names, control_names, et, cores
 
   # Create sample type vector efficiently
   sample_types <- data.table::data.table(sample_name = c(test_names, control_names),
-                                         type = rep(c("test", "control"), c(length(test_names), length(control_names))))
+                                         type = rep(c("test", "control"),
+                                                    c(length(test_names), length(control_names))))
 
   # Load PSI values for each sample and splicing event type
   psi_data_list <- lapply(1:nrow(sample_types), function(x) {

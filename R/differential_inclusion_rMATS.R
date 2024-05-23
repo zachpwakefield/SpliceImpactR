@@ -164,7 +164,7 @@ differential_inclusion_rMATS <- function(control_names, test_names, et, cores = 
 
   if (et == "A5SS" | et == "A3SS" | et == "MXE") {
     # extract paired results for naturally paired output
-    stats_out <- paired_rMATS_helper2(stats_out)
+    stats_out <- paired_rMATS_helper(stats_out)
   } else if (et == "SE") {
     stats_out <- stats_out[rep(1:nrow(stats_out), each = 2),]
     stats_out$add_inf <- paste0(stats_out$add_inf, ";", c("seInclusion", "seExclusion"), ";", rep(1:(nrow(stats_out)/2), each = 2))
@@ -180,7 +180,7 @@ differential_inclusion_rMATS <- function(control_names, test_names, et, cores = 
 }
 
 
-paired_rMATS_helper2 <- function(df, type) {
+paired_rMATS_helper <- function(df, type) {
   swapped_exon <- paste0(unlist(lapply(strsplit(df$exon, split = ":"), "[[", 1)), ":", unlist(lapply(strsplit(df$add_inf, split = ";"), "[[", 2)))
   mod_df <- do.call(rbind, lapply(1:nrow(df), function(x) {
     i_df <- data.frame(gene = c(df$gene[x], df$gene[x]),
