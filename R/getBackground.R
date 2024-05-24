@@ -32,14 +32,10 @@ getBackground <- function(input, mOverlap, cores, exon_type, pdir, output_locati
     redExon <- redExon[!duplicated(redExon),]
 
     message("background exons loaded, matching now, this may take a little bit...")
+    matched <- getTranscriptBackground(gtf, redExon, exon_type, mOverlap, cores)
 
-    ## Use getTranscriptBackground() to extract total and (if background = F) paired transcripts matched to input exons
-    matched <- getTranscriptBackground(gtf = gtf, redExon = redExon, ex_type = exon_type, minOverlap = mOverlap, cores = cores)
-
-    ## Use bedifyBackground() to extract the total or matched (if background = F) bed file
-
-    message("bedifying and adding protein info to background...")
-    bed <- bedifyBackground(matched, outname = output_location, cores = cores, gtf=gtf)
+    message("Bedifying and adding protein info to background...")
+    bed <- bedifyBackground(matched, outname = output_location, cores = cores, gtf = gtf)
 
     ## extract unique transcript names as trans and all transcript names as possT
     trans <- stringr::str_extract(unique(bed$name), "^[^#]*")

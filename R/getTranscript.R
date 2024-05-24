@@ -59,8 +59,7 @@ getTranscriptForeground <- function(gtf, redExon, ex_type, minOverlap = .05, cor
 getTranscriptBackground <- function(gtf, redExon, ex_type, minOverlap = .05, cores = 1) {
 
     # Parallel computation for each exon in redExon using multiple cores
-    results <- matcher(ex_type = ex_type, background = TRUE, cores = cores, redExon = redExon, minOverlap = minOverlap)
-
+    results <- matcher(ex_type, TRUE, cores, redExon, minOverlap)
     compliment_redExon <- redExon[rep(1:nrow(redExon), each = 1),]
 
     # Filter out 0s
