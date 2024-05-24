@@ -1,30 +1,39 @@
 #' matches the given locations to annotations and transcripts
 #'
 #' @param background whether making background or not
-#' @param redExon_globe input of simplified exon coords internally
+#' @param redExon input of simplified exon coords internally
 #' @param ex_type type of exon being queried
 #' @param minOverlap minimum overlap to classify as matched to annotation
 #' @param cores number of requested cores
 #' @return figures and dataframes with paired data
 #' @importFrom parallel mclapply
 #' @export
-matcher <- function(ex_type, background = FALSE, cores = 1, redExon_globe, minOverlap=.05) {
+matcher <- function(ex_type, background = FALSE, cores = 1, redExon, minOverlap=.05) {
 
-  gtf_transcripts_globe <- gtf[gtf$classification == 'transcript',]
-  gtf_exons_globe <- gtf[!(gtf$classification %in% c('gene', 'transcript')),]
+  gtf_transcripts <- gtf[gtf$classification == 'transcript',]
+  gtf_exons <- gtf[!(gtf$classification %in% c('gene', 'transcript')),]
 
   # Filter protein_coding_transcripts once and for all
-  protein_coding_transcripts_globe <- unique(gtf$transcriptID[gtf$tpc == "protein_coding" & !is.na(gtf$tpc)])
+  protein_coding_transcripts <- unique(gtf$transcriptID[gtf$tpc == "protein_coding" & !is.na(gtf$tpc)])
 
   # Pre-compute a lookup for start positions of all transcripts in gtf
-  transcript_starts_globe <- setNames(gtf$start[gtf$classification == 'transcript'], gtf$transcriptID[gtf$classification == 'transcript'])
+  transcript_starts <- setNames(gtf$start[gtf$classification == 'transcript'], gtf$transcriptID[gtf$classification == 'transcript'])
+
+  # Explicit evals
+  redExon_globe <- redExon
+  transcript_starts_globe <- transcript_starts
+  gtf_exons_globe <- gtf_exons
+  gtf_transcripts_globe <- gtf_transcripts
+  protein_coding_transcripts_globe <- protein_coding_transcripts
+  minOverlap_globe <- minOverlap
 
   if (background) {
-    gtf_filtered_globe <- gtf[gtf$classification %in% c("first", "internal", "last"),]
+    gtf_filtered <- gtf[gtf$classification %in% c("first", "internal", "last"),]
+    gtf_filtered_globe <- gtf_filtered  # Explicitly evaluate `gtf_filtered`
     results <- unlist(parallel::mclapply(1:nrow(redExon_globe), mc.cores = cores, function(i) {
       HITmatcher(i, redExon = redExon_globe,
                  gtf_filtered=gtf_filtered_globe,
-                 minOverlap = minOverlap,
+                 minOverlap = minOverlap_globe,
                  protein_coding_transcripts = protein_coding_transcripts_globe)
     }))
   } else if (ex_type %in% c("AFE", "ALE", "HFE", "HLE")) {
@@ -39,12 +48,12 @@ matcher <- function(ex_type, background = FALSE, cores = 1, redExon_globe, minOv
     results <- unlist(parallel::mclapply(1:nrow(redExon_globe), mc.cores = cores, function(i) {
       HITmatcher(i, redExon = redExon_globe,
                  gtf_filtered=gtf_filtered_globe,
-                 minOverlap = minOverlap,
+                 minOverlap = minOverlap_globe,
                  protein_coding_transcripts = protein_coding_transcripts_globe)
     }))
   } else if (ex_type %in% c("A5SS", "A3SS")) {
     results <- unlist(parallel::mclapply(seq(1, nrow(redExon_globe), by = 2), mc.cores = cores, function(i) {
-      ASmatcher(i, redExon = redExon_globe, minOverlap = minOverlap,
+      ASmatcher(i, redExon = redExon_globe, minOverlap = minOverlap_globe,
                  gtf_transcripts = gtf_transcripts_globe,
                  gtf_exons = gtf_exons_globe,
                  protein_coding_transcripts = protein_coding_transcripts_globe,
@@ -52,7 +61,7 @@ matcher <- function(ex_type, background = FALSE, cores = 1, redExon_globe, minOv
     }))
   } else if (ex_type %in% c("MXE")) {
     results <- unlist(parallel::mclapply(seq(1, nrow(redExon_globe), by = 2), mc.cores = cores, function(i) {
-      MXmatcher(i, redExon = redExon_globe, minOverlap = minOverlap,
+      MXmatcher(i, redExon = redExon_globe, minOverlap = minOverlap_globe,
                 gtf_transcripts = gtf_transcripts_globe,
                 gtf_exons = gtf_exons_globe,
                 protein_coding_transcripts = protein_coding_transcripts_globe,
@@ -60,7 +69,7 @@ matcher <- function(ex_type, background = FALSE, cores = 1, redExon_globe, minOv
     }))
   } else if (ex_type %in% c("SE")) {
     results <- unlist(parallel::mclapply(seq(1, nrow(redExon_globe), by = 2), mc.cores = cores, function(i) {
-      SEmatcher(i, redExon = redExon_globe, minOverlap = minOverlap,
+      SEmatcher(i, redExon = redExon_globe, minOverlap = minOverlap_globe,
                 gtf_transcripts = gtf_transcripts_globe,
                 gtf_exons = gtf_exons_globe,
                 protein_coding_transcripts = protein_coding_transcripts_globe,
@@ -68,7 +77,7 @@ matcher <- function(ex_type, background = FALSE, cores = 1, redExon_globe, minOv
     }))
   } else if (ex_type %in% c("RI")) {
     results <- unlist(parallel::mclapply(seq(1, nrow(redExon_globe), by = 2), mc.cores = cores, function(i) {
-      RImatcher(i, redExon = redExon_globe, minOverlap = minOverlap,
+      RImatcher(i, redExon = redExon_globe, minOverlap = minOverlap_globe,
                 gtf_transcripts = gtf_transcripts_globe,
                 gtf_exons = gtf_exons_globe,
                 protein_coding_transcripts = protein_coding_transcripts_globe,

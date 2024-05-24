@@ -4,13 +4,7 @@
 \alias{matcher}
 \title{matches the given locations to annotations and transcripts}
 \usage{
-matcher(
-  ex_type,
-  background = FALSE,
-  cores = 1,
-  redExon_globe,
-  minOverlap = 0.05
-)
+matcher(ex_type, background = FALSE, cores = 1, redExon, minOverlap = 0.05)
 }
 \arguments{
 \item{ex_type}{type of exon being queried}
@@ -19,7 +13,7 @@ matcher(
 
 \item{cores}{number of requested cores}
 
-\item{redExon_globe}{input of simplified exon coords internally}
+\item{redExon}{input of simplified exon coords internally}
 
 \item{minOverlap}{minimum overlap to classify as matched to annotation}
 }
