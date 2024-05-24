@@ -11,7 +11,7 @@
 getTranscriptForeground <- function(gtf, redExon, ex_type, minOverlap = .05, cores = 1) {
 
   # Parallel computation for each exon in redExon using multiple cores
-  results <- matcher(ex_type = ex_type, cores = cores, redExon = redExon,  minOverlap=minOverlap)
+  results <- matcher(ex_type = ex_type, cores = cores, redExon_globe = redExon,  minOverlap=minOverlap)
 
   # Double for convenience if not AFE/ALE
   compliment_redExon <- redExon
