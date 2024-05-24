@@ -18,7 +18,7 @@ getfxnlASoutcome <- function(output_location,
                              exon_type, cutoff = .1, outlier_handle = "4/n",
                              cores = 1,
                              tti_location = "", full_pipe = TRUE, bg = NA, mOverlap = .05, gtf) {
-  system2(paste0("mkdir ",  output_location))
+  system(paste0("mkdir ",  output_location))
   pdir <- system.file(package="SpliceImpactR")
 
   if (exon_type %in% c("AFE", "HFE")) {
