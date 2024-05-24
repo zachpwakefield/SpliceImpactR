@@ -35,6 +35,6 @@ qualityFilter <- function(df, nT, nC, min_prop_samples = 0.5, max_zero_prop = 0.
 #' @return a filtered di inclusion dataframe
 #' @export
 significanceFilter <- function(df, fdr = .05, d.psi = .1) {
-  df_filtered <- df[abs(df$delta.psi) >= d.psi & df$p.adj <= fdr]
+  df_filtered <- df[abs(df$delta.psi) >= d.psi & df$p.adj <= fdr,]
   return(df_filtered)
 }
