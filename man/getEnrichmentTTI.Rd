@@ -21,4 +21,3 @@ geneset enrichment from hypeR
 \description{
 enrichment helper function
 }
-\keyword{internal}

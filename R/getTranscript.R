@@ -7,7 +7,7 @@
 #' @param cores number of requested cores
 #' @return figures and dataframes with paired data
 #' @import dplyr
-#' @keywords internal
+#' @export
 getTranscriptForeground <- function(gtf, redExon, ex_type, minOverlap = .05, cores = 1) {
 
   # Parallel computation for each exon in redExon using multiple cores
@@ -55,7 +55,7 @@ getTranscriptForeground <- function(gtf, redExon, ex_type, minOverlap = .05, cor
 #' @param cores number of requested cores
 #' @return figures and dataframes with paired data
 #' @import dplyr
-#' @keywords internal
+#' @export
 getTranscriptBackground <- function(gtf, redExon, ex_type, minOverlap = .05, cores = 1) {
 
     # Parallel computation for each exon in redExon using multiple cores

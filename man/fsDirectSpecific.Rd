@@ -19,4 +19,3 @@ alignment type
 \description{
 Align and classify 2 sequences using specific method -- using nucleotides finding indels of non-3 multiples or leads or non-3
 }
-\keyword{internal}

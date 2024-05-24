@@ -15,4 +15,3 @@ continuous indels
 \description{
 Idenfity continuous indels
 }
-\keyword{internal}

@@ -19,4 +19,3 @@ a filtered di inclusion dataframe
 \description{
 filter using delta psi and fdr
 }
-\keyword{internal}

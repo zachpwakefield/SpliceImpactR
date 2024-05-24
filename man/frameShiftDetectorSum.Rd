@@ -17,4 +17,3 @@ both specific and shift results
 \description{
 Return both shift and specific results for a given alignment
 }
-\keyword{internal}

@@ -20,4 +20,3 @@ tti igraphs
 \description{
 graph helper function
 }
-\keyword{internal}

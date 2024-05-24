@@ -23,4 +23,3 @@ figures and dataframes with paired data
 \description{
 gets the transcripts to match to each as event or exon
 }
-\keyword{internal}

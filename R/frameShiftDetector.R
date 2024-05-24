@@ -2,7 +2,7 @@
 #' @param df dataframe with protein code column
 #' @param i row num
 #' @return both specific and shift results
-#' @keywords internal
+#' @export
 frameShiftDetectorSum <- function(df, i) {
   pB_nuc <- unlist(c(fsDirectSpecific(df$code[i], df$code[i+1]),
              fsDirectShift(df$code[i], df$code[i+1])))
@@ -12,7 +12,7 @@ frameShiftDetectorSum <- function(df, i) {
 #' Idenfity continuous indels
 #' @param indels the indels from an alignment
 #' @return continuous indels
-#' @keywords internal
+#' @export
 findContinuousIndels <- function(indels) {
   diffs <- diff(indels)
   breaks <- which(diffs > 1)
@@ -28,7 +28,7 @@ findContinuousIndels <- function(indels) {
 #' @importFrom msa msa msaConsensusSequence
 #' @importFrom Biostrings DNAStringSet
 #' @return alignment type
-#' @keywords internal
+#' @export
 fsDirectSpecific <- function(seq1, seq2) {
   alignment <- msa::msaConsensusSequence(msa::msa(Biostrings::DNAStringSet(c(seq1, seq2)),
                                                   substitutionMatrix =
