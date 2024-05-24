@@ -17,7 +17,7 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
                           data_df, outlier_handle,
                           cutoff = .1, cores = 1, bg_pre = NA,
                           tti_location = "/projectnb/evolution/zwakefield/allison_mettl/analysis/sir/",
-                          mOverlap = .05, gtf=gtf) {
+                          mOverlap = .05, gtf) {
   system(paste0("mkdir ",  output_directory))
   pdir <- system.file(package="SpliceImpactR")
   ##get bg for all classes
@@ -38,11 +38,11 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
   if (bg_param) {
     bg_input <- gsub("[^/]*$", "", c(control_group, test_group))
     bg <- getBackground(input=bg_input,
-                        mOverlap = mOverlap,
-                        cores = cores,
+                        mOverlap,
+                        cores,
                         exon_type = as_types[1],
-                        pdir = pdir,
-                        output_location = output_directory, gtf=gtf)
+                        pdir,
+                        output_location = output_directory, gtf)
   } else {
     bg <- bg_pre
   }

@@ -35,7 +35,7 @@ getBackground <- function(input, mOverlap, cores, exon_type, pdir, output_locati
     matched <- getTranscriptBackground(gtf, redExon, exon_type, mOverlap, cores)
 
     message("Bedifying and adding protein info to background...")
-    bed <- bedifyBackground(matched, outname = output_location, cores = cores, gtf = gtf)
+    bed <- bedifyBackground(matched, outname = output_location, cores, gtf)
 
     ## extract unique transcript names as trans and all transcript names as possT
     trans <- stringr::str_extract(unique(bed$name), "^[^#]*")

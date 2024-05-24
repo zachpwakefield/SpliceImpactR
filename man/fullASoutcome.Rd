@@ -15,7 +15,7 @@ fullASoutcome(
   bg_pre = NA,
   tti_location = "/projectnb/evolution/zwakefield/allison_mettl/analysis/sir/",
   mOverlap = 0.05,
-  gtf = gtf
+  gtf
 )
 }
 \arguments{
