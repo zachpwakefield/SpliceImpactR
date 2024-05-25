@@ -117,8 +117,9 @@ getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
 
     l_dd <- lengths(fg_dom_li)
     count_swaps_dd <- sum(l_dd) >= 1
-    lengthsDistributionDF <- data.frame(vals = l_dd, types = x)
-    barPlotDF <- data.frame(vals = count_swaps_dd, types = x)
+
+    lengthsDistributionDF <- data.frame(vals = fg_dom, types = rep(x, length(fg_dom))
+    barPlotDF <- data.frame(vals = length(fg_dom), types = x)
 
     successes <- lapply(searcher, function(x) c(sum(fg_dom == x), sum(bg_dom == x)))
     pop_size <- length(bg_dom)
@@ -170,7 +171,7 @@ getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
     ggplot2::xlab("") +
     ggplot2::theme(legend.position = "none")
 
-  domainChanges <- ggplot2::ggplot(lengthDist, ggplot2::aes(x = types, y = vals, fill = types)) + ggplot2::geom_bar(stat = 'identity') +
+  domainChanges <- ggplot2::ggplot(changeNum, ggplot2::aes(x = types, y = vals, fill = types)) + ggplot2::geom_bar(stat = 'identity') +
     ggplot2::scale_fill_manual(values=c("brown", "chartreuse4"), breaks = c("down", "up")) +
     ggplot2::theme_classic() + ggplot2::xlab("") + ggplot2::ylab("Count of swaps with domain changes")+
     ggplot2::theme(legend.position = "none")
