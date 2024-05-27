@@ -161,7 +161,7 @@ SEmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
   up_down_stop <- up_down[c(FALSE, TRUE)]
 
   # Filter for computational efficiency at the beginning to minimize dataset size
-  gtf_filtered <- subset(gtf_exons, .data$geneID == geneR & .data$chr == redExon$chr[i])
+  gtf_filtered <- subset(gtf_exons, geneID == geneR & chr == redExon$chr[i])
   if (nrow(gtf_filtered) <= 1) return(c(0, 0)) # Skip if less than 2 relevant gtf entries found
 
   # Calculate Jaccard index for each gtf entry once instead of three times
@@ -204,7 +204,7 @@ SEmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
   gtf_filtered$jaccard <- jaccard_indices[[1]]$jaccard_index
   gtf_filtered$length_jacc <- jaccard_indices[[1]]$length_jacc
 
-  gtf_filtered <- subset(gtf_filtered, .data$jaccard > .data$minOverlap & .data$classification == "internal" & .data$transcriptID %in% inclusion)
+  gtf_filtered <- subset(gtf_filtered, jaccard > minOverlap & classification == "internal" & transcriptID %in% inclusion)
 
   if (nrow(gtf_filtered) == 0) return(c(0, 0)) # Skip if no entries found
 
@@ -262,7 +262,7 @@ MXmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
   excl_stop <- up_down[2]
 
   # Filter for computational efficiency at the beginning to minimize dataset size
-  gtf_filtered <- subset(gtf_exons, .data$classification == "internal" & .data$geneID == geneR & .data$chr == redExon$chr[i])
+  gtf_filtered <- subset(gtf_exons, classification == "internal" & geneID == geneR & chr == redExon$chr[i])
   if (nrow(gtf_filtered) <= 1) return(c(0, 0)) # Skip if less than 2 relevant gtf entries found
 
   # Calculate Jaccard index for inclusion and finds intersect with exclusion of second exon
@@ -305,7 +305,7 @@ MXmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
   gtf_filtered$jaccard <- inclusion_indices$jaccard_index
   gtf_filtered$length_jacc <- inclusion_indices$length_jacc
 
-  gtf_filtered <- subset(gtf_filtered, .data$jaccard > minOverlap & .data$classification == "internal" & .data$transcriptID %in% inclusion)
+  gtf_filtered <- subset(gtf_filtered, jaccard > minOverlap & classification == "internal" & transcriptID %in% inclusion)
 
   if (nrow(gtf_filtered) == 0) return(c(0, 0)) # Skip if no entries found
 
@@ -380,7 +380,7 @@ ASmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
   exclusion_location <- idSS(start, stop, up_down[1], up_down[2])
 
   # Filter for computational efficiency at the beginning to minimize dataset size
-  gtf_filtered <- subset(gtf_exons, .data$classification %in% c("first", "last", "internal") & .data$geneID == geneR & .data$chr == redExon$chr[i])
+  gtf_filtered <- subset(gtf_exons, classification %in% c("first", "last", "internal") & geneID == geneR & chr == redExon$chr[i])
   if (nrow(gtf_filtered) <= 1) return(c(0, 0)) # Skip if less than 2 relevant gtf entries found
 
   # Calculate Jaccard index for inclusion and finds intersect with exclusion of second exon
@@ -426,7 +426,7 @@ ASmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
   gtf_filtered$jaccard <- inclusion_indices$jaccard_index
   gtf_filtered$length_jacc <- inclusion_indices$length_jacc
 
-  gtf_filtered <- subset(gtf_filtered, .data$jaccard > minOverlap & .data$transcriptID %in% inclusion)
+  gtf_filtered <- subset(gtf_filtered, jaccard > minOverlap & transcriptID %in% inclusion)
 
   if (nrow(gtf_filtered) == 0) return(c(0, 0)) # Skip if no entries found
 
@@ -500,7 +500,7 @@ RImatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
 
 
   # Filter for computational efficiency at the beginning to minimize dataset size
-  gtf_filtered <- subset(gtf_exons, .data$geneID == geneR & .data$chr == redExon$chr[i])
+  gtf_filtered <- subset(gtf_exons, geneID == geneR & chr == redExon$chr[i])
   if (nrow(gtf_filtered) <= 1) return(c(0, 0)) # Skip if less than 2 relevant gtf entries found
 
 
@@ -546,7 +546,7 @@ RImatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
   gtf_filtered$jaccard <- jaccard_indices[[1]]$jaccard_index
   gtf_filtered$length_jacc <- jaccard_indices[[1]]$length_jacc
 
-  gtf_filtered <- subset(gtf_filtered, .data$jaccard > minOverlap & .data$classification %in% c("first", "internal", "last") & .data$transcriptID %in% inclusion)
+  gtf_filtered <- subset(gtf_filtered, jaccard > minOverlap & classification %in% c("first", "internal", "last") & transcriptID %in% inclusion)
 
   if (nrow(gtf_filtered) == 0) return(c(0, 0)) # Skip if no entries found
 
