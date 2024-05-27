@@ -118,8 +118,8 @@ getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
     l_dd <- lengths(fg_dom_li)
     count_swaps_dd <- sum(l_dd) >= 1
 
-    lengthsDistributionDF <- data.frame(vals = fg_dom, types = rep(x, length(fg_dom))
-    barPlotDF <- data.frame(vals = length(fg_dom), types = x)
+    lengthsDistributionDF <- data.frame(vals = lengths(fg_dom), types = rep(x, length(lengths(fg_dom))))
+    barPlotDF <- data.frame(vals = length(lengths(fg_dom)), types = x)
 
     successes <- lapply(searcher, function(x) c(sum(fg_dom == x), sum(bg_dom == x)))
     pop_size <- length(bg_dom)
