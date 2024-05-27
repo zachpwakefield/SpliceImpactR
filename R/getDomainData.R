@@ -15,6 +15,7 @@
 #' @importFrom stats phyper p.adjust
 #' @importFrom ggplot2 scale_fill_manual theme_classic ggplot aes xlab ylab theme geom_bar geom_boxplot theme_classic coord_flip theme_bw ggtitle element_blank element_line
 #' @importFrom ggpubr ggarrange
+#' @import data.table
 #' @export
 getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
                     output_location, fdr_use = .05, min_sample_success = 3,
@@ -49,29 +50,28 @@ getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
 
 
     ## filter by whichever domain identifying engine(s) selected
-    ips <- ip
+    ips_dt <- data.table::as.data.table(ip)
     # ips <- ip %>% dplyr::filter(X4 %in% engine)
 
-    # Process and aggregate information for each protein domain
-    protInf <- mclapply(1:length(gN), mc.cores = cores, function(j) {
-      paste(ips$X6[ips$X1 == gN[j]], collapse = ';')
-    })
-    protInf.o <- unlist(protInf)
-    protInf.o[protInf.o == ""] <- "none"
+    result <- ips_dt[, .(protInf = paste(X6, collapse = ";")), by = X1]
 
-    # Construct final output data frames for background and foreground
-    indexRef <- unlist(lapply(s$id, function(x) {
-      which(x %in% gN)[1]
-      }))
+    protInf_df <- data.frame(result[gN, on = .(X1), nomatch = NA])
+    protInf_df$protInf[is.na(protInf_df$protInf)] <- "none"
+    order_index <- match(protInf_df$X1, gN)
+
+    protInf_df_ordered <- protInf_df[order(order_index), , drop = FALSE]
+
+    protInf.o <- protInf_df_ordered$protInf
+
     if (o == 2) {
       finOut <- data.frame(exon = gN,
-                           protein = s$prot[indexRef],
+                           protein = s$prot,
                            protInfor = protInf.o,
-                           delta.psi = s$delta.psi[indexRef],
-                           p.adj = s$p.adj[indexRef])
+                           delta.psi = s$delta.psi,
+                           p.adj = s$p.adj)
     } else {
       finOut <- data.frame(exon = gN,
-                           protein = s$prot[indexRef],
+                           protein = s$prot,
                            protInfor = protInf.o)
 
     }
@@ -95,17 +95,19 @@ getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
       bg_dom <- unlist(lapply(interproscan_results[[1]]$protInfor, function(dom) {
         unique(unlist(strsplit(dom, split = ";")))
       }))
-      fg_dom <- unlist(lapply(1:nrow(fg_ip), function(ind) {
-        setdiff(unique(unlist(strsplit(fg_ip$protInfor[ind], split = ";"))), unique(unlist(strsplit(fg_sc$protInfor[ind], split = ";"))))
-      }))
+      fg_dom_ul <- lapply(1:nrow(fg_ip), function(ind) {
+        setdiff(c(unique(unlist(strsplit(fg_ip$protInfor[ind], split = ";"))), "none"), c(unique(unlist(strsplit(fg_sc$protInfor[ind], split = ";"))), "none"))
+      })
+      fg_dom <- unlist(fg_dom_ul)
     } else if (repeatingDomains) {
       bg_dom <- unlist(strsplit(interproscan_results[[1]]$protInfor, split = ';'))
-      fg_dom <- unlist(lapply(1:nrow(fg_ip), function(ind) {
-        setdiff(unlist(strsplit(fg_ip$protInfor[ind], split = ";")), unlist(strsplit(fg_sc$protInfor[ind], split = ";")))
-      }))
+      fg_dom_ul <- lapply(1:nrow(fg_ip), function(ind) {
+        setdiff(c(unlist(strsplit(fg_ip$protInfor[ind], split = ";")), "none"), c(unlist(strsplit(fg_sc$protInfor[ind], split = ";")), "none"))
+      })
+      fg_dom <- unlist(fg_dom_ul)
     }
 
-    if (length(fg_dom) == 0) {
+    if (length(lengths(fg_dom_ul)) == 0) {
       noneFound <- paste0("No domains enriched in ", x, " set")
       message(noneFound)
       return(list("none", data.frame(vals = 0, types = x), data.frame(vals = 0, types = x)))
@@ -115,11 +117,11 @@ getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
     fg_dom_li <- lapply(strsplit(fg_ip$protInfor, split = ';'), unique)
     searcher <- unique(fg_dom)
 
-    l_dd <- lengths(fg_dom_li)
-    count_swaps_dd <- sum(l_dd) >= 1
+    l_dd <- lengths(fg_dom_ul)[lengths(fg_dom_ul) != 0]
 
-    lengthsDistributionDF <- data.frame(vals = lengths(fg_dom), types = rep(x, length(lengths(fg_dom))))
-    barPlotDF <- data.frame(vals = length(lengths(fg_dom)), types = x)
+
+    lengthsDistributionDF <- data.frame(vals = l_dd, types = rep(x, length(l_dd)))
+    barPlotDF <- data.frame(vals = length(l_dd), types = x)
 
     successes <- lapply(searcher, function(x) c(sum(fg_dom == x), sum(bg_dom == x)))
     pop_size <- length(bg_dom)
@@ -164,14 +166,18 @@ getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
 
   lengthDist <- do.call(rbind, lapply(dataList, "[[", 2))
   changeNum <- do.call(rbind, lapply(dataList, "[[", 3))
+  lengthDist$types2 <- "(-)"
+  lengthDist$types2[lengthDist$types == "up"] <- "(+)"
+  changeNum$types2 <- "(-)"
+  changeNum$types2[changeNum$types == "up"] <- "(+)"
 
-  domainChangesNums <- ggplot2::ggplot(lengthDist, ggplot2::aes(x = types, y = vals, fill = types)) + ggplot2::geom_boxplot() +
+  domainChangesNums <- ggplot2::ggplot(lengthDist, ggplot2::aes(x = types2, y = vals, fill = types)) + ggplot2::geom_boxplot() +
     ggplot2::scale_fill_manual(values=c("brown", "chartreuse4"), breaks = c("down", "up")) +
     ggplot2::theme_classic() + ggplot2::ylab("Number of domain changes per swap") +
     ggplot2::xlab("") +
     ggplot2::theme(legend.position = "none")
 
-  domainChanges <- ggplot2::ggplot(changeNum, ggplot2::aes(x = types, y = vals, fill = types)) + ggplot2::geom_bar(stat = 'identity') +
+  domainChanges <- ggplot2::ggplot(changeNum, ggplot2::aes(x = types2, y = vals, fill = types)) + ggplot2::geom_bar(stat = 'identity') +
     ggplot2::scale_fill_manual(values=c("brown", "chartreuse4"), breaks = c("down", "up")) +
     ggplot2::theme_classic() + ggplot2::xlab("") + ggplot2::ylab("Count of swaps with domain changes")+
     ggplot2::theme(legend.position = "none")
