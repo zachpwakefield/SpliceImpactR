@@ -46,7 +46,7 @@ getForeground <- function(input, test_names, control_names, thresh = .1, fdr = .
 
 
   ## Use getTranscriptForeground() to extract total and (if background = F) paired transcripts matched to input exons
-  matched <- getTranscriptForeground(gtf = gtf, redExon = redExon, ex_type = exon_type, minOverlap = mOverlap, cores = cores)
+  matched <- getTranscriptForeground(gtf, redExon, ex_type = exon_type, minOverlap = mOverlap, cores)
 
   ## Use bedifyForeground() to extract the  bed file
   bed <- bedifyForeground(matched, outname = output_location, cores = cores, gtf=gtf)

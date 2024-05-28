@@ -4,7 +4,14 @@
 \alias{matcher}
 \title{matches the given locations to annotations and transcripts}
 \usage{
-matcher(ex_type, background = FALSE, cores = 1, redExon, minOverlap = 0.05)
+matcher(
+  ex_type,
+  background = FALSE,
+  cores = 1,
+  redExon,
+  minOverlap = 0.05,
+  gtf
+)
 }
 \arguments{
 \item{ex_type}{type of exon being queried}
@@ -16,6 +23,8 @@ matcher(ex_type, background = FALSE, cores = 1, redExon, minOverlap = 0.05)
 \item{redExon}{input of simplified exon coords internally}
 
 \item{minOverlap}{minimum overlap to classify as matched to annotation}
+
+\item{gtf}{dataframe from setup_gtf}
 }
 \value{
 figures and dataframes with paired data

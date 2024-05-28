@@ -11,7 +11,7 @@
 getTranscriptForeground <- function(gtf, redExon, ex_type, minOverlap = .05, cores = 1) {
 
   # Parallel computation for each exon in redExon using multiple cores
-  results <- matcher(ex_type, FALSE, cores, redExon,  minOverlap)
+  results <- matcher(ex_type, FALSE, cores, redExon,  minOverlap, gtf)
 
   # Double for convenience if not AFE/ALE
   compliment_redExon <- redExon
@@ -59,7 +59,7 @@ getTranscriptForeground <- function(gtf, redExon, ex_type, minOverlap = .05, cor
 getTranscriptBackground <- function(gtf, redExon, ex_type, minOverlap = .05, cores = 1) {
 
     # Parallel computation for each exon in redExon using multiple cores
-    results <- matcher(ex_type, TRUE, cores, redExon, minOverlap)
+    results <- matcher(ex_type, TRUE, cores, redExon, minOverlap, gtf)
     compliment_redExon <- redExon[rep(1:nrow(redExon), each = 1),]
 
     # Filter out 0s

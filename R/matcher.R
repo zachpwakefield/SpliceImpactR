@@ -5,10 +5,11 @@
 #' @param ex_type type of exon being queried
 #' @param minOverlap minimum overlap to classify as matched to annotation
 #' @param cores number of requested cores
+#' @param gtf dataframe from setup_gtf
 #' @return figures and dataframes with paired data
 #' @importFrom parallel mclapply
 #' @export
-matcher <- function(ex_type, background = FALSE, cores = 1, redExon, minOverlap=.05) {
+matcher <- function(ex_type, background = FALSE, cores = 1, redExon, minOverlap=.05, gtf) {
 
   gtf_transcripts <- gtf[gtf$classification == 'transcript',]
   gtf_exons <- gtf[!(gtf$classification %in% c('gene', 'transcript')),]
