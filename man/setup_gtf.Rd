@@ -4,15 +4,10 @@
 \alias{setup_gtf}
 \title{setting up gtf with exon labels, first, internal, last, hybrid, etc}
 \usage{
-setup_gtf(gtf_location, cores = 1)
-}
-\arguments{
-\item{gtf_location}{location of gtf file}
-
-\item{cores}{number of cores requested}
+setup_gtf()
 }
 \value{
-annotated gtf
+annotated gtf and various hybrid info. also gene to transcript to protein naming dataframe
 }
 \description{
 setting up gtf with exon labels, first, internal, last, hybrid, etc
