@@ -38,10 +38,10 @@ matcher <- function(ex_type, background = FALSE, cores = 1, redExon, minOverlap=
     }))
   } else if (ex_type %in% c("AFE", "ALE", "HFE", "HLE")) {
     gtf_filtered_globe <- gtf[gtf$classification %in% c("first", "internal", "last"),]
-    if (ex_type == "HFE") {
+    if (ex_type == "HFE" | ex_type == "AFE") {
       lim <- "first"
       gtf_filtered_globe <- gtf[gtf$classification == lim,]
-    } else if (ex_type == "HLE") {
+    } else if (ex_type == "HLE" | ex_type == "ALE") {
       lim <- "last"
       gtf_filtered_globe <- gtf[gtf$classification == lim,]
     }
