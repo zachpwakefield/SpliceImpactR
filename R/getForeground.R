@@ -15,6 +15,7 @@
 #' proFast : fasta file of proteins identified in proBed
 #' @importFrom dplyr arrange first left_join group_by summarise
 #' @importFrom tidyr separate
+#' @importFrom readr read_csv read_lines
 #' @export
 getForeground <- function(input, test_names, control_names, thresh = .1, fdr = .05,
                           mOverlap,exon_type, pdir,
@@ -92,11 +93,11 @@ getForeground <- function(input, test_names, control_names, thresh = .1, fdr = .
   proFast <- paste(rbind(fasta_headers, fasta_sequences))
 
   system(paste0("mkdir ", output_location, "Foreground/"))
-  write_csv(proBed, paste0(output_location, "Foreground/", "fgoutBed.csv"))
-  write_lines(proFast, paste0(output_location, "Foreground/", "fgoutFast.fa"))
-  write_csv(matched,  paste0(output_location, "Foreground/", "fgmatched.csv"))
-  write_csv(df.l,  paste0(output_location, "Foreground/", "fglfc.csv"))
-  write_csv(bed,  paste0(output_location, "Foreground/", "fgexonBed.csv"))
+  readr::write_csv(proBed, paste0(output_location, "Foreground/", "fgoutBed.csv"))
+  readr::write_lines(proFast, paste0(output_location, "Foreground/", "fgoutFast.fa"))
+  readr::write_csv(matched,  paste0(output_location, "Foreground/", "fgmatched.csv"))
+  readr::write_csv(df.l,  paste0(output_location, "Foreground/", "fglfc.csv"))
+  readr::write_csv(bed,  paste0(output_location, "Foreground/", "fgexonBed.csv"))
 
   pdf(paste0(output_location, "Foreground/", "delta_psi_plot.pdf"))
   print(lfcPlot)
