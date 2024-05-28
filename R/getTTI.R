@@ -12,6 +12,7 @@
 #' @param output_location location to make output
 #' @param tti_location if init_tti already performed, location of output or ""
 #' @param minOverlap minimum overlap to classify as matched to annotation
+#' @param tgp tgp_biomart from setup_gtf output
 #' @param cores number of requested cores
 #' @return differences between each tti pair and the overall results
 #' @importFrom igraph graph_from_edgelist V make_ego_graph write_graph simplify E layout.fruchterman.reingold
@@ -24,7 +25,7 @@
 getTTI <- function(paired_foreground, background, pdir, steps = 1, max_vertices_for_viz = 5000,
                    fdr = .05, plot_bool = TRUE, ppidm_class = c("Gold", "Silver", "Bronze")[1],
                    write_igraphs = TRUE,
-                   output_location, tti_location) {
+                   output_location, tti_location, tgp) {
   # Create a directory for storing plots if plot_bool is TRUE
   if (plot_bool) {
     system(paste0("mkdir ", output_location, "tti"))
@@ -34,7 +35,7 @@ getTTI <- function(paired_foreground, background, pdir, steps = 1, max_vertices_
   }
 
   # Read the transcript-gene-protein mapping data for current genome
-  tgp <- read.csv(paste0(pdir, '/gencodev42_transcriptGeneProtein.csv'))
+  # tgp <- read.csv(paste0(pdir, '/gencodev42_transcriptGeneProtein.csv'))
 
   # Read edgelist output from initTTI -- using the ppidm class used previously
   edgeList <- read.table(paste0(tti_location,  "tti_igraph_edgelist_", paste(ppidm_class, collapse = ""), "_removeDups"), sep = " ", row.names = NULL)

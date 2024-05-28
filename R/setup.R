@@ -41,11 +41,9 @@ get_c_nucs <- function(transcripts_location) {
 }
 
 #' wrapper for setup_gtf
-#' @param location location of gtf file
-#' @param cores number of cores requested
-#' @return annotated gtf dataframe
+#' @return annotated gtf and others from setup_gtf
 #' @export
-get_gtf <- function(location, cores) {
-  cg <- setup_gtf(location, cores = cores)
+get_gtf <- function() {
+  cg <- setup_gtf()
   return(cg)
 }

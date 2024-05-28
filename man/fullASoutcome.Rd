@@ -15,7 +15,7 @@ fullASoutcome(
   bg_pre = NA,
   tti_location = "/projectnb/evolution/zwakefield/allison_mettl/analysis/sir/",
   mOverlap = 0.05,
-  gtf
+  s_gtf
 )
 }
 \arguments{
@@ -35,7 +35,7 @@ fullASoutcome(
 
 \item{mOverlap}{minimum overlap to call an exon as matched to annotation}
 
-\item{gtf}{gtf data_frame from setup_gtf}
+\item{gtf}{output from setup_gtf}
 }
 \value{
 nothing in R, output to the output_directory

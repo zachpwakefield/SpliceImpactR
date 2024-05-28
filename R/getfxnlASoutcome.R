@@ -8,7 +8,7 @@
 #' @param output_location location to make  directory
 #' @param cutoff cutoff for significance of differential inclusion
 #' @param bg whether bg preran or needs making
-#' @param gtf gtf data frame from setup_gtf
+#' @param gtf output from setup_gtf
 #' @param tti_location location of previuously made tti or ""
 #' @param full_pipe if TRUE, doesn't save output to R, only writes to output_location
 #' @return nothing or all output from pipeline
@@ -49,7 +49,7 @@ getfxnlASoutcome <- function(output_location,
                      cores=cores,
                      exon_type=exon_type,
                      pdir=pdir,
-                     output_location=output_location, gtf=gtf,
+                     output_location=output_location, gtf=gtf$gtf,
                      max_zero_prop = .5, min_prop_samples = .5)
 
   if (!(exon_type %in% c("HFE", "HLE"))) {
@@ -57,7 +57,7 @@ getfxnlASoutcome <- function(output_location,
   }
 
   pfg <- getPaired(foreground = fg$proBed, et = exon_type, nucleotides = c_nucs,
-                   output_location = output_location, newGTF = newGTF, saveAlignments = FALSE)
+                   output_location = output_location, newGTF = gtf, saveAlignments = FALSE)
 
   if (nrow(pfg$paired_proBed) > 1) {
     length_comparison <- getLengthComparison(data_df, pfg$paired_proBed, output_location)
@@ -77,7 +77,7 @@ getfxnlASoutcome <- function(output_location,
                         cores = cores,
                         exon_type = exon_type,
                         pdir = pdir,
-                        output_location = output_location, gtf=gtf)
+                        output_location = output_location, gtf=gtf$gtf)
   }
 
 
@@ -98,7 +98,7 @@ getfxnlASoutcome <- function(output_location,
                   ppidm_class = "Gold_Standard",
                   write_igraphs = TRUE,
                   output_location = output_location,
-                  tti_location = tti_location)
+                  tti_location = tti_location, tgp = gtf$tgp_biomart)
   } else {
     tti <- NA
   }

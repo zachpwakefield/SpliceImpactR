@@ -7,7 +7,7 @@
 #' @param cutoff diInclusion cutoff to use to identify significance
 #' @param cutoff diInclusion cutoff to use to identify significance
 #' @param bg_pre if bg was made earlier, param to give premade bg
-#' @param gtf gtf data_frame from setup_gtf
+#' @param gtf output from setup_gtf
 #' @param tti_location location of previously made transcript-transcript interactions network
 #' @param mOverlap minimum overlap to call an exon as matched to annotation
 #' @return nothing in R, output to the output_directory
@@ -17,7 +17,7 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
                           data_df, outlier_handle,
                           cutoff = .1, cores = 1, bg_pre = NA,
                           tti_location = "/projectnb/evolution/zwakefield/allison_mettl/analysis/sir/",
-                          mOverlap = .05, gtf) {
+                          mOverlap = .05, s_gtf) {
   system(paste0("mkdir ",  output_directory))
   pdir <- system.file(package="SpliceImpactR")
   ##get bg for all classes
@@ -42,7 +42,7 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
                         cores,
                         exon_type = as_types[1],
                         pdir,
-                        output_location = output_directory, gtf)
+                        output_location = output_directory, s_gtf$gtf)
   } else {
     bg <- bg_pre
   }
@@ -54,7 +54,7 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
     fAS <- getfxnlASoutcome(output_location = paste0(output_directory, x, "/"),
                              test_group = test_group,control_group = control_group, data_df = data_df,
                              exon_type = x, cutoff = cutoff, outlier_handle = outlier_handle, cores = cores,
-                             tti_location = tti_location, full_pipe = TRUE, mOverlap = mOverlap, bg = bg, gtf=gtf)
+                             tti_location = tti_location, full_pipe = TRUE, mOverlap = mOverlap, bg = bg, gtf=s_gtf)
   })
 
 }

@@ -4,15 +4,10 @@
 \alias{get_gtf}
 \title{wrapper for setup_gtf}
 \usage{
-get_gtf(location, cores)
-}
-\arguments{
-\item{location}{location of gtf file}
-
-\item{cores}{number of cores requested}
+get_gtf()
 }
 \value{
-annotated gtf dataframe
+annotated gtf and others from setup_gtf
 }
 \description{
 wrapper for setup_gtf

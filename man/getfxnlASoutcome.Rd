@@ -41,7 +41,7 @@ getfxnlASoutcome(
 
 \item{mOverlap}{overlap to identify a match to annotation}
 
-\item{gtf}{gtf data frame from setup_gtf}
+\item{gtf}{output from setup_gtf}
 }
 \value{
 nothing or all output from pipeline

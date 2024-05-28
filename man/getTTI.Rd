@@ -15,7 +15,8 @@ getTTI(
   ppidm_class = c("Gold", "Silver", "Bronze")[1],
   write_igraphs = TRUE,
   output_location,
-  tti_location
+  tti_location,
+  tgp
 )
 }
 \arguments{
@@ -38,6 +39,8 @@ getTTI(
 \item{output_location}{location to make output}
 
 \item{tti_location}{if init_tti already performed, location of output or ""}
+
+\item{tgp}{tgp_biomart from setup_gtf output}
 
 \item{write_graphs}{save full graph interactions for each with signfiicant changes}
 
