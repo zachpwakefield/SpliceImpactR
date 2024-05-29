@@ -6,19 +6,19 @@
 #' @param minOverlap minimum overlap to classify as matched to annotation
 #' @param cores number of requested cores
 #' @param gtf dataframe from setup_gtf
+#' @param gtf_transcript dataframe from setup_gtf
 #' @return figures and dataframes with paired data
 #' @importFrom parallel mclapply
 #' @export
-matcher <- function(ex_type, background = FALSE, cores = 1, redExon, minOverlap=.05, gtf) {
+matcher <- function(ex_type, background = FALSE, cores = 1, redExon, minOverlap=.05, gtf, gtf_transcripts) {
 
-  gtf_transcripts <- gtf[gtf$classification == 'transcript',]
-  gtf_exons <- gtf[!(gtf$classification %in% c('gene', 'transcript')),]
+  gtf_exons <- gtf
 
   # Filter protein_coding_transcripts once and for all
   protein_coding_transcripts <- unique(gtf$transcriptID[gtf$tpc == "protein_coding" & !is.na(gtf$tpc)])
 
   # Pre-compute a lookup for start positions of all transcripts in gtf
-  transcript_starts <- setNames(gtf$start[gtf$classification == 'transcript'], gtf$transcriptID[gtf$classification == 'transcript'])
+  transcript_starts <- setNames(gtf_transcripts$start, gtf_transcripts$transcriptID)
 
   # Explicit evals
   redExon_globe <- redExon

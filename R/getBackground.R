@@ -4,7 +4,7 @@
 #' @param mOverlap overlap to identify a match to annotation
 #' @param exon_type placeholder for other functions
 #' @param pdir location of the package
-#' @param gtf gtf dataframe from setup_gtf
+#' @param gtf full output from setup_gtf
 #' @param output_location location to make background directory
 #' @return matched : matched transcripts dataframe, bed : bed file of the matched transcripts
 #' proBed : output for further functions with protein code and protein info,
@@ -32,10 +32,10 @@ getBackground <- function(input, mOverlap, cores, exon_type, pdir, output_locati
     redExon <- redExon[!duplicated(redExon),]
 
     message("background exons loaded, matching now, this may take a little bit...")
-    matched <- getTranscriptBackground(gtf, redExon, exon_type, mOverlap, cores)
+    matched <- getTranscriptBackground(gtf$gtf, redExon, exon_type, mOverlap, cores, gtf$transcript_gtf)
 
     message("Bedifying and adding protein info to background...")
-    bed <- bedifyBackground(matched, outname = output_location, cores, gtf)
+    bed <- bedifyBackground(matched, outname = output_location, cores, gtf$gtf)
 
     ## extract unique transcript names as trans and all transcript names as possT
     trans <- stringr::str_extract(unique(bed$name), "^[^#]*")

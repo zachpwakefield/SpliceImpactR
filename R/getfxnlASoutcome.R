@@ -49,7 +49,7 @@ getfxnlASoutcome <- function(output_location,
                      cores=cores,
                      exon_type=exon_type,
                      pdir=pdir,
-                     output_location=output_location, gtf=gtf$gtf,
+                     output_location=output_location, gtf=gtf,
                      max_zero_prop = .5, min_prop_samples = .5)
 
   if (!(exon_type %in% c("HFE", "HLE"))) {
@@ -77,7 +77,7 @@ getfxnlASoutcome <- function(output_location,
                         cores = cores,
                         exon_type = exon_type,
                         pdir = pdir,
-                        output_location = output_location, gtf=gtf$gtf)
+                        output_location = output_location, gtf=gtf)
   }
 
 

@@ -10,7 +10,8 @@ matcher(
   cores = 1,
   redExon,
   minOverlap = 0.05,
-  gtf
+  gtf,
+  gtf_transcripts
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ matcher(
 \item{minOverlap}{minimum overlap to classify as matched to annotation}
 
 \item{gtf}{dataframe from setup_gtf}
+
+\item{gtf_transcript}{dataframe from setup_gtf}
 }
 \value{
 figures and dataframes with paired data

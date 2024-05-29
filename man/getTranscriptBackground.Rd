@@ -4,7 +4,14 @@
 \alias{getTranscriptBackground}
 \title{gets the transcripts to match to each as event or exon}
 \usage{
-getTranscriptBackground(gtf, redExon, ex_type, minOverlap = 0.05, cores = 1)
+getTranscriptBackground(
+  gtf,
+  redExon,
+  ex_type,
+  minOverlap = 0.05,
+  cores = 1,
+  transcript_gtf
+)
 }
 \arguments{
 \item{gtf}{gtf from get_gtf from setup}
@@ -14,6 +21,8 @@ getTranscriptBackground(gtf, redExon, ex_type, minOverlap = 0.05, cores = 1)
 \item{minOverlap}{minimum overlap to classify as matched to annotation}
 
 \item{cores}{number of requested cores}
+
+\item{transcript_gtf}{output dataframe frmo setup_gtf}
 
 \item{exon_type}{type of exon being queried}
 }

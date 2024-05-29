@@ -5,13 +5,14 @@
 #' @param exon_type type of exon being queried
 #' @param minOverlap minimum overlap to classify as matched to annotation
 #' @param cores number of requested cores
+#' @param transcript_gtf output dataframe frmo setup_gtf
 #' @return figures and dataframes with paired data
 #' @import dplyr
 #' @export
-getTranscriptForeground <- function(gtf, redExon, ex_type, minOverlap = .05, cores = 1) {
+getTranscriptForeground <- function(gtf, redExon, ex_type, minOverlap = .05, cores = 1, transcript_gtf) {
 
   # Parallel computation for each exon in redExon using multiple cores
-  results <- matcher(ex_type, FALSE, cores, redExon,  minOverlap, gtf)
+  results <- matcher(ex_type, FALSE, cores, redExon,  minOverlap, gtf, transcript_gtf)
 
   # Double for convenience if not AFE/ALE
   compliment_redExon <- redExon
@@ -53,13 +54,14 @@ getTranscriptForeground <- function(gtf, redExon, ex_type, minOverlap = .05, cor
 #' @param exon_type type of exon being queried
 #' @param minOverlap minimum overlap to classify as matched to annotation
 #' @param cores number of requested cores
+#' @param transcript_gtf output dataframe frmo setup_gtf
 #' @return figures and dataframes with paired data
 #' @import dplyr
 #' @export
-getTranscriptBackground <- function(gtf, redExon, ex_type, minOverlap = .05, cores = 1) {
+getTranscriptBackground <- function(gtf, redExon, ex_type, minOverlap = .05, cores = 1, transcript_gtf) {
 
     # Parallel computation for each exon in redExon using multiple cores
-    results <- matcher(ex_type, TRUE, cores, redExon, minOverlap, gtf)
+    results <- matcher(ex_type, TRUE, cores, redExon, minOverlap, gtf, transcript_gtf)
     compliment_redExon <- redExon[rep(1:nrow(redExon), each = 1),]
 
     # Filter out 0s

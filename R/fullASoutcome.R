@@ -42,7 +42,7 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
                         cores,
                         exon_type = as_types[1],
                         pdir,
-                        output_location = output_directory, s_gtf$gtf)
+                        output_location = output_directory, s_gtf)
   } else {
     bg <- bg_pre
   }

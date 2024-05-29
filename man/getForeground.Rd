@@ -35,7 +35,7 @@ getForeground(
 
 \item{output_location}{location to make background directory}
 
-\item{gtf}{gtf dataframe from setup_gtf}
+\item{gtf}{full output from setup_gtf}
 
 \item{max_zero_prop}{max number of zeros in to count an exon}
 

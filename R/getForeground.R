@@ -5,7 +5,7 @@
 #' @param exon_type placeholder for other functions
 #' @param thresh delta psi threshold to filter
 #' @param fdr adj p to filter for
-#' @param gtf gtf dataframe from setup_gtf
+#' @param gtf full output from setup_gtf
 #' @param pdir location of the package
 #' @param max_zero_prop max number of zeros in to count an exon
 #' @param min_prop_samples min proportion of samples needed to not be counted as outliers
@@ -19,7 +19,9 @@
 #' @export
 getForeground <- function(input, test_names, control_names, thresh = .1, fdr = .05,
                           mOverlap,exon_type, pdir,
-                          output_location, cores = 1, gtf, max_zero_prop = .5, min_prop_samples = .5) {
+                          output_location, cores = 1, gtf,
+                          max_zero_prop = .5,
+                          min_prop_samples = .5) {
 
   ## If using foreground set, read in diExon file and extract differentially included exons using diff_info()
   df <- input
@@ -47,10 +49,10 @@ getForeground <- function(input, test_names, control_names, thresh = .1, fdr = .
 
 
   ## Use getTranscriptForeground() to extract total and (if background = F) paired transcripts matched to input exons
-  matched <- getTranscriptForeground(gtf, redExon, ex_type = exon_type, minOverlap = mOverlap, cores)
+  matched <- getTranscriptForeground(gtf$gtf, redExon, ex_type = exon_type, minOverlap = mOverlap, cores, gtf$transcript_gtf)
 
   ## Use bedifyForeground() to extract the  bed file
-  bed <- bedifyForeground(matched, outname = output_location, cores = cores, gtf=gtf)
+  bed <- bedifyForeground(matched, outname = output_location, cores = cores, gtf=gtf$gtf)
 
   ## extract uniqiue transcript names as trans and all trancript names as possT
   trans <- str_extract(unique(bed$name), "^[^#]*")
