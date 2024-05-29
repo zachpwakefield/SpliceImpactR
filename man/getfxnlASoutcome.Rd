@@ -17,7 +17,8 @@ getfxnlASoutcome(
   full_pipe = TRUE,
   bg = NA,
   mOverlap = 0.05,
-  gtf
+  gtf,
+  plotAlignments = FALSE
 )
 }
 \arguments{
@@ -42,6 +43,8 @@ getfxnlASoutcome(
 \item{mOverlap}{overlap to identify a match to annotation}
 
 \item{gtf}{output from setup_gtf}
+
+\item{plotAlignments}{whether to output paired alignments}
 }
 \value{
 nothing or all output from pipeline

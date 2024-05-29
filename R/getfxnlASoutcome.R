@@ -8,6 +8,7 @@
 #' @param output_location location to make  directory
 #' @param cutoff cutoff for significance of differential inclusion
 #' @param bg whether bg preran or needs making
+#' @param plotAlignments whether to output paired alignments
 #' @param gtf output from setup_gtf
 #' @param tti_location location of previuously made tti or ""
 #' @param full_pipe if TRUE, doesn't save output to R, only writes to output_location
@@ -17,7 +18,9 @@ getfxnlASoutcome <- function(output_location,
                              test_group,control_group,data_df,
                              exon_type, cutoff = .1, outlier_handle = "4/n",
                              cores = 1,
-                             tti_location = "", full_pipe = TRUE, bg = NA, mOverlap = .05, gtf) {
+                             tti_location = "", full_pipe = TRUE,
+                             bg = NA, mOverlap = .05, gtf,
+                             plotAlignments = FALSE) {
   system(paste0("mkdir ",  output_location))
   pdir <- system.file(package="SpliceImpactR")
 
@@ -57,7 +60,7 @@ getfxnlASoutcome <- function(output_location,
   }
 
   pfg <- getPaired(foreground = fg$proBed, et = exon_type, nucleotides = c_nucs,
-                   output_location = output_location, newGTF = gtf, saveAlignments = FALSE)
+                   output_location = output_location, newGTF = gtf, saveAlignments = plotAlignments)
 
   if (nrow(pfg$paired_proBed) > 1) {
     length_comparison <- getLengthComparison(data_df, pfg$paired_proBed, output_location)
@@ -92,7 +95,7 @@ getfxnlASoutcome <- function(output_location,
     tti <- getTTI(paired_foreground = pfg$paired_proBed, background = bg$proBed,
                   pdir = pdir,
                   steps=1,
-                  max_vertices_for_viz = 5000,
+                  max_vertices_for_viz = 2000,
                   fdr = .05,
                   plot_bool = TRUE,
                   ppidm_class = "Gold_Standard",
