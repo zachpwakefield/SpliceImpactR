@@ -82,11 +82,28 @@ setup_gtf <- function() {
   )
   gtf <- gtf[gtf$gpc == "protein_coding",]
 
+
+  transcript_attributes <- c("ensembl_transcript_id", "chromosome_name", "strand", "transcript_start", "transcript_end")
+  transcript_data <- biomaRt::getBM(attributes = transcript_attributes, mart = ensembl, values = c(1:23, "X", "Y"), filters = 'chromosome_name')
+  merge_transcript_exon <- gtf[gtf$classification == "first",c("transcriptID", "rownum")]
+  merge_transcript_exon <- merge_transcript_exon[!duplicated(merge_transcript_exon),]
+  transcript_gtf <- dplyr::left_join(transcript_data, merge_transcript_exon, by = join_by('ensembl_transcript_id' == 'transcriptID'))
+  transcript_gtf <- transcript_gtf[transcript_gtf$ensembl_transcript_id %in% gtf$transcriptID,]
+  transcript_gtf$chromosome_name <- paste0('chr', transcript_gtf$chromosome_name)
+  colnames(transcript_gtf) <- c('transcriptID', 'chr', 'strand', 'start', 'stop', 'rownum')
+  transcript_gtf <- transcript_gtf %>% dplyr::mutate(strand = ifelse(strand == -1, "-", "+"))
+  gtf <- gtf %>% dplyr::mutate(strand = ifelse(strand == -1, "-", "+"))
+
+
+
   hleList <- unique(c(paste0(hybrid_last_exons$ensembl_transcript_id_last, ';', hybrid_last_exons$ensembl_transcript_id_internal),
                       paste0(hybrid_last_exons$ensembl_transcript_id_internal, ';', hybrid_last_exons$ensembl_transcript_id_last)))
   hfeList <- unique(c(paste0(hybrid_first_exons$ensembl_transcript_id_first, ';', hybrid_first_exons$ensembl_transcript_id_internal),
                       paste0(hybrid_first_exons$ensembl_transcript_id_internal, ';', hybrid_first_exons$ensembl_transcript_id_first)))
+
+
   return(list(gtf = gtf,
+              transcript_gtf = transcript_gtf,
               hybrid_last_extract = hybrid_last_exons,
               hybrid_first_extract = hybrid_first_exons,
               hybrid_first_extract_transcripts = hfeList,
