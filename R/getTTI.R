@@ -338,10 +338,12 @@ init_ddi <- function(pdir, output_location, ppidm_class = c("Gold_Standard", "Go
 
 
   # Read in the protein-protein interaction domain mapping (PPIDM) dataset
-  R.utils::gunzip(paste(pdir, "/PPIDM_GoldDDIs.csv.gz"), remove=FALSE)
+  if (!(file.exists(paste0(pdir, "/PPIDM_GoldDDIs.csv")))) {
+    R.utils::gunzip(paste0(pdir, "/PPIDM_GoldDDIs.csv.gz"), remove=FALSE, overwrite=TRUE)
+  }
 
-  pdm1 <- readr::read_csv(paste(pdir, "/PPIDM_GoldDDIs.csv",
-                                sep = ""))
+  pdm1 <- readr::read_delim(paste(pdir, "/PPIDM_GoldDDIs.csv",
+                                sep = ""), sep = ";")
 
   # Filter interactions based on the specified PPIDM class (e.g., Gold, Silver, Bronze)
   if ("Gold_Standard" == ppidm_class) {
