@@ -21,7 +21,7 @@ getPfam <- function(background, foreground, pdir, output_location, cores = 1) {
   pfam_data <- pfam_data[pfam_data$interpro_description != "",]
 
   pfam_hg38 <- data.frame(transcriptID = pfam_data$ensembl_transcript_id,
-                          geneID = pfam_data$ensemble_gene_id,
+                          geneID = pfam_data$ensembl_gene_id,
                           domains = pfam_data$interpro_description)
 
   # Process foreground data to match Pfam domains with transcripts
