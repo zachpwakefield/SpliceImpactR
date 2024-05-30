@@ -343,7 +343,7 @@ init_ddi <- function(pdir, output_location, ppidm_class = c("Gold_Standard", "Go
   }
 
   pdm1 <- readr::read_delim(paste(pdir, "/PPIDM_GoldDDIs.csv",
-                                sep = ""), sep = ";")
+                                sep = ""), delim = ";")
 
   # Filter interactions based on the specified PPIDM class (e.g., Gold, Silver, Bronze)
   if ("Gold_Standard" == ppidm_class) {
