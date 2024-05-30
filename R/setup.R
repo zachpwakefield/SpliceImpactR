@@ -7,10 +7,10 @@
 #' @return modified protein code fasta
 #' @export
 getTranslations <- function(translations_location) {
-  if (!(file.exists(paste0(translations_location, "gencode.v45.pc_transcripts.fa")))) {
+  if (!(file.exists(paste0(translations_location, "gencode.v45.pc_translations.fa")))) {
     url = "ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_45/gencode.v45.pc_translations.fa.gz"
     utils::download.file(url,paste0(translations_location, "gencode.v45.pc_translations.fa.gz"))
-    R.utils::gunzip(paste0(translations_location, "gencode.v45.pc_translations.fa.gz"), remove=FALSE, overwrite=FALSE)
+    R.utils::gunzip(paste0(translations_location, "gencode.v45.pc_translations.fa.gz"), remove=FALSE, overwrite=TRUE)
   }
   c_trans_pre <- readr::read_lines(paste0(translations_location, "gencode.v45.pc_translations.fa"))
   transcript_title <- c(grep(">", c_trans_pre), (length(c_trans_pre)+1))
@@ -33,7 +33,7 @@ getTranscripts <- function(transcripts_location) {
   if (!(file.exists(paste0(transcripts_location, "gencode.v45.pc_transcripts.fa")))) {
     url = "ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_45/gencode.v45.pc_transcripts.fa.gz"
     utils::download.file(url,paste0(transcripts_location, "gencode.v45.pc_transcripts.fa.gz"))
-    R.utils::gunzip(paste0(transcripts_location, "gencode.v45.pc_transcripts.fa.gz"), remove=FALSE, overwrite=FALSE)
+    R.utils::gunzip(paste0(transcripts_location, "gencode.v45.pc_transcripts.fa.gz"), remove=FALSE, overwrite=TRUE)
   }
   nc <- readr::read_lines(paste0(transcripts_location, "gencode.v45.pc_transcripts.fa"))
   transcript_title <- c(grep(">", nc), (length(nc)+1))
