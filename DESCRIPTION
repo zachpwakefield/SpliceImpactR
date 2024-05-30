@@ -25,6 +25,9 @@ Imports:
   dplyr,
   grDevices,
   stats,
-  utils
+  utils,
+  stringr,
+  biomaRt,
+  R.utils
 RoxygenNote: 7.2.3
 biovViews: Software
