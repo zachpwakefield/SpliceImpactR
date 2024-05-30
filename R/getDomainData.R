@@ -15,7 +15,7 @@
 #' @importFrom stats phyper p.adjust
 #' @importFrom ggplot2 scale_fill_manual theme_classic ggplot aes xlab ylab theme geom_bar geom_boxplot theme_classic coord_flip theme_bw ggtitle element_blank element_line
 #' @importFrom ggpubr ggarrange
-#' @import data.table
+#' @importFrom data.table as.data.table
 #' @export
 getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
                     output_location, fdr_use = .05, min_sample_success = 3,

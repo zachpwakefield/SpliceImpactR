@@ -7,7 +7,6 @@
 #' @param cores number of requested cores
 #' @param transcript_gtf output dataframe frmo setup_gtf
 #' @return figures and dataframes with paired data
-#' @import dplyr
 #' @export
 getTranscriptForeground <- function(gtf, redExon, ex_type, minOverlap = .05, cores = 1, transcript_gtf) {
 
@@ -56,7 +55,6 @@ getTranscriptForeground <- function(gtf, redExon, ex_type, minOverlap = .05, cor
 #' @param cores number of requested cores
 #' @param transcript_gtf output dataframe frmo setup_gtf
 #' @return figures and dataframes with paired data
-#' @import dplyr
 #' @export
 getTranscriptBackground <- function(gtf, redExon, ex_type, minOverlap = .05, cores = 1, transcript_gtf) {
 

@@ -6,7 +6,6 @@
 #' @param output_location location to make background directory
 #' @param cores number of requested cores
 #' @return figures and dataframes with paired data
-#' @import dplyr
 #' @importFrom readr read_tsv write_tsv
 #' @importFrom parallel mclapply
 #' @importFrom biomaRt useEnsembl getBM

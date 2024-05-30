@@ -6,7 +6,7 @@
 #' @param cores the number of cores requested
 #' @param outlier_threshold the thresholding of the cooks distance, no outlier removal is "Inf"
 #' @return a dataframe with differential inclusion information
-#' @import data.table
+#' @importFrom data.table := data.table fread rbindlist fifelse
 #' @importFrom dplyr arrange select
 #' @export
 differential_inclusion_rMATS <- function(control_names, test_names, et, cores = 1,
