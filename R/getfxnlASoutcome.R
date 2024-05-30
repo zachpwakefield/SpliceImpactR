@@ -69,11 +69,6 @@ getfxnlASoutcome <- function(output_location,
     length_comparison <- getLengthComparison(data_df, pfg$paired_proBed, output_location)
   }
 
-  if (tti_location == "") {
-    iDDI <- init_ddi(pdir = pdir, output_location = output_location,
-                     ppidm_class = "Gold_Standard", removeDups = TRUE)
-    tti_location <- output_location
-  }
 
   bg_param <- suppressWarnings(is.na(bg))
   if (bg_param) {

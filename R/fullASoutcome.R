@@ -49,6 +49,12 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
   } else {
     bg <- bg_pre
   }
+  if (tti_location == "") {
+    iDDI <- init_ddi(pdir = pdir, output_location = output_location,
+                     ppidm_class = "Gold_Standard", removeDups = TRUE)
+    tti_location <- output_location
+  }
+
   lapply(as_types, function(x) {
     messageOut <- paste0(x, " analysis...")
     message(messageOut)
