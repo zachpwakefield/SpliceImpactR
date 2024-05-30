@@ -38,7 +38,7 @@ getPfam <- function(background, foreground, pdir, output_location, cores = 1) {
                    foreground$proBed$stop[i], ";",
                    foreground$proBed$strand[i])
       # Replace the first column of the dataframe with the new identifier
-      df$X1 <- rep(id, length(df$X1))
+      df$X1 <- rep(id, nrow(df))
       df
     }
   }))
@@ -53,7 +53,7 @@ getPfam <- function(background, foreground, pdir, output_location, cores = 1) {
                    background$proBed$start[i], "-",
                    background$proBed$stop[i], ";",
                    background$proBed$strand[i])
-      df$X1 <- rep(id, length(df$X1))
+      df$X1 <- rep(id, nrow(df))
       df
     }
   }))
