@@ -53,7 +53,7 @@ getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
     ips_dt <- data.table::as.data.table(ip)
     # ips <- ip %>% dplyr::filter(X4 %in% engine)
 
-    result <- ips_dt[, .(protInf = paste(X6, collapse = ";")), by = X1]
+    result <- ips_dt[, .(protInf = paste(domains, collapse = ";")), by = X1]
 
     protInf_df <- data.frame(result[gN, on = .(X1), nomatch = NA])
     protInf_df$protInf[is.na(protInf_df$protInf)] <- "none"

@@ -9,23 +9,20 @@
 #' @import dplyr
 #' @importFrom readr read_tsv write_tsv
 #' @importFrom parallel mclapply
+#' @importFrom biomaRt useEnsembl getBM
 #' @export
 getPfam <- function(background, foreground, pdir, output_location, cores = 1) {
-  # Load the Pfam reference data, which maps transcripts to protein codes
-  pfam_hg38 <- readr::read_tsv(paste0(pdir, '/protein_code_from_gencodev43_headerFix.txt.tsv'), col_names = FALSE)
 
-  # Extract transcript IDs from the reference data
-  pfam_hg38$transcriptID <- unlist(lapply(strsplit(pfam_hg38$X1, split = "#"),
-                                          "[[", 1))
+  ensembl <- biomaRt::useEnsembl(biomart = "ensembl",
+                                 dataset = "hsapiens_gene_ensembl")
+  attributes <- c("ensembl_gene_id", "ensembl_transcript_id", "chromosome_name",
+                  "transcript_biotype","interpro_description")
+  pfam_data <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list(c(1:23, "X", "Y"), "protein_coding"), filters = c('chromosome_name', "transcript_biotype"))
+  pfam_data <- pfam_data[pfam_data$interpro_description != "",]
 
-  # Reorder the dataframe to have transcriptID as the first column
-  pfam_hg38 <- pfam_hg38 %>% dplyr::relocate(transcriptID)
-
-  # Extract gene IDs from the reference data
-  pfam_hg38$geneID <- unlist(lapply(strsplit(unlist(lapply(strsplit(pfam_hg38$X1,
-                                                                    split = "#"), "[[", 2)), split = ";"), "[[", 1))
-  # Reorder the dataframe to have geneID right after transcriptID
-  pfam_hg38 <- pfam_hg38 %>% dplyr::relocate(geneID, .after = transcriptID)
+  pfam_hg38 <- data.frame(transcriptID = pfam_data$ensembl_transcript_id,
+                          geneID = pfam_data$ensemble_gene_id,
+                          domains = pfam_data$interpro_description)
 
   # Process foreground data to match Pfam domains with transcripts
   fg_out <- do.call(rbind, parallel::mclapply(1:length(foreground$proBed$transcript), mc.cores = cores, function(i) {

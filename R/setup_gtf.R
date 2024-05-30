@@ -6,8 +6,7 @@
 
 setupAnnotation <- function() {
   ensembl <- biomaRt::useEnsembl(biomart = "ensembl",
-                                 dataset = "hsapiens_gene_ensembl",
-                                 mirror = "useast")
+                                 dataset = "hsapiens_gene_ensembl")
   attributes <- c("chromosome_name", "exon_chrom_start", "exon_chrom_end", "strand", "ensembl_gene_id", "ensembl_transcript_id", "gene_biotype",
                   "transcript_biotype", "external_gene_name", "rank", "ensembl_exon_id")
   exon_data <- biomaRt::getBM(attributes = attributes, mart = ensembl)
