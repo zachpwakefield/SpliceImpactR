@@ -17,7 +17,7 @@
 #' @export
 fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", "RI", "A5SS", "A3SS"),
                           output_directory, data_directory,
-                          data_df, outlier_handle,
+                          data_df, outlier_handle = "1",
                           cutoff = .1, cores = 1, bg_pre = NA,
                           tti_location = "/projectnb/evolution/zwakefield/allison_mettl/analysis/sir/",
                           mOverlap = .05, s_gtf, plotAlignments = FALSE, transcripts, translations) {
