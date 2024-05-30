@@ -8,7 +8,7 @@
 #' @export
 getTranslations <- function(translations_location) {
   if (!(file.exists(paste0(translations_location, "gencode.v45.pc_translations.fa")))) {
-    url = "ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_45/gencode.v45.pc_translations.fa.gz"
+    url <- "ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_45/gencode.v45.pc_translations.fa.gz"
     utils::download.file(url,paste0(translations_location, "gencode.v45.pc_translations.fa.gz"))
     R.utils::gunzip(paste0(translations_location, "gencode.v45.pc_translations.fa.gz"), remove=FALSE, overwrite=TRUE)
   }
@@ -31,7 +31,7 @@ getTranslations <- function(translations_location) {
 #' @export
 getTranscripts <- function(transcripts_location) {
   if (!(file.exists(paste0(transcripts_location, "gencode.v45.pc_transcripts.fa")))) {
-    url = "ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_45/gencode.v45.pc_transcripts.fa.gz"
+    url <- "ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_45/gencode.v45.pc_transcripts.fa.gz"
     utils::download.file(url,paste0(transcripts_location, "gencode.v45.pc_transcripts.fa.gz"))
     R.utils::gunzip(paste0(transcripts_location, "gencode.v45.pc_transcripts.fa.gz"), remove=FALSE, overwrite=TRUE)
   }
