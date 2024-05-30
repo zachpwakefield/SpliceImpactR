@@ -9,7 +9,7 @@
 #' @param saveAlignments bool to save alignment pdfs
 #' @param newGTF from setup get_gtf
 #' @return figures and dataframes with paired data
-#' @import dplyr
+#' @importFrom dplyr %>% mutate filter rename left_join
 #' @importFrom ggplot2 ggplot aes geom_histogram after_stat geom_density scale_fill_manual theme_classic xlab ylab
 #' @importFrom ggpubr ggarrange
 #' @export
