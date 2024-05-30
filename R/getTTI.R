@@ -306,44 +306,41 @@ getEnrichmentTTI <- function(current_transcript, t_impacts, fdr, transGeneProt,
 #' @importFrom parallel mclapply
 #' @importFrom dplyr select relocate
 #' @importFrom hypeR msigdb_gsets hypeR hyp_dots
+#' @importFrom R.utils gunzip
+#' @importFrom biomaRt useEnsembl getBM
 #' @export
 init_ddi <- function(pdir, output_location, ppidm_class = c("Gold_Standard", "Gold", "Silver", "Bronze")[1], removeDups = TRUE, cores = 1) {
   # Read in the protein coding data from the package directory
-  pfam_in <- read.delim(paste0(pdir, '/protein_code_from_gencodev43_headerFix.txt.tsv'),
-                        header = FALSE)
-
-  # Extract the transcript ID from the first column
-  pfam_in$transcriptID <- unlist(lapply(strsplit(pfam_in$V1, split = "#"),
-                                        "[[", 1))
-  # Relocate the transcriptID column to the first position
-  pfam_in <- pfam_in %>% dplyr::relocate(transcriptID)
-
-  # Extract the gene ID from the first column
-  pfam_in$geneID <- unlist(lapply(strsplit(unlist(lapply(strsplit(pfam_in$V1,
-                                                                  split = "#"), "[[", 2)), split = ";"), "[[", 1))
-
-  # Make a copy of pfam_in before filtering for Pfam domains only
-  pfam_in_i <- pfam_in
-  # pfam_in <- pfam_in %>% dplyr::filter(V4 %in% c("Pfam"))
+  ensembl <- biomaRt::useEnsembl(biomart = "ensembl",
+                                 dataset = "hsapiens_gene_ensembl")
+  attributes <- c("ensembl_gene_id", "ensembl_transcript_id", "pfam",
+                  "transcript_biotype")
+  pfam_data <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list(c(1:23, "X", "Y"), "protein_coding"), filters = c('chromosome_name', "transcript_biotype"))
+  pfam_data <- pfam_data[pfam_data$pfam != "",]
+  pfam_in <- data.frame(transcriptID = ensembl_transcript_id,
+                        geneID = ensembl_gene_id,
+                        pfamID = pfam)
 
   # Select and deduplicate transcriptID and geneID pairs
-  gt_df <- pfam_in_i %>% dplyr::select(transcriptID, geneID)
+  gt_df <- pfam_in %>% dplyr::select(transcriptID, geneID)
   gt_df <- gt_df[!duplicated(gt_df), ]
 
   # Create a list of transcripts associated with each unique domain (V5)
-  d_transcripts <- lapply(unique(pfam_in$V5), function(x) {
-    unique(pfam_in$transcriptID[pfam_in$V5 == x])
+  d_transcripts <- lapply(unique(pfam_in$pfam), function(x) {
+    unique(pfam_in$transcriptID[pfam_in$pfam == x])
   })
 
   # Name the list elements with the unique domain names
-  names(d_transcripts) <- unique(pfam_in$V5)
+  names(d_transcripts) <- unique(pfam_in$pfam)
 
   # Remove duplicate list elements
   d_transcripts <- d_transcripts[!duplicated(d_transcripts)]
 
 
   # Read in the protein-protein interaction domain mapping (PPIDM) dataset
-  pdm1 <- readr::read_csv(paste(pdir, "/PPIDM_FullSortedDataset_84K_GSB.csv",
+  R.utils::gunzip(paste(pdir, "/PPIDM_GoldDDIs.csv.gz"), remove=FALSE)
+
+  pdm1 <- readr::read_csv(paste(pdir, "/PPIDM_GoldDDIs.csv",
                                 sep = ""))
 
   # Filter interactions based on the specified PPIDM class (e.g., Gold, Silver, Bronze)
