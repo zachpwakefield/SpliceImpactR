@@ -10,6 +10,7 @@
 #' @param max_zero_prop max number of zeros in to count an exon
 #' @param min_prop_samples min proportion of samples needed to not be counted as outliers
 #' @param output_location location to make background directory
+#' @param translations from getTranslations
 #' @return matched : matched transcripts dataframe, bed : bed file of the matched transcripts
 #' proBed : output for further functions with protein code and protein info,
 #' proFast : fasta file of proteins identified in proBed
@@ -21,7 +22,7 @@ getForeground <- function(input, test_names, control_names, thresh = .1, fdr = .
                           mOverlap,exon_type, pdir,
                           output_location, cores = 1, gtf,
                           max_zero_prop = .5,
-                          min_prop_samples = .5) {
+                          min_prop_samples = .5, translations) {
 
   ## If using foreground set, read in diExon file and extract differentially included exons using diff_info()
   df <- input
@@ -61,7 +62,7 @@ getForeground <- function(input, test_names, control_names, thresh = .1, fdr = .
   possT <- str_extract(bed$name, "^[^#]*")
 
   ## Find annotated proteins for transcripts if possible
-  protCode <- c_trans[match(trans, c_trans) + 1]
+  protCode <- translations[match(trans, translations) + 1]
   protCode[is.na(protCode)]<- "none"
 
   merger <- data.frame(name = unique(bed$name),

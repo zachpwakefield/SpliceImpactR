@@ -17,7 +17,8 @@ getForeground(
   cores = 1,
   gtf,
   max_zero_prop = 0.5,
-  min_prop_samples = 0.5
+  min_prop_samples = 0.5,
+  translations
 )
 }
 \arguments{
@@ -40,6 +41,8 @@ getForeground(
 \item{max_zero_prop}{max number of zeros in to count an exon}
 
 \item{min_prop_samples}{min proportion of samples needed to not be counted as outliers}
+
+\item{translations}{from getTranslations}
 }
 \value{
 matched : matched transcripts dataframe, bed : bed file of the matched transcripts

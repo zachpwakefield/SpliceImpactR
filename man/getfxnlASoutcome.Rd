@@ -18,7 +18,9 @@ getfxnlASoutcome(
   bg = NA,
   mOverlap = 0.05,
   gtf,
-  plotAlignments = FALSE
+  plotAlignments = FALSE,
+  transcripts,
+  translations
 )
 }
 \arguments{
@@ -45,6 +47,10 @@ getfxnlASoutcome(
 \item{gtf}{output from setup_gtf}
 
 \item{plotAlignments}{whether to output paired alignments}
+
+\item{transcripts}{from getTranscripts}
+
+\item{translations}{from getTranslations}
 }
 \value{
 nothing or all output from pipeline

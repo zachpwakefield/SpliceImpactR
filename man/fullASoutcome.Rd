@@ -16,7 +16,9 @@ fullASoutcome(
   tti_location = "/projectnb/evolution/zwakefield/allison_mettl/analysis/sir/",
   mOverlap = 0.05,
   s_gtf,
-  plotAlignments = FALSE
+  plotAlignments = FALSE,
+  transcripts,
+  translations
 )
 }
 \arguments{
@@ -37,6 +39,10 @@ fullASoutcome(
 \item{mOverlap}{minimum overlap to call an exon as matched to annotation}
 
 \item{plotAlignments}{whether to plot alignments from getPaired/matchAlignType}
+
+\item{transcripts}{from getTranscripts}
+
+\item{translations}{from getTranslations}
 
 \item{gtf}{output from setup_gtf}
 }

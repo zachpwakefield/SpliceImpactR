@@ -6,6 +6,7 @@
 #' @param pdir location of the package
 #' @param gtf full output from setup_gtf
 #' @param output_location location to make background directory
+#' @param translations from getTranslations
 #' @return matched : matched transcripts dataframe, bed : bed file of the matched transcripts
 #' proBed : output for further functions with protein code and protein info,
 #' proFast : fasta file of proteins identified in proBed
@@ -13,7 +14,7 @@
 #' @importFrom tidyr separate
 #' @importFrom stringr str_extract
 #' @export
-getBackground <- function(input, mOverlap, cores, exon_type, pdir, output_location, gtf) {
+getBackground <- function(input, mOverlap, cores, exon_type, pdir, output_location, gtf, translations) {
     ## extract all first exons and create combined data.frame with gene, location
     files <- paste(input, unlist(lapply(input, function(x) list.files(x)[grep('[.]exon', list.files(x))])), sep = "")
 
@@ -44,7 +45,7 @@ getBackground <- function(input, mOverlap, cores, exon_type, pdir, output_locati
     possT <- stringr::str_extract(bed$name, "^[^#]*")
 
     ## Find annotated proteins for transcripts if possible
-    protCode <- c_trans[match(trans, c_trans) + 1]
+    protCode <- translations[match(trans, translations) + 1]
     protCode[is.na(protCode)]<- "none"
 
     merger <- data.frame(name = unique(bed$name),

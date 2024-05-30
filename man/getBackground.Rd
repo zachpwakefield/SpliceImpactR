@@ -4,7 +4,16 @@
 \alias{getBackground}
 \title{getBackground set of transcripts in samples}
 \usage{
-getBackground(input, mOverlap, cores, exon_type, pdir, output_location, gtf)
+getBackground(
+  input,
+  mOverlap,
+  cores,
+  exon_type,
+  pdir,
+  output_location,
+  gtf,
+  translations
+)
 }
 \arguments{
 \item{input}{the path containing the .exon file}
@@ -18,6 +27,8 @@ getBackground(input, mOverlap, cores, exon_type, pdir, output_location, gtf)
 \item{output_location}{location to make background directory}
 
 \item{gtf}{full output from setup_gtf}
+
+\item{translations}{from getTranslations}
 }
 \value{
 matched : matched transcripts dataframe, bed : bed file of the matched transcripts

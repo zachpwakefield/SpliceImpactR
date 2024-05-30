@@ -11,6 +11,8 @@
 #' @param gtf output from setup_gtf
 #' @param tti_location location of previously made transcript-transcript interactions network
 #' @param mOverlap minimum overlap to call an exon as matched to annotation
+#' @param translations from getTranslations
+#' @param transcripts from getTranscripts
 #' @return nothing in R, output to the output_directory
 #' @export
 fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", "RI", "A5SS", "A3SS"),
@@ -18,7 +20,7 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
                           data_df, outlier_handle,
                           cutoff = .1, cores = 1, bg_pre = NA,
                           tti_location = "/projectnb/evolution/zwakefield/allison_mettl/analysis/sir/",
-                          mOverlap = .05, s_gtf, plotAlignments = FALSE) {
+                          mOverlap = .05, s_gtf, plotAlignments = FALSE, transcripts, translations) {
   system(paste0("mkdir ",  output_directory))
   pdir <- system.file(package="SpliceImpactR")
   ##get bg for all classes
@@ -43,7 +45,7 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
                         cores,
                         exon_type = as_types[1],
                         pdir,
-                        output_location = output_directory, s_gtf)
+                        output_location = output_directory, s_gtf, translations)
   } else {
     bg <- bg_pre
   }
@@ -65,7 +67,8 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
                             mOverlap = mOverlap,
                             bg = bg,
                             gtf=s_gtf,
-                            plotAlignments)
+                            plotAlignments,
+                            transcripts, translations)
   })
 
 }
