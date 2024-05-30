@@ -7,7 +7,7 @@
 #' @return modified protein code fasta
 #' @export
 getTranslations <- function(translations_location) {
-  if (!(exists(paste0(translations_location, "gencode.v45.pc_transcripts.fa")))) {
+  if (!(file.exists(paste0(translations_location, "gencode.v45.pc_transcripts.fa")))) {
     url = "ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_45/gencode.v45.pc_translations.fa.gz"
     utils::download.file(url,paste0(translations_location, "gencode.v45.pc_translations.fa.gz"))
     R.utils::gunzip(paste0(translations_location, "gencode.v45.pc_translations.fa.gz"), remove=FALSE)
@@ -30,7 +30,7 @@ getTranslations <- function(translations_location) {
 #' @return modified nucleotide code fasta
 #' @export
 getTranscripts <- function(transcripts_location) {
-  if (!(exists(paste0(transcripts_location, "gencode.v45.pc_transcripts.fa")))) {
+  if (!(file.exists(paste0(transcripts_location, "gencode.v45.pc_transcripts.fa")))) {
     url = "ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_45/gencode.v45.pc_transcripts.fa.gz"
     utils::download.file(url,paste0(transcripts_location, "gencode.v45.pc_transcripts.fa.gz"))
     R.utils::gunzip(paste0(transcripts_location, "gencode.v45.pc_transcripts.fa.gz"), remove=FALSE)
