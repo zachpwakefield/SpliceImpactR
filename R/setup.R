@@ -1,10 +1,18 @@
 #' setting up translations
 #' @param translations_location location of translations file
 #' @importFrom rtracklayer import
+#' @importFrom readr read_lines
+#' @importFrom utils download.file
+#' @importFrom R.utils gunzip
 #' @return modified protein code fasta
 #' @export
-get_c_trans <- function(translations_location) {
-  c_trans_pre <- readr::read_lines(translations_location)
+getTranslations <- function(translations_location) {
+  if (!(exists(paste0(translations_location, "gencode.v45.pc_transcripts.fa")))) {
+    url = "ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_45/gencode.v45.pc_translations.fa.gz"
+    utils::download.file(url,paste0(translations_location, "gencode.v45.pc_translations.fa.gz"))
+    R.utils::gunzip(paste0(translations_location, "gencode.v45.pc_translations.fa.gz"), remove=FALSE)
+  }
+  c_trans_pre <- readr::read_lines(paste0(translations_location, "gencode.v45.pc_translations.fa"))
   transcript_title <- c(grep(">", c_trans_pre), (length(c_trans_pre)+1))
   tts <- unlist(lapply(strsplit(unlist(lapply(strsplit(c_trans_pre[transcript_title[1:(length(transcript_title)-1)]], split = "[|]"), "[[", 2)), split = "[.]"), "[[", 1))
   c_trans <- unlist(lapply(1:(length(transcript_title)-1), function(x) {
@@ -14,13 +22,20 @@ get_c_trans <- function(translations_location) {
 }
 
 #' setting up transcriptions
-#' @param transcripts_location location of transcripts file
+#' @param transcripts_location location of transcripts file / where to save the transcript file if not already imported
 #' @importFrom rtracklayer import
 #' @importFrom readr read_lines
+#' @importFrom utils download.file
+#' @importFrom R.utils gunzip
 #' @return modified nucleotide code fasta
 #' @export
-get_c_nucs <- function(transcripts_location) {
-  nc <- readr::read_lines("/projectnb2/evolution/zwakefield/Annotations/hg38_gencode/gencode.v45.pc_transcripts.fa")
+getTranscripts <- function(transcripts_location) {
+  if (!(exists(paste0(transcripts_location, "gencode.v45.pc_transcripts.fa")))) {
+    url = "ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_45/gencode.v45.pc_transcripts.fa.gz"
+    utils::download.file(url,paste0(transcripts_location, "gencode.v45.pc_transcripts.fa.gz"))
+    R.utils::gunzip(paste0(transcripts_location, "gencode.v45.pc_transcripts.fa.gz"), remove=FALSE)
+  }
+  nc <- readr::read_lines(paste0(transcripts_location, "gencode.v45.pc_transcripts.fa"))
   transcript_title <- c(grep(">", nc), (length(nc)+1))
   splitF <- strsplit(nc[(transcript_title[1:(length(transcript_title)-1)])], split = "[|]")
   cdsL <- unlist(lapply(splitF, function(x) grep("CDS:", x)))
@@ -43,7 +58,7 @@ get_c_nucs <- function(transcripts_location) {
 #' wrapper for setup_gtf
 #' @return annotated gtf and others from setup_gtf
 #' @export
-get_gtf <- function() {
-  cg <- setup_gtf()
+getAnnotation <- function() {
+  cg <- setupAnnotation()
   return(cg)
 }
