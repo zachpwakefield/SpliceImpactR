@@ -317,9 +317,9 @@ init_ddi <- function(pdir, output_location, ppidm_class = c("Gold_Standard", "Go
                   "transcript_biotype")
   pfam_data <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list(c(1:23, "X", "Y"), "protein_coding"), filters = c('chromosome_name', "transcript_biotype"))
   pfam_data <- pfam_data[pfam_data$pfam != "",]
-  pfam_in <- data.frame(transcriptID = ensembl_transcript_id,
-                        geneID = ensembl_gene_id,
-                        pfamID = pfam)
+  pfam_in <- data.frame(transcriptID = pfam_data$ensembl_transcript_id,
+                        geneID = pfam_data$ensembl_gene_id,
+                        pfamID = pfam_data$pfam)
 
   # Select and deduplicate transcriptID and geneID pairs
   gt_df <- pfam_in %>% dplyr::select(transcriptID, geneID)
