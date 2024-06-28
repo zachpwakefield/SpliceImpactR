@@ -30,4 +30,4 @@ Imports:
   biomaRt,
   R.utils
 RoxygenNote: 7.2.3
-biovViews: Software
+biovViews: AlternativeSplicing, DifferentialSplicing, StatisticalMethod

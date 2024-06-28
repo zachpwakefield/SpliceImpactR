@@ -17,7 +17,13 @@ matchAlignType <- function(proBed, protCode, nucleotides, output_location, saveA
   system(paste0("mkdir ", output_location, "pairedAlignments"))
   setwd(paste0(output_location, "pairedAlignments/"))
   # Iterate through protein codes in pairs
-  alignmentTypes <- lapply(seq(1, nrow(df), by = 2), function(i)  {
+
+  alignmentScores <-   alignmentScorer(exon_type, df)
+
+  alignmentTypes <- getFrameShift(df$add_inf, et = exon_type)
+
+
+  lapply(seq(1, nrow(df), by = 2), function(i)  {
     if (df$prot[i] == "none" & df$prot[i+1] == "none") {
       alignType <- c("noPC")
       pMatch <- 0

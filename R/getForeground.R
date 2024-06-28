@@ -75,6 +75,7 @@ getForeground <- function(input, test_names, control_names, thresh = .1, fdr = .
                      delta.psi = dplyr::first(delta.psi),
                      p.adj = dplyr::first(p.adj),
                      add_inf = dplyr::first(add_inf),
+                     exonID = dplyr::first(exonID),
                      .groups = 'drop')
 
 

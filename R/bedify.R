@@ -25,17 +25,19 @@ bedifyForeground <- function(matched, outname, cores, gtf) {
 
     ## Manipulate into BED format
     bed <- bed %>%
-        dplyr::mutate(
-            score = 0,
-            name = paste(.data$transcriptID, "#", .data$input_id, sep = ""),
-            chromStart = ifelse(.data$strand == "+", bed$start - 1, bed$start),
-            chrom = bed$chr,
-            chromEnd =ifelse(.data$strand == "+", bed$stop, bed$stop + 1)
-    ) %>%
-    dplyr::select(
+      dplyr::mutate(
+        score = 0,
+        name = paste(.data$transcriptID, "#", .data$input_id, sep = ""),
+        exonID = .data$exonID,
+        chromStart = ifelse(.data$strand == "+", bed$start - 1, bed$start),
+        chrom = bed$chr,
+        chromEnd =ifelse(.data$strand == "+", bed$stop, bed$stop + 1)
+      ) %>%
+      dplyr::select(
         .data$chrom, .data$chromStart, .data$chromEnd, .data$name, .data$score, .data$strand,
-        .data$delta.psi, .data$p.adj, add_inf = .data$add_inf
-    )
+        .data$delta.psi, .data$p.adj, add_inf = .data$add_inf, exonID = .data$exonID
+      )
+
 
     return(bed)
 }

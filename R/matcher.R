@@ -300,42 +300,54 @@ MXmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
   }))
   exclusion_rownum <- gtf_transcripts$rownum[gtf_transcripts$transcriptID == exclusion[which.max(exclusion_lengths)] & gtf_transcripts$chr == redExon$chr[i]]
   # Skip if no exclusion
-  if (length(exclusion) == 0) {return(c(0, 0))}
+  if (length(exclusion) == 0 | length(inclusion) == 0) {return(c(0, 0))}
 
-  # Apply jaccard index and classification filter directly
-  gtf_filtered$jaccard <- inclusion_indices$jaccard_index
-  gtf_filtered$length_jacc <- inclusion_indices$length_jacc
-
-  gtf_filtered <- subset(gtf_filtered, jaccard > minOverlap & classification == "internal" & transcriptID %in% inclusion)
-
-  if (nrow(gtf_filtered) == 0) return(c(0, 0)) # Skip if no entries found
-
-  # Order and find the best match more efficiently
-  gtf_filtered <- gtf_filtered[order(-gtf_filtered$jaccard),]
+  exclusion_rownum <- getMXE_internal(gtf_filtered, exclusion_indices, exclusion, "excl")
+  inclusion_rownum <- getMXE_internal(gtf_filtered, inclusion_indices, inclusion, "incl")
+  if (sum(exclusion_rownum) == 0 | sum(inclusion_rownum) == 0) {
+    return(c(0, 0))
+  }
+  return(c(inclusion_rownum, exclusion_rownum))
+}
 
 
-  # Directly return results based on condition
-  if (nrow(gtf_filtered) == 1 || gtf_filtered$jaccard[1] > gtf_filtered$jaccard[2]) {
-    return(c(gtf_filtered$rownum[1], exclusion_rownum)) # Complete the logic for finding the correct rownum
-  } else if (gtf_filtered$jaccard[1] == gtf_filtered$jaccard[2]) {
+#' helper for MXEmatcher
+#' @return rownums for the clusion
+#' @export
+getMXE_internal <- function(g, indices, clusion, strVar) {
+  g$jaccard <- indices$jaccard_index
+  g$length_jacc <- indices$length_jacc
+  g <- subset(g, jaccard > minOverlap & classification == "internal" & transcriptID %in% clusion)
+  if (nrow(g) == 0) return(c(0, 0)) # Skip if no entries found
+  g <- g[order(-g$jaccard),]
 
-    gtf_min <- gtf_filtered[gtf_filtered$jaccard == max(gtf_filtered$jaccard),]
 
+  if (nrow(g) == 1 || g$jaccard[1] > g$jaccard[2]) {
+    return(c(g$rownum[1])) # Complete the logic for finding the correct rownum
+  } else if (g$jaccard[1] == g$jaccard[2]) {
+
+    gtf_min <- g[g$jaccard == max(g$jaccard),]
+    clusion <- clusion[g$jaccard == max(g$jaccard)]
     # Pre-compute the start positions for transcripts in exclusion
-    exclusion_start <- gtf_transcripts$start[gtf_transcripts$rownum == exclusion_rownum]
+    if (strVar == "inc") {
+      exclusion_start <- gtf_transcripts$start[gtf_transcripts$rownum == exclusion_rownum]
 
 
-    # Vectorize the calculation of start distances
-    start_distances <- abs(transcript_starts[inclusion] - exclusion_start)
+      # Vectorize the calculation of start distances
+      start_distances <- abs(transcript_starts[clusion] - exclusion_start)
 
-    # Ensure start_distances is a vector if it's not due to subsetting a single element
-    start_distances <- as.numeric(start_distances)
+      # Ensure start_distances is a vector if it's not due to subsetting a single element
+      start_distances <- as.numeric(start_distances)
+      c_gtf <- gtf_min[start_distances == min(start_distances),] %>% dplyr::arrange(desc(.data$length_jacc))
 
-    c_gtf <- gtf_min[start_distances == min(start_distances),] %>% dplyr::arrange(desc(.data$length_jacc))
+    } else {
+      c_gtf <- gtf_min %>% dplyr::arrange(desc(.data$length_jacc))
 
-    inclusion_rownum <- c_gtf$rownum[1]
+    }
 
-    return(c(inclusion_rownum, exclusion_rownum))
+    clusion_rownum <- c_gtf$rownum[1]
+
+    return(clusion_rownum)
   } else {
     return(c(0, 0))
   }
@@ -348,7 +360,7 @@ ASmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
                       gtf_transcripts,
                       gtf_exons,
                       protein_coding_transcripts,
-                      transcript_starts) {
+                      transcript_starts, whichType) {
 
   # Function to calculate Jaccard-like index more efficiently
   calculate_jaccard_like <- function(start1, stop1, start2, stop2) {
@@ -382,6 +394,17 @@ ASmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
 
   # Filter for computational efficiency at the beginning to minimize dataset size
   gtf_filtered <- subset(gtf_exons, classification %in% c("first", "last", "internal") & geneID == geneR & chr == redExon$chr[i])
+  if (nrow(gtf_filtered) <= 1) return(c(0, 0))
+  if (whichType == "A5SS" & unique(gtf_filtered$strand) == "+") {
+    gtf_filtered <- gtf_filtered[gtf_filtered$classification %in% c("first", "internal"),]
+  } else if (whichType == "A5SS" & unique(gtf_filtered$strand) == "-") {
+    gtf_filtered <- gtf_filtered[gtf_filtered$classification %in% c("last", "internal"),]
+  } else if (whichType == "A3SS" & unique(gtf_filtered$strand) == "+") {
+    gtf_filtered <- gtf_filtered[gtf_filtered$classification %in% c("last", "internal"),]
+  } else if (whichType == "A3SS" & unique(gtf_filtered$strand) == "-") {
+    gtf_filtered <- gtf_filtered[gtf_filtered$classification %in% c("first", "internal"),]
+  }
+
   if (nrow(gtf_filtered) <= 1) return(c(0, 0)) # Skip if less than 2 relevant gtf entries found
 
   # Calculate Jaccard index for inclusion and finds intersect with exclusion of second exon
@@ -421,42 +444,54 @@ ASmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
   exclusion_rownum <- gtf_transcripts$rownum[gtf_transcripts$transcriptID == exclusion[which.max(exclusion_lengths)] &
                                                gtf_transcripts$chr == redExon$chr[i]]
   # Skip if no exclusion
-  if (length(exclusion) == 0) {return(c(0, 0))}
+  if (length(exclusion) == 0 | length(inclusion) == 0) {return(c(0, 0))}
 
-  # Apply jaccard index and classification filter directly
-  gtf_filtered$jaccard <- inclusion_indices$jaccard_index
-  gtf_filtered$length_jacc <- inclusion_indices$length_jacc
-
-  gtf_filtered <- subset(gtf_filtered, jaccard > minOverlap & transcriptID %in% inclusion)
-
-  if (nrow(gtf_filtered) == 0) return(c(0, 0)) # Skip if no entries found
-
-  # Order and find the best match more efficiently
-  gtf_filtered <- gtf_filtered[order(-gtf_filtered$jaccard),]
+  exclusion_rownum <- getAS_internal(gtf_filtered, exclusion_overlap_indices, exclusion, "excl")
+  inclusion_rownum <- getAS_internal(gtf_filtered, inclusion_indices, inclusion, "incl")
+  if (sum(exclusion_rownum) == 0 | sum(inclusion_rownum) == 0) {
+    return(c(0, 0))
+  }
+  return(c(inclusion_rownum, exclusion_rownum))
+}
 
 
-  # Directly return results based on condition
-  if (nrow(gtf_filtered) == 1 || gtf_filtered$jaccard[1] > gtf_filtered$jaccard[2]) {
-    return(c(gtf_filtered$rownum[1], exclusion_rownum)) # Complete the logic for finding the correct rownum
-  } else if (gtf_filtered$jaccard[1] == gtf_filtered$jaccard[2]) {
+#' helper for MXEmatcher
+#' @return rownums for the clusion
+#' @export
+getAS_internal <- function(g, indices, clusion, strVar) {
+  g$jaccard <- indices$jaccard_index
+  g$length_jacc <- indices$length_jacc
+  g <- subset(g, jaccard > minOverlap & transcriptID %in% clusion)
+  if (nrow(g) == 0) return(c(0, 0)) # Skip if no entries found
+  g <- g[order(-g$jaccard),]
 
-    gtf_min <- gtf_filtered[gtf_filtered$jaccard == max(gtf_filtered$jaccard),]
 
+  if (nrow(g) == 1 || g$jaccard[1] > g$jaccard[2]) {
+    return(c(g$rownum[1])) # Complete the logic for finding the correct rownum
+  } else if (g$jaccard[1] == g$jaccard[2]) {
+
+    gtf_min <- g[g$jaccard == max(g$jaccard),]
+    clusion <- clusion[g$jaccard == max(g$jaccard)]
     # Pre-compute the start positions for transcripts in exclusion
-    exclusion_start <- gtf_transcripts$start[gtf_transcripts$rownum == exclusion_rownum]
+    if (strVar == "inc") {
+      exclusion_start <- gtf_transcripts$start[gtf_transcripts$rownum == exclusion_rownum]
 
 
-    # Vectorize the calculation of start distances
-    start_distances <- abs(transcript_starts[gtf_min$transcriptID] - exclusion_start)
+      # Vectorize the calculation of start distances
+      start_distances <- abs(transcript_starts[clusion] - exclusion_start)
 
-    # Ensure start_distances is a vector if it's not due to subsetting a single element
-    start_distances <- as.numeric(start_distances)
+      # Ensure start_distances is a vector if it's not due to subsetting a single element
+      start_distances <- as.numeric(start_distances)
+      c_gtf <- gtf_min[start_distances == min(start_distances),] %>% dplyr::arrange(desc(.data$length_jacc))
 
-    c_gtf <- gtf_min[start_distances == min(start_distances),] %>% dplyr::arrange(desc(.data$length_jacc))
+    } else {
+      c_gtf <- gtf_min %>% dplyr::arrange(desc(.data$length_jacc))
 
-    inclusion_rownum <- c_gtf$rownum[1]
+    }
 
-    return(c(inclusion_rownum, exclusion_rownum))
+    clusion_rownum <- c_gtf$rownum[1]
+
+    return(clusion_rownum)
   } else {
     return(c(0, 0))
   }
@@ -470,7 +505,6 @@ RImatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
                       gtf_exons,
                       protein_coding_transcripts,
                       transcript_starts) {
-
 
   # Function to calculate Jaccard-like index more efficiently
   calculate_jaccard_like <- function(start1, stop1, start2, stop2) {
@@ -521,62 +555,101 @@ RImatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
   }
 
   # Compute intersections more efficiently
-  possible_exclusion_transcripts <- Reduce(intersect, c(lapply(jaccard_indices[2:3],
-                                                               function(jacc) unique(gtf_filtered$transcriptID[jacc$jaccard_index > minOverlap])),
-                                                        list(gtf_filtered$transcriptID[sapply(gtf_filtered$transcriptID,
-                                                                                              function(x) is_below_threshold_ri(x, threshold = below_thresh))])))
+  possible_exclusion_exons <- lapply(jaccard_indices[2:3], function(jacc) {
+    ji <- jacc$jaccard_index[jacc$jaccard_index > minOverlap]
+    gff <- gtf_filtered[jacc$jaccard_index > minOverlap,] %>% arrange(desc(ji))
+    if (nrow(gff) == 0) {return(c(0, 0))}
+    gff$exonID[1]
+  })
+  possible_exclusion_exons[[1]] <- unique(possible_exclusion_exons[[1]])
+  possible_exclusion_exons[[2]] <- unique(possible_exclusion_exons[[2]])[!(unique(possible_exclusion_exons[[2]]) %in%
+                                                                             possible_exclusion_exons[[1]])]
+  if (sum(lengths(possible_exclusion_exons) > 0) < 2) {return(c(0, 0))}
+  possible_exclusion_transcripts <- unique(gtf_filtered$transcriptID[sapply(gtf_filtered$transcriptID,
+                                                                            function(x) is_below_threshold_ri(x, threshold = below_thresh))])
+
+  pet_split <- split(gtf_filtered[gtf_filtered$transcriptID %in% possible_exclusion_transcripts,],
+                     gtf_filtered$transcriptID[gtf_filtered$transcriptID %in% possible_exclusion_transcripts])
+
+  possible_exclusion_transcripts <- names(pet_split)[unlist(lapply(pet_split, function(x) {
+    sum(sum(x$exonID %in% possible_exclusion_exons[[1]]),
+        sum(x$exonID %in% possible_exclusion_exons[[2]])) == 2
+  }))]
 
 
   # Further refine to only include those that are also in the protein coding transcripts, if necessary
   pc_exclusion <- possible_exclusion_transcripts[possible_exclusion_transcripts %in% protein_coding_transcripts]
 
   # Apply protein coding filter again
-  pc_inclusion <- possible_inclusion_transcripts[possible_inclusion_transcripts %in% protein_coding_transcripts]
 
-  inclusion <- ifelse(length(pc_inclusion) == 0, list(possible_inclusion_transcripts), list(pc_inclusion))[[1]]
+  inclusion <- possible_inclusion_transcripts
   exclusion <- ifelse(length(pc_exclusion) == 0, list(possible_exclusion_transcripts), list(pc_exclusion))[[1]]
   exclusion_lengths <- unlist(lapply(exclusion, function(tid) {
     abs(gtf_transcripts$start[gtf_transcripts$transcriptID == tid]-
           gtf_transcripts$stop[gtf_transcripts$transcriptID == tid])
   }))
-  exclusion_rownum <- gtf_transcripts$rownum[gtf_transcripts$transcriptID == exclusion[which.max(exclusion_lengths)] & gtf_transcripts$chr == redExon$chr[i]]
+
   # Skip if no exclusion
-  if (length(exclusion) == 0) {return(c(0, 0))}
+  if (length(exclusion) == 0 | length(inclusion) == 0) {return(c(0, 0))}
 
-  # Apply jaccard index and classification filter directly
-  gtf_filtered$jaccard <- jaccard_indices[[1]]$jaccard_index
-  gtf_filtered$length_jacc <- jaccard_indices[[1]]$length_jacc
+  inclusion_rownum <- getRI_internal(gtf_filtered, jaccard_indices[[1]], inclusion, "incl")
 
-  gtf_filtered <- subset(gtf_filtered, jaccard > minOverlap & classification %in% c("first", "internal", "last") & transcriptID %in% inclusion)
+  if (unique(gtf_filtered$strand) == "+") {
+    downstream_exclusion_exon <- unlist(possible_exclusion_exons)[which.max(gtf_filtered$start[match(unlist(possible_exclusion_exons),
+                                                                                                     gtf_filtered$exonID) ])]
+    exclusion_rownum <- gtf_filtered$rownum[gtf_filtered$transcriptID == exclusion[which.max(exclusion_lengths)] &
+                                              gtf_filtered$chr == redExon$chr[i] &
+                                              gtf_filtered$exonID == downstream_exclusion_exon]
+  } else {
+    downstream_exclusion_exon <- unlist(possible_exclusion_exons)[which.min(gtf_filtered$start[match(unlist(possible_exclusion_exons),
+                                                                                                     gtf_filtered$exonID) ])]
+    exclusion_rownum <- gtf_filtered$rownum[gtf_filtered$transcriptID == exclusion[which.max(exclusion_lengths)] &
+                                              gtf_filtered$chr == redExon$chr[i] &
+                                              gtf_filtered$exonID == downstream_exclusion_exon]
+  }
+  if (sum(exclusion_rownum) == 0 | sum(inclusion_rownum) == 0) {
+    return(c(0, 0))
+  }
+  return(c(inclusion_rownum, exclusion_rownum))
+}
 
-  if (nrow(gtf_filtered) == 0) return(c(0, 0)) # Skip if no entries found
+#' helper for RImatcher
+#' @return rownums for the clusion
+#' @export
+getRI_internal <- function(g, indices, clusion, strVar) {
+  g$jaccard <- indices$jaccard_index
+  g$length_jacc <- indices$length_jacc
+  g <- subset(g, jaccard > minOverlap & transcriptID %in% clusion)
+  if (nrow(g) == 0) return(c(0, 0)) # Skip if no entries found
+  g <- g[order(-g$jaccard),]
 
-  # Order and find the best match more efficiently
-  gtf_filtered <- gtf_filtered[order(-gtf_filtered$jaccard),]
 
+  if (nrow(g) == 1 || g$jaccard[1] > g$jaccard[2]) {
+    return(c(g$rownum[1])) # Complete the logic for finding the correct rownum
+  } else if (g$jaccard[1] == g$jaccard[2]) {
 
-  # Directly return results based on condition
-  if (nrow(gtf_filtered) == 1 || gtf_filtered$jaccard[1] > gtf_filtered$jaccard[2]) {
-    return(c(gtf_filtered$rownum[1], exclusion_rownum)) # Complete the logic for finding the correct rownum
-  } else if (gtf_filtered$jaccard[1] == gtf_filtered$jaccard[2]) {
-
-    gtf_min <- gtf_filtered[gtf_filtered$jaccard == max(gtf_filtered$jaccard),]
-
+    gtf_min <- g[g$jaccard == max(g$jaccard),]
+    clusion <- clusion[g$jaccard == max(g$jaccard)]
     # Pre-compute the start positions for transcripts in exclusion
-    exclusion_start <- gtf_transcripts$start[gtf_transcripts$rownum == exclusion_rownum]
+    if (strVar == "inc") {
+      exclusion_start <- gtf_transcripts$start[gtf_transcripts$rownum == exclusion_rownum]
 
 
-    # Vectorize the calculation of start distances
-    start_distances <- abs(transcript_starts[gtf_min$transcriptID] - exclusion_start)
+      # Vectorize the calculation of start distances
+      start_distances <- abs(transcript_starts[clusion] - exclusion_start)
 
-    # Ensure start_distances is a vector if it's not due to subsetting a single element
-    start_distances <- as.numeric(start_distances)
+      # Ensure start_distances is a vector if it's not due to subsetting a single element
+      start_distances <- as.numeric(start_distances)
+      c_gtf <- gtf_min[start_distances == min(start_distances),] %>% dplyr::arrange(desc(.data$length_jacc))
 
-    c_gtf <- gtf_min[start_distances == min(start_distances),] %>% dplyr::arrange(desc(.data$length_jacc))
+    } else {
+      c_gtf <- gtf_min %>% dplyr::arrange(desc(.data$length_jacc))
 
-    inclusion_rownum <- c_gtf$rownum[1]
+    }
 
-    return(c(inclusion_rownum, exclusion_rownum))
+    clusion_rownum <- c_gtf$rownum[1]
+
+    return(clusion_rownum)
   } else {
     return(c(0, 0))
   }
