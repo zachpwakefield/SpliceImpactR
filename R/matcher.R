@@ -58,7 +58,7 @@ matcher <- function(ex_type, background = FALSE, cores = 1, redExon, minOverlap=
                  gtf_transcripts = gtf_transcripts_globe,
                  gtf_exons = gtf_exons_globe,
                  protein_coding_transcripts = protein_coding_transcripts_globe,
-                 transcript_starts = transcript_starts_globe)
+                 transcript_starts = transcript_starts_globe, whichType = ex_type)
     }))
   } else if (ex_type %in% c("MXE")) {
     results <- unlist(parallel::mclapply(seq(1, nrow(redExon_globe), by = 2), mc.cores = cores, function(i) {
@@ -124,7 +124,7 @@ HITmatcher <- function(i, redExon, gtf_filtered, minOverlap,
   }
 
   # Order by Jaccard index to find best match
-  gtf_min <- gtf_min[order(-gtf_min[, "jaccard"]),]
+  gtf_min <- gtf_min %>% dplyr::arrange(dplyr::desc(jaccard))
 
   ## If only one match or one best match
   if (nrow(gtf_min) == 1 | gtf_min$jaccard[1] > gtf_min$jaccard[2]) {
@@ -458,7 +458,7 @@ ASmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
 #' helper for MXEmatcher
 #' @return rownums for the clusion
 #' @export
-getAS_internal <- function(g, indices, clusion, strVar) {
+getAS_internal <- function(g, indices, clusion, strVar, whichType) {
   g$jaccard <- indices$jaccard_index
   g$length_jacc <- indices$length_jacc
   g <- subset(g, jaccard > minOverlap & transcriptID %in% clusion)
