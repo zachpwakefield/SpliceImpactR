@@ -441,13 +441,13 @@ ASmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
     abs(gtf_transcripts$start[gtf_transcripts$transcriptID == tid]-
           gtf_transcripts$stop[gtf_transcripts$transcriptID == tid])
   }))
-  exclusion_rownum <- gtf_transcripts$rownum[gtf_transcripts$transcriptID == exclusion[which.max(exclusion_lengths)] &
-                                               gtf_transcripts$chr == redExon$chr[i]]
+
   # Skip if no exclusion
   if (length(exclusion) == 0 | length(inclusion) == 0) {return(c(0, 0))}
 
   exclusion_rownum <- getAS_internal(gtf_filtered, exclusion_overlap_indices, exclusion, "excl")
   inclusion_rownum <- getAS_internal(gtf_filtered, inclusion_indices, inclusion, "incl")
+
   if (sum(exclusion_rownum) == 0 | sum(inclusion_rownum) == 0) {
     return(c(0, 0))
   }

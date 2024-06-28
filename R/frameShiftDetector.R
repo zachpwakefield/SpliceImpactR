@@ -18,25 +18,41 @@ getFrameShiftInit <- function() {
 
 
 getFrameShift <- function(fC, et) {
-  if (et %in% c("afe", "ale", "hfe", "hle")) {
-    fs_out <- atheRead(addInf = fC, et)
-  } else if (et %in% c('a3ss', 'a5ss')) {
-    fs_out <- altsRead(addInf = fC)
-  } else if (et == 'se') {
-    fs_out <- seRead(addInf = fC)
-  } else if (et == "ri") {
-    fs_out <- irRead(addInf = fC)
-  } else if (et == "mxe") {
-    fs_out <- mxeRead(addInf = fC)
+  gfs_init <- getFrameShiftInit()
+  if (et %in% c("AFE", "ALE", "HFE", "HLE")) {
+    fs_out <- atheRead(addInf = fC, et,
+                       coding_exons = gfs_init$coding_exons,
+                       exon_data = gfs_init$exon_data,
+                       exon_length_df = gfs_init$exon_length_df)
+  } else if (et %in% c('A3SS', 'A5SS')) {
+    fs_out <- altsRead(addInf = fC,
+                       coding_exons = gfs_init$coding_exons,
+                       exon_data = gfs_init$exon_data,
+                       exon_length_df = gfs_init$exon_length_df)
+  } else if (et == 'SE') {
+    fs_out <- seRead(addInf = fC,
+                     coding_exons = gfs_init$coding_exons,
+                     exon_data = gfs_init$exon_data,
+                     exon_length_df = gfs_init$exon_length_df)
+  } else if (et == "RI") {
+    fs_out <- irRead(addInf = fC,
+                     coding_exons = gfs_init$coding_exons,
+                     exon_data = gfs_init$exon_data,
+                     exon_length_df = gfs_init$exon_length_df)
+  } else if (et == "MXE") {
+    fs_out <- mxeRead(addInf = fC,
+                      coding_exons = gfs_init$coding_exons,
+                      exon_data = gfs_init$exon_data,
+                      exon_length_df = gfs_init$exon_length_df)
   }
   return(fs_out)
 }
 
-getFLOverlap <- function(transcript1, transcript2, ex, coding_exons = gfs_init$coding_exons) {
+getFLOverlap <- function(transcript1, transcript2, ex, coding_exonsX) {
 
-  df1 <- newGTF$gtf[newGTF$gtf$transcriptID %in% transcript1 & newGTF$gtf$exonID %in% coding_exons$ensembl_exon_id,]
+  df1 <- newGTF$gtf[newGTF$gtf$transcriptID %in% transcript1 & newGTF$gtf$exonID %in% coding_exonsX$ensembl_exon_id,]
 
-  df2 <- newGTF$gtf[newGTF$gtf$transcriptID %in% transcript2 & newGTF$gtf$exonID %in% coding_exons$ensembl_exon_id,]
+  df2 <- newGTF$gtf[newGTF$gtf$transcriptID %in% transcript2 & newGTF$gtf$exonID %in% coding_exonsX$ensembl_exon_id,]
 
   # Find overlaps using vectorized operations
   overlap_matrix <- outer(df1$start, df2$stop, '<=') & outer(df1$stop, df2$start, '>=')
@@ -70,15 +86,15 @@ getFLOverlap <- function(transcript1, transcript2, ex, coding_exons = gfs_init$c
 }
 
 
-atheRead <- function(addInf, et, coding_exons = gfs_init$coding_exons, exon_data = gfs_init$exon_data, exon_length_df = gfs_init$exon_length_df) {
+atheRead <- function(addInf, et, coding_exons, exon_data, exon_length_df) {
 
-  outReads <- unlist(lapply(seq(1, nrow(addInf), by=2), function(x) {
+  outReads <- unlist(lapply(seq(1, length(addInf), by=2), function(x) {
     if (addInf$prot[x] == "none" & addInf$prot[x+1] == "none") {
       return(paste0("noPC"))
     } else if (sum(c(addInf$prot[x] == "none", addInf$prot[x+1] == "none")) == 1) {
       return(paste0("onePC"))
     }
-    overlappingExon <- getFLOverlap(addInf$transcript[x], addInf$transcript[x+1], ex=et)
+    overlappingExon <- getFLOverlap(addInf$transcript[x], addInf$transcript[x+1], ex=et, coding_exons)
     if (overlappingExon[1] == "noOverlap") {
       return(paste0("noOverlap"))
     } else {
@@ -101,74 +117,69 @@ atheRead <- function(addInf, et, coding_exons = gfs_init$coding_exons, exon_data
 }
 
 
-irRead <- function(addInf) {
-  outReads <- unlist(mclapply(addInf, mc.cores = 8, function(x) {
-    codeVar <- codingCheck(x[3:(length(x)-1)])
-    if (codeVar == "allNonCoding#") {
-      paste0(codeVar, "PartialMatch")
-    } else if (codeVar == "someNonCoding#") {
-      paste0(codeVar, "PartialMatch")
-    } else {
-      ir <- exon_length_df$cds_length[exon_length_df$ensembl_exon_id %in% x[3]]
-      sep_ex <- exon_length_df$cds_length[exon_length_df$ensembl_exon_id %in% x[4:(length(x)-1)]]
+irRead <- function(addInf, coding_exons, exon_data, exon_length_df) {
+  outReads <- unlist(lapply(seq(1, length(addInf), by=2), function(x) {
+    if (addInf$prot[x] == "none" & addInf$prot[x+1] == "none") {
+      return("noPC")
+    } else if (sum(c(addInf$prot[x] == "none", addInf$prot[x+1] == "none")) == 1) {
+      return("onePC")
+    }
+      ir <- exon_length_df$cds_length[exon_length_df$ensembl_exon_id %in% addInf[x]]
+      sep_ex <- exon_length_df$cds_length[exon_length_df$ensembl_exon_id %in% addInf[x+1]]
       sep_ex[is.na(sep_ex)] <- 0
       ir[is.na(ir)] <- 0
       if (abs(sum(ir)-sum(sep_ex)) %% 3 == 0) {
-        paste0(codeVar, "PartialMatch")
+        return("PartialMatch")
       } else {
-        paste0(codeVar, "FrameShift")
+        return("FrameShift")
       }
-    }
   }))
-  return(outReads)
+  return(rep(outReads, each = 2))
 }
 
-mxeRead <- function(addInf) {
-  outReads <- unlist(mclapply(addInf, mc.cores = 8, function(x) {
-    codeVar <- codingCheck(c(x[(which(x == "MXEI")+1):(which(x == "MXEJ")-1)], x[(which(x == "MXEJ")+1):(length(x)-1)]))
-    if (codeVar == "allNonCoding#") {
-      paste0(codeVar, "PartialMatch")
-    } else if (codeVar == "someNonCoding#") {
-      paste0(codeVar, "PartialMatch")
-    } else {
-      i_lengths <- exon_length_df$cds_length[exon_length_df$ensembl_exon_id %in% x[(which(x == "MXEI")+1):(which(x == "MXEJ")-1)]]
-      j_lengths <- exon_length_df$cds_length[exon_length_df$ensembl_exon_id %in% x[(which(x == "MXEJ")+1):(length(x)-1)]]
+mxeRead <- function(addInf, coding_exons, exon_data, exon_length_df) {
+  outReads <- unlist(lapply(seq(1, length(addInf), by=2), function(x) {
+    if (addInf$prot[x] == "none" & addInf$prot[x+1] == "none") {
+      return("noPC")
+    } else if (sum(c(addInf$prot[x] == "none", addInf$prot[x+1] == "none")) == 1) {
+      return("onePC")
+    }
+      i_lengths <- exon_length_df$cds_length[exon_length_df$ensembl_exon_id %in% addInf[x]]
+      j_lengths <- exon_length_df$cds_length[exon_length_df$ensembl_exon_id %in% addInf[x+1]]
       i_lengths[is.na(i_lengths)] <- 0
       j_lengths[is.na(j_lengths)] <- 0
       if (abs(sum(i_lengths)-sum(j_lengths)) %% 3 == 0) {
-        paste0(codeVar,"PartialMatch")
+        return("PartialMatch")
       } else {
-        paste0(codeVar,"FrameShift")
+        return("FrameShift")
       }
-    }
+
   }))
-  return(outReads)
+  return(rep(outReads, each = 2))
 }
 
-altsRead <- function(addInf) {
-  outReads <- unlist(mclapply(addInf, mc.cores = 8, function(x) {
-    codeVar <- codingCheck(x[c(3, 4)])
-    if (codeVar == "allNonCoding#") {
-      paste0(codeVar, "PartialMatch")
-    } else if (codeVar == "someNonCoding#") {
-      paste0(codeVar, "PartialMatch")
-    } else {
-      lengthsVers1 <- unique(exon_length_df$cds_length[exon_length_df$ensembl_exon_id == x[3]])
-      lengthsVers2 <- unique(exon_length_df$cds_length[exon_length_df$ensembl_exon_id == x[4]])
+altsRead <- function(addInf, coding_exons, exon_data, exon_length_df) {
+  outReads <- unlist(lapply(seq(1, length(addInf), by=2), function(x) {
+    if (addInf$prot[x] == "none" & addInf$prot[x+1] == "none") {
+      return("noPC")
+    } else if (sum(c(addInf$prot[x] == "none", addInf$prot[x+1] == "none")) == 1) {
+      return("onePC")
+    }
+      lengthsVers1 <- unique(exon_length_df$cds_length[exon_length_df$ensembl_exon_id == addInf[x]])
+      lengthsVers2 <- unique(exon_length_df$cds_length[exon_length_df$ensembl_exon_id == addInf[x+1]])
       lengthsVers1[is.na(lengthsVers1)] <- 0
       lengthsVers2[is.na(lengthsVers2)] <- 0
       if (abs(max(lengthsVers1)-max(lengthsVers2)) %% 3 == 0) {
-        paste0(codeVar, "PartialMatch")
+        return("PartialMatch")
       } else {
-        paste0(codeVar, "FrameShift")
+        return("FrameShift")
       }
-    }
   }))
-  return(outReads)
+  return(rep(outReads, each = 2))
 }
 
-seRead <- function(addInf) {
-  outReads <- unlist(lapply(seq(1, nrow(addInf), by=2), function(x) {
+seRead <- function(addInf, coding_exons, exon_data, exon_length_df) {
+  outReads <- unlist(lapply(seq(1, length(addInf), by=2), function(x) {
     if (addInf$prot[x] == "none" & addInf$prot[x+1] == "none") {
       return("noPC")
     } else if (sum(c(addInf$prot[x] == "none", addInf$prot[x+1] == "none")) == 1) {
@@ -189,147 +200,6 @@ seRead <- function(addInf) {
   return(rep(outReads, each = 2))
 }
 
-#' Return both shift and specific results for a given alignment
-#' @param df dataframe with protein code column
-#' @param i row num
-#' @return both specific and shift results
-#' @export
-frameShiftDetectorSum <- function(df, i) {
-  pB_nuc <- unlist(c(fsDirectSpecific(df$code[i], df$code[i+1]),
-             fsDirectShift(df$code[i], df$code[i+1])))
-  return(pB_nuc)
-}
-
-#' Idenfity continuous indels
-#' @param indels the indels from an alignment
-#' @return continuous indels
-#' @export
-findContinuousIndels <- function(indels) {
-  diffs <- diff(indels)
-  breaks <- which(diffs > 1)
-  continuousRegions <- split(indels, cumsum(c(1, diff(indels) > 1)))
-  continuousRegions
-}
-
-#' Align and classify 2 sequences using specific method -- using nucleotides finding indels of non-3 multiples or leads or non-3
-#'
-#' @return both specific and shift results
-#' @param seq1 first nuc sequence
-#' @param seq2 second nuc sequence
-#' @importFrom msa msa msaConsensusSequence
-#' @importFrom Biostrings DNAStringSet
-#' @return alignment type
-#' @export
-fsDirectSpecific <- function(seq1, seq2) {
-  alignment <- msa::msaConsensusSequence(msa::msa(Biostrings::DNAStringSet(c(seq1, seq2)),
-                                                  substitutionMatrix =
-                                                    matrix(c(2, -1, -1, -1,
-                                                             -1, 2, -1, -1,
-                                                             -1, -1, 2, -1,
-                                                             -1, -1, -1, 2),
-                                                           byrow = TRUE, nrow = 4,
-                                                           dimnames = list(c("A", "C", "G", "T"),
-                                                                           c("A", "C", "G", "T"))),
-                                                  gapOpening = 10, gapExtension = 1))
-  alignScore <- sum(strsplit(alignment, "")[[1]] != "?")/max(nchar(seq1), nchar(seq2))
-  leading <- attr(regexpr("^[?]+", alignment), "match.length")
-  if (leading %% 3 == 0 | leading == -1) {
-    indels <- gregexpr("[?]", alignment)[[1]]
-    allIndels <- sort(indels)
-    allIndels <- allIndels[allIndels != -1]
-    continuousIndels <- findContinuousIndels(allIndels)
-    frameShifts <- any(sapply(continuousIndels, function(region) length(region) %% 3 != 0))
-    if (frameShifts) {
-      return(c("FrameShift", alignScore))
-    } else {return(c("PartialMatch", alignScore))}
-  } else {return(c("FrameShift", alignScore))}
-}
-
-#' Align and classify 2 sequences using shift method,
-#'
-#' @return both specific and shift results
-#' @importFrom msa msa msaConsensusSequence
-#' @importFrom Biostrings DNAStringSet pairwiseAlignment
-#' @return alignment type
-#' @export
-fsDirectShift <- function(seq1, seq2) {
-
-  seqUse <- c(seq1, seq2)[which.min(c(nchar(seq1), nchar(seq2)))]
-  seqMore <- c(seq1, seq2)[which.max(c(nchar(seq1), nchar(seq2)))]
-  a1 <- Biostrings::pairwiseAlignment(pattern = Biostrings::DNAString(substr(seqUse, 1, nchar(seqUse))),
-                                      subject = Biostrings::DNAString(seqMore),
-                                      substitutionMatrix=matrix(c(2, -1, -1, -1,
-                                                                  -1, 2, -1, -1,
-                                                                  -1, -1, 2, -1,
-                                                                  -1, -1, -1, 2),
-                                                                byrow = TRUE, nrow = 4,
-                                                                dimnames = list(c("A", "C", "G", "T"),
-                                                                                c("A", "C", "G", "T"))),
-                                      gapOpening = 10,
-                                      gapExtension = 1)
-  a2 <- Biostrings::pairwiseAlignment(pattern = Biostrings::DNAString(substr(seqUse, 2, length(seqUse))),
-                                      subject = Biostrings::DNAString(seqMore),
-                                      substitutionMatrix=matrix(c(2, -1, -1, -1,
-                                                                  -1, 2, -1, -1,
-                                                                  -1, -1, 2, -1,
-                                                                  -1, -1, -1, 2),
-                                                                byrow = TRUE, nrow = 4,
-                                                                dimnames = list(c("A", "C", "G", "T"),
-                                                                                c("A", "C", "G", "T"))),
-                                      gapOpening = 10,
-                                      gapExtension = 1)@score
-  a3 <- Biostrings::pairwiseAlignment(pattern = Biostrings::DNAString(substr(seqUse, 3, length(seqUse))),
-                                      subject = Biostrings::DNAString(seqMore),
-                                      substitutionMatrix=matrix(c(2, -1, -1, -1,
-                                                                  -1, 2, -1, -1,
-                                                                  -1, -1, 2, -1,
-                                                                  -1, -1, -1, 2),
-                                                                byrow = TRUE, nrow = 4,
-                                                                dimnames = list(c("A", "C", "G", "T"),
-                                                                                c("A", "C", "G", "T"))),
-                                      gapOpening = 10,
-                                      gapExtension = 1)@score
-
-  a4 <- Biostrings::pairwiseAlignment(pattern = Biostrings::DNAString(substr(seqUse, ((nchar(seqUse)/2)-1.5), nchar(seqUse))),
-                                      subject = Biostrings::DNAString(seqMore),
-                                      substitutionMatrix=matrix(c(2, -1, -1, -1,
-                                                                  -1, 2, -1, -1,
-                                                                  -1, -1, 2, -1,
-                                                                  -1, -1, -1, 2),
-                                                                byrow = TRUE, nrow = 4,
-                                                                dimnames = list(c("A", "C", "G", "T"),
-                                                                                c("A", "C", "G", "T"))),
-                                      gapOpening = 10,
-                                      gapExtension = 1)@score
-  a5 <- Biostrings::pairwiseAlignment(pattern = Biostrings::DNAString(substr(seqUse, 1+((nchar(seqUse)/2)-1.5), nchar(seqUse))),
-                                      subject = Biostrings::DNAString(seqMore),
-                                      substitutionMatrix=matrix(c(2, -1, -1, -1,
-                                                                  -1, 2, -1, -1,
-                                                                  -1, -1, 2, -1,
-                                                                  -1, -1, -1, 2),
-                                                                byrow = TRUE, nrow = 4,
-                                                                dimnames = list(c("A", "C", "G", "T"),
-                                                                                c("A", "C", "G", "T"))),
-                                      gapOpening = 10,
-                                      gapExtension = 1)@score
-  a6 <- Biostrings::pairwiseAlignment(pattern = Biostrings::DNAString(substr(seqUse, 2+((nchar(seqUse)/2)-1.5), nchar(seqUse))),
-                                      subject = Biostrings::DNAString(seqMore), substitutionMatrix=matrix(c(2, -1, -1, -1,
-                                                                                                            -1, 2, -1, -1,
-                                                                                                            -1, -1, 2, -1,
-                                                                                                            -1, -1, -1, 2),
-                                                                                                          byrow = TRUE, nrow = 4,
-                                                                                                          dimnames = list(c("A", "C", "G", "T"),
-                                                                                                                          c("A", "C", "G", "T"))),
-                                      gapOpening = 10,
-                                      gapExtension = 1)@score
-
-  leading <- attr(regexpr("^-+", as.character(a1)), "match.length")
-  if (leading %% 3 == 0 | leading == -1) {
-    if (a1@score < a2 | a1@score < a3 | a4 < a5 | a4 < a6) {
-      return("FrameShift")
-    } else {return("PartialMatch")}
-  } else {return("FrameShift")}
-}
 
 alignmentScorer <- function(type, proBed) {
   values <- c(
