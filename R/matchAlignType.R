@@ -18,57 +18,29 @@ matchAlignType <- function(proBed, protCode, nucleotides, output_location, saveA
   setwd(paste0(output_location, "pairedAlignments/"))
   # Iterate through protein codes in pairs
 
-  alignmentScores <-   alignmentScorer(exon_type, df)
+  alignmentScores <- alignmentScorer(exon_type, df)
+  alignmentScore <- alignmentScores$alignScore
+  alignmentScore[alignmentScore == -1] <- rep(median(alignmentScore[alignmentScore != 0]), sum(alignmentScore == -1))
 
-  alignmentTypes <- getFrameShift(df$add_inf, et = exon_type)
-
-
-  lapply(seq(1, nrow(df), by = 2), function(i)  {
-    if (df$prot[i] == "none" & df$prot[i+1] == "none") {
-      alignType <- c("noPC")
-      pMatch <- 0
-    } else if (df$prot[i] == "none" | df$prot[i+1] == "none") {
-      alignType <- c("onePC")
-      pMatch <- 0
-    } else if (df$prot[i] == df$prot[i+1]) {
-      pMatch <- 1.04
-      alignType <- c("Match")
-    } else {
-      if (as.numeric(nchar(df$code[i]))*as.numeric(nchar(df$code[i+1])) >= 2000000000) {
-        alignType <- c("PartialMatch")
-        pMatch <- 0.9
-      } else {
-        fs_check <- frameShiftDetectorSum(df, i)
-
-        pMatch <- fs_check[[2]]
-        if (fs_check[[1]] == fs_check[[3]]) {
-          alignType <- fs_check[[1]]
-        } else {
-          alignType <- c("PartialMatch")
-        }
-        if (saveAlignments) {
-          try(msa::msaPrettyPrint(msa(Biostrings::AAStringSet(c(protCode[i], protCode[i+1])), verbose = FALSE), askForOverwrite=FALSE,
-                             file = paste(output_location, "pairedAlignments/", proBed$transcript[i], "_", proBed$transcript[i+1], "_", alignType, "_Alignment.pdf", sep = ""), output = "pdf"))
-        }
-
-      }
-      }
-
-
-
-    c(pMatch, alignType)
+  alignmentTypes <- getFrameShift(df, et = exon_type)
+  alignmentTypes[alignmentScore == 1] <- "Match"
+  if (saveAlignments) {
+  lapply(seq(1, length(alignmentTypes), by = 2), function(i) {
+    if (alignmentTypes[i] %in% c("Match", "PartialMatch", "FrameShift")) {
+      try(msa::msaPrettyPrint(msa(Biostrings::AAStringSet(c(df$prot[i], df$prot[i+1])), verbose = FALSE), askForOverwrite=FALSE,
+                              file = paste(output_location, "pairedAlignments/", proBed$transcript[i], "_", proBed$transcript[i+1],
+                                           "_", alignmentTypes[x], "_Alignment.pdf", sep = ""), output = "pdf"))
+    }
 
   })
-  pMatch <- unlist(lapply(alignmentTypes, "[[", 1))
-  alignType <- unlist(lapply(alignmentTypes, "[[", 2))
-
+    }
 
   # Add matching information to the 'proBed' dataframe
-  proBed$prop <- rep(pMatch, each = 2)
-  proBed$matchType <- rep(alignType, each = 2)
+  df$prop <- alignmentScore
+  df$matchType <- alignmentTypes
 
   # Return a list containing the modified 'proBed' dataframe, match percentages, and alignment types
-  return(list(proBed,
-              pMatch,
-              alignType))
+  return(list(df,
+              alignmentScore,
+              alignmentTypes))
 }

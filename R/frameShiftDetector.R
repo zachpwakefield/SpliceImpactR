@@ -64,14 +64,14 @@ getFLOverlap <- function(transcript1, transcript2, ex, coding_exonsX) {
   if (dim(overlap_indices)[1] == 0) {
     return("noOverlap")
   } else {
-    if (ex %in% c('afe', 'hfe')) {
+    if (ex %in% c('AFE', 'HFE')) {
       first_overlap_indices <- overlap_indices[1, ]
 
       # Extract the first overlapping pairs
       first_overlap_df1 <- df1[first_overlap_indices[1], ]
       first_overlap_df2 <- df2[first_overlap_indices[2], ]
       return(c(first_overlap_df1$exonID, first_overlap_df2$exonID, first_overlap_df1$classification, first_overlap_df2$classification))
-    } else if (ex %in% c('ale', 'hle')) {
+    } else if (ex %in% c('ALE', 'HLE')) {
       last_overlap_indices <- overlap_indices[nrow(overlap_indices), ]
 
       # Extract the last overlapping pairs
@@ -88,7 +88,7 @@ getFLOverlap <- function(transcript1, transcript2, ex, coding_exonsX) {
 
 atheRead <- function(addInf, et, coding_exons, exon_data, exon_length_df) {
 
-  outReads <- unlist(lapply(seq(1, length(addInf), by=2), function(x) {
+  outReads <- unlist(lapply(seq(1, nrow(addInf), by=2), function(x) {
     if (addInf$prot[x] == "none" & addInf$prot[x+1] == "none") {
       return(paste0("noPC"))
     } else if (sum(c(addInf$prot[x] == "none", addInf$prot[x+1] == "none")) == 1) {
@@ -96,7 +96,7 @@ atheRead <- function(addInf, et, coding_exons, exon_data, exon_length_df) {
     }
     overlappingExon <- getFLOverlap(addInf$transcript[x], addInf$transcript[x+1], ex=et, coding_exons)
     if (overlappingExon[1] == "noOverlap") {
-      return(paste0("noOverlap"))
+      return(paste0("PartialMatch"))
     } else {
       e1_over <- unique(exon_length_df$phase[exon_length_df$ensembl_exon_id == overlappingExon[1]])
       e2_over <- unique(exon_length_df$phase[exon_length_df$ensembl_exon_id == overlappingExon[2]])
@@ -118,14 +118,14 @@ atheRead <- function(addInf, et, coding_exons, exon_data, exon_length_df) {
 
 
 irRead <- function(addInf, coding_exons, exon_data, exon_length_df) {
-  outReads <- unlist(lapply(seq(1, length(addInf), by=2), function(x) {
+  outReads <- unlist(lapply(seq(1, nrow(addInf), by=2), function(x) {
     if (addInf$prot[x] == "none" & addInf$prot[x+1] == "none") {
       return("noPC")
     } else if (sum(c(addInf$prot[x] == "none", addInf$prot[x+1] == "none")) == 1) {
       return("onePC")
     }
-      ir <- exon_length_df$cds_length[exon_length_df$ensembl_exon_id %in% addInf[x]]
-      sep_ex <- exon_length_df$cds_length[exon_length_df$ensembl_exon_id %in% addInf[x+1]]
+      ir <- exon_length_df$cds_length[exon_length_df$ensembl_exon_id %in% addInf$exonID[x]]
+      sep_ex <- exon_length_df$cds_length[exon_length_df$ensembl_exon_id %in% addInf$exonID[x+1]]
       sep_ex[is.na(sep_ex)] <- 0
       ir[is.na(ir)] <- 0
       if (abs(sum(ir)-sum(sep_ex)) %% 3 == 0) {
@@ -138,14 +138,14 @@ irRead <- function(addInf, coding_exons, exon_data, exon_length_df) {
 }
 
 mxeRead <- function(addInf, coding_exons, exon_data, exon_length_df) {
-  outReads <- unlist(lapply(seq(1, length(addInf), by=2), function(x) {
+  outReads <- unlist(lapply(seq(1, nrow(addInf), by=2), function(x) {
     if (addInf$prot[x] == "none" & addInf$prot[x+1] == "none") {
       return("noPC")
     } else if (sum(c(addInf$prot[x] == "none", addInf$prot[x+1] == "none")) == 1) {
       return("onePC")
     }
-      i_lengths <- exon_length_df$cds_length[exon_length_df$ensembl_exon_id %in% addInf[x]]
-      j_lengths <- exon_length_df$cds_length[exon_length_df$ensembl_exon_id %in% addInf[x+1]]
+      i_lengths <- exon_length_df$cds_length[exon_length_df$ensembl_exon_id %in% addInf$exonID[x]]
+      j_lengths <- exon_length_df$cds_length[exon_length_df$ensembl_exon_id %in% addInf$exonID[x+1]]
       i_lengths[is.na(i_lengths)] <- 0
       j_lengths[is.na(j_lengths)] <- 0
       if (abs(sum(i_lengths)-sum(j_lengths)) %% 3 == 0) {
@@ -159,14 +159,14 @@ mxeRead <- function(addInf, coding_exons, exon_data, exon_length_df) {
 }
 
 altsRead <- function(addInf, coding_exons, exon_data, exon_length_df) {
-  outReads <- unlist(lapply(seq(1, length(addInf), by=2), function(x) {
+  outReads <- unlist(lapply(seq(1, nrow(addInf), by=2), function(x) {
     if (addInf$prot[x] == "none" & addInf$prot[x+1] == "none") {
       return("noPC")
     } else if (sum(c(addInf$prot[x] == "none", addInf$prot[x+1] == "none")) == 1) {
       return("onePC")
     }
-      lengthsVers1 <- unique(exon_length_df$cds_length[exon_length_df$ensembl_exon_id == addInf[x]])
-      lengthsVers2 <- unique(exon_length_df$cds_length[exon_length_df$ensembl_exon_id == addInf[x+1]])
+      lengthsVers1 <- unique(exon_length_df$cds_length[exon_length_df$ensembl_exon_id == addInf$exonID[x]])
+      lengthsVers2 <- unique(exon_length_df$cds_length[exon_length_df$ensembl_exon_id == addInf$exonID[x+1]])
       lengthsVers1[is.na(lengthsVers1)] <- 0
       lengthsVers2[is.na(lengthsVers2)] <- 0
       if (abs(max(lengthsVers1)-max(lengthsVers2)) %% 3 == 0) {
@@ -179,7 +179,7 @@ altsRead <- function(addInf, coding_exons, exon_data, exon_length_df) {
 }
 
 seRead <- function(addInf, coding_exons, exon_data, exon_length_df) {
-  outReads <- unlist(lapply(seq(1, length(addInf), by=2), function(x) {
+  outReads <- unlist(lapply(seq(1, nrow(addInf), by=2), function(x) {
     if (addInf$prot[x] == "none" & addInf$prot[x+1] == "none") {
       return("noPC")
     } else if (sum(c(addInf$prot[x] == "none", addInf$prot[x+1] == "none")) == 1) {
@@ -241,14 +241,14 @@ alignmentScorer <- function(type, proBed) {
   pB_nuc2 <- pB_nuc[NonMatch,]
   alignType <- lapply(seq(1,nrow(pB_nuc2), by = 2), function(rowCount) {
     if (as.numeric(nchar(pB_nuc2$prot[rowCount]))*as.numeric(nchar(pB_nuc2$prot[rowCount+1])) >= 2000000000) {
-      c(-1, -1)
+      list(c(-1, -1), c(-1, -1))
     } else {
       msaA1 <- msa::msaConsensusSequence(msa::msa(Biostrings::AAStringSet(c(as.character(pB_nuc2$prot[rowCount]),
                                                                 as.character(pB_nuc2$prot[rowCount+1]))),
                                                   substitutionMatrix = BLOSUM62))
 
       alignScore <- sum(strsplit(msaA1, "")[[1]] != "?")/nchar(msaA1)
-      c(alignScore, alignScore, nchar(msaA1), nchar(msaA1))
+      list(c(alignScore, alignScore), c(nchar(msaA1), nchar(msaA1)))
     }
   })
   alignScore <- rep(0, length(pB_nuc$prot))

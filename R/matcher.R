@@ -193,6 +193,7 @@ SEmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
 
   inclusion <- ifelse(length(pc_inclusion) == 0, list(possible_inclusion_transcripts), list(pc_inclusion))[[1]]
   exclusion <- ifelse(length(pc_exclusion) == 0, list(possible_exclusion_transcripts), list(pc_exclusion))[[1]]
+  exclusion <- exclusion[!(exclusion %in% inclusion)]
   exclusion_lengths <- unlist(lapply(exclusion, function(tid) {
     abs(gtf_transcripts$start[gtf_transcripts$transcriptID == tid]-
           gtf_transcripts$stop[gtf_transcripts$transcriptID == tid])
@@ -294,6 +295,7 @@ MXmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
 
   inclusion <- ifelse(length(pc_inclusion) == 0, list(possible_inclusion_transcripts), list(pc_inclusion))[[1]]
   exclusion <- ifelse(length(pc_exclusion) == 0, list(possible_exclusion_transcripts), list(pc_exclusion))[[1]]
+  exclusion <- exclusion[!(exclusion %in% inclusion)]
   exclusion_lengths <- unlist(lapply(exclusion, function(tid) {
     abs(gtf_transcripts$start[gtf_transcripts$transcriptID == tid]-
           gtf_transcripts$stop[gtf_transcripts$transcriptID == tid])
@@ -437,6 +439,7 @@ ASmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
 
   inclusion <- ifelse(length(pc_inclusion) == 0, list(possible_inclusion_transcripts), list(pc_inclusion))[[1]]
   exclusion <- ifelse(length(pc_exclusion) == 0, list(possible_exclusion_transcripts), list(pc_exclusion))[[1]]
+  exclusion <- exclusion[!(exclusion %in% inclusion)]
   exclusion_lengths <- unlist(lapply(exclusion, function(tid) {
     abs(gtf_transcripts$start[gtf_transcripts$transcriptID == tid]-
           gtf_transcripts$stop[gtf_transcripts$transcriptID == tid])
@@ -584,6 +587,7 @@ RImatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
 
   inclusion <- possible_inclusion_transcripts
   exclusion <- ifelse(length(pc_exclusion) == 0, list(possible_exclusion_transcripts), list(pc_exclusion))[[1]]
+  exclusion <- exclusion[!(exclusion %in% inclusion)]
   exclusion_lengths <- unlist(lapply(exclusion, function(tid) {
     abs(gtf_transcripts$start[gtf_transcripts$transcriptID == tid]-
           gtf_transcripts$stop[gtf_transcripts$transcriptID == tid])
