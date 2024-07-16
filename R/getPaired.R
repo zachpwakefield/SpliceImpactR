@@ -90,16 +90,16 @@ getPaired <- function(foreground, et, nucleotides, newGTF, cores = 1, output_loc
 
     # Use matchAlignType to identify protein alignment score and type
     placeholder_tri <- matchAlignType(proBed = combined_rows_df_expanded, protCode = combined_rows_df_expanded$prot, nucleotides = nucleotides, output_location = output_location,
-                                                   saveAlignments = saveAlignments)
+                                                   saveAlignments = saveAlignments, exon_type = et)
     proBed <- placeholder_tri[[1]]
     pMatch <- placeholder_tri[[2]]
     alignType <- placeholder_tri[[3]]
 
-    combined_rows_df_expanded$pMatch <- rep(as.numeric(pMatch), each = 2)
-    combined_rows_df_expanded$alignType <- rep(alignType, each = 2)
+    combined_rows_df_expanded$pMatch <- as.numeric(pMatch)
+    combined_rows_df_expanded$alignType <- alignType
 
-    exon_pairs_df$pMatch <- as.numeric(pMatch)
-    exon_pairs_df$alignType <- alignType
+    exon_pairs_df$pMatch <- as.numeric(pMatch)[seq(1, length(pMatch), by=2)]
+    exon_pairs_df$alignType <- alignType[seq(1, length(pMatch), by=2)]
 
     if (et == "HFE") {
       pair_trans <- unlist(lapply(seq(1, nrow(combined_rows_df_expanded), by=2), function(x) {

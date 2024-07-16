@@ -10,7 +10,7 @@
 #' @importFrom Biostrings AAStringSet
 #' @importFrom msa msaPrettyPrint msa
 #' @export
-matchAlignType <- function(proBed, protCode, nucleotides, output_location, saveAlignments = TRUE) {
+matchAlignType <- function(proBed, protCode, nucleotides, output_location, saveAlignments = TRUE, exon_type) {
 
   df <- dplyr::left_join(proBed, nucleotides$transDF, by = c("transcript" = "transcriptID")) # transcripts
 
