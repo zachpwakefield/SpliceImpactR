@@ -6,7 +6,7 @@
 #' @param cores the number of cores requested
 #' @param outlier_threshold the thresholding of the cooks distance, no outlier removal is "Inf"
 #' @return a dataframe with differential inclusion information
-#' @importFrom data.table := data.table fread fifelse rbindlist
+#' @importFrom data.table := data.table fread fifelse rbindlist uniqueN
 #' @importFrom dplyr arrange
 #' @importFrom stats cooks.distance lm logLik pchisq setNames start
 #' @importFrom utils data read.csv read.delim read.table write.csv

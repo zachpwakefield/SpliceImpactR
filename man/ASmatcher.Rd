@@ -12,7 +12,8 @@ ASmatcher(
   gtf_transcripts,
   gtf_exons,
   protein_coding_transcripts,
-  transcript_starts
+  transcript_starts,
+  whichType
 )
 }
 \value{
