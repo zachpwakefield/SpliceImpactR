@@ -1,8 +1,6 @@
 getFrameShiftInit <- function() {
   ensembl <- biomaRt::useEnsembl(biomart = "ensembl",
                                  dataset = "hsapiens_gene_ensembl")
-  biomaRt::useEnsembl(biomart = "ensembl",
-                               dataset = "hsapiens_gene_ensembl")
   attributes <- c("exon_chrom_start", "exon_chrom_end", "ensembl_exon_id",'cds_start', 'cds_end', 'phase', 'end_phase')
   exon_data <- biomaRt::getBM(attributes = attributes, mart = ensembl)
   exon_data <- exon_data[exon_data$ensembl_exon_id %in% newGTF$gtf$exonID,]
