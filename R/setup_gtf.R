@@ -26,22 +26,28 @@ setupAnnotation <- function() {
   last_exons <- exon_data_exon_label %>% dplyr::filter(exon_label == "last")
 
   # Join the first and internal exons to find overlaps within the same gene
-  hybrid_first_exons <- dplyr::inner_join(first_exons, internal_exons, by = "ensembl_gene_id", suffix = c("_first", "_internal")) %>%
+  hybrid_first_exons <- dplyr::inner_join(first_exons, exon_data_exon_label, by = "ensembl_gene_id", suffix = c("_first", "_internal")) %>%
     dplyr::filter(chromosome_name_first == chromosome_name_internal &
-             ensembl_transcript_id_first != ensembl_transcript_id_internal &
-             ((exon_chrom_start_first <= exon_chrom_end_internal & exon_chrom_end_first >= exon_chrom_start_internal) |
-                (exon_chrom_start_internal <= exon_chrom_end_first & exon_chrom_end_internal >= exon_chrom_start_first)))
+                    ensembl_transcript_id_first != ensembl_transcript_id_internal &
+                    ((exon_chrom_start_first <= exon_chrom_end_internal & exon_chrom_end_first >= exon_chrom_start_internal) |
+                       (exon_chrom_start_internal <= exon_chrom_end_first & exon_chrom_end_internal >= exon_chrom_start_first))) %>%
+    dplyr::group_by(ensembl_transcript_id_first, ensembl_transcript_id_internal) %>%
+    dplyr::filter(n() == 1) %>%
+    dplyr::ungroup() %>% filter(exon_label_internal == "internal")
 
   # Select relevant columns to display the hybrid exons
   hybrid_first_exons <- hybrid_first_exons %>% dplyr::select(ensembl_gene_id, ensembl_transcript_id_first, exon_chrom_start_first, exon_chrom_end_first, ensembl_exon_id_first,
                                                              ensembl_transcript_id_internal, exon_chrom_start_internal, exon_chrom_end_internal, ensembl_exon_id_internal)
 
   # Join the first and internal exons to find overlaps within the same gene
-  hybrid_last_exons <- dplyr::inner_join(last_exons, internal_exons, by = "ensembl_gene_id", suffix = c("_last", "_internal")) %>%
+  hybrid_last_exons <- dplyr::inner_join(last_exons, exon_data_exon_label, by = "ensembl_gene_id", suffix = c("_last", "_internal")) %>%
     dplyr::filter(chromosome_name_last == chromosome_name_internal &
-             ensembl_transcript_id_last != ensembl_transcript_id_internal &
-             ((exon_chrom_start_last <= exon_chrom_end_internal & exon_chrom_end_last >= exon_chrom_start_internal) |
-                (exon_chrom_start_internal <= exon_chrom_end_last & exon_chrom_end_internal >= exon_chrom_start_last)))
+                    ensembl_transcript_id_last != ensembl_transcript_id_internal &
+                    ((exon_chrom_start_last <= exon_chrom_end_internal & exon_chrom_end_last >= exon_chrom_start_internal) |
+                       (exon_chrom_start_internal <= exon_chrom_end_last & exon_chrom_end_internal >= exon_chrom_start_last))) %>%
+    dplyr::group_by(ensembl_transcript_id_last, ensembl_transcript_id_internal) %>%
+    dplyr::filter(n() == 1) %>%
+    dplyr::ungroup() %>% filter(exon_label_internal == "internal")
 
   # Select relevant columns to display the hybrid exons
   hybrid_last_exons <- hybrid_last_exons %>% dplyr::select(ensembl_gene_id, ensembl_transcript_id_last, exon_chrom_start_last, exon_chrom_end_last, ensembl_exon_id_last,
@@ -109,4 +115,3 @@ setupAnnotation <- function() {
               hybrid_last_extract_transcripts = hleList,
               tgp_biomart = tgp_biomart))
 }
-

@@ -10,7 +10,7 @@
 #' @importFrom Biostrings AAStringSet
 #' @importFrom msa msaPrettyPrint msa
 #' @export
-matchAlignType <- function(proBed, protCode, nucleotides, output_location, saveAlignments = TRUE, exon_type) {
+matchAlignType <- function(proBed, protCode, nucleotides, output_location, saveAlignments = TRUE, exon_type, newgtf) {
 
   df <- dplyr::left_join(proBed, nucleotides$transDF, by = c("transcript" = "transcriptID")) # transcripts
 
@@ -22,7 +22,7 @@ matchAlignType <- function(proBed, protCode, nucleotides, output_location, saveA
   alignmentScore <- alignmentScores$alignScore
   alignmentScore[alignmentScore == -1] <- rep(median(alignmentScore[alignmentScore != 0]), sum(alignmentScore == -1))
 
-  alignmentTypes <- getFrameShift(df, et = exon_type)
+  alignmentTypes <- getFrameShift(df, et = exon_type, newgtf)
   alignmentTypes[alignmentScore == 1] <- "Match"
   if (saveAlignments) {
   lapply(seq(1, length(alignmentTypes), by = 2), function(i) {
