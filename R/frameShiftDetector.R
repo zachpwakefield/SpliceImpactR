@@ -69,11 +69,11 @@ getFrameShift <- function(fC, et, newgtf) {
   return(fs_out)
 }
 
-getFLOverlap <- function(transcript1, transcript2, ex, coding_exonsX) {
+getFLOverlap <- function(transcript1, transcript2, ex, coding_exonsX, eld) {
 
-  df1 <- newGTF$gtf[newGTF$gtf$transcriptID %in% transcript1 & (!is.na(exon_length_df$genomic_coding_end) & !is.na(exon_length_df$genomic_coding_start)),]
+  df1 <- newGTF$gtf[newGTF$gtf$transcriptID %in% transcript1 & (!is.na(eld$genomic_coding_end) & !is.na(eld$genomic_coding_start)),]
 
-  df2 <- newGTF$gtf[newGTF$gtf$transcriptID %in% transcript2 & (!is.na(exon_length_df$genomic_coding_end) & !is.na(exon_length_df$genomic_coding_start)),]
+  df2 <- newGTF$gtf[newGTF$gtf$transcriptID %in% transcript2 & (!is.na(eld$genomic_coding_end) & !is.na(eld$genomic_coding_start)),]
 
   # Find overlaps using vectorized operations
   overlap_matrix <- outer(df1$genomic_coding_start, df2$genomic_coding_end, '<=') & outer(df1$genomic_coding_end, df2$genomic_coding_start, '>=')
@@ -115,7 +115,7 @@ alheRead <- function(addInf, et, coding_exons, exon_data, exon_length_df) {
     } else if (sum(c(addInf$prot[x] == "none", addInf$prot[x+1] == "none")) == 1) {
       return(paste0("onePC"))
     }
-    overlappingExon <- getFLOverlap(addInf$transcript[x], addInf$transcript[x+1], ex=et, coding_exons)
+    overlappingExon <- getFLOverlap(addInf$transcript[x], addInf$transcript[x+1], ex=et, coding_exons, exon_length_df)
     if (overlappingExon[1] == "noOverlap") {
       return(paste0("PartialMatch"))
     } else {
@@ -169,7 +169,7 @@ afheRead <- function(addInf, et, coding_exons, exon_data, exon_length_df) {
     } else if (sum(c(addInf$prot[x] == "none", addInf$prot[x+1] == "none")) == 1) {
       return(paste0("onePC"))
     }
-    overlappingExon <- getFLOverlap(addInf$transcript[x], addInf$transcript[x+1], ex=et, coding_exons)
+    overlappingExon <- getFLOverlap(addInf$transcript[x], addInf$transcript[x+1], ex=et, coding_exons, exon_length_df)
     if (overlappingExon[1] == "noOverlap") {
       return(paste0("PartialMatch"))
     } else {
