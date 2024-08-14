@@ -85,6 +85,7 @@ setupAnnotation <- function() {
     gpc = exon_data_exon_label$gene_biotype,
     tpc = exon_data_exon_label$transcript_biotype
   )
+
   gtf <- gtf[gtf$gpc == "protein_coding",]
 
 
@@ -100,12 +101,18 @@ setupAnnotation <- function() {
   gtf <- gtf %>% dplyr::mutate(strand = ifelse(strand == -1, "-", "+"))
 
 
-
   hleList <- unique(c(paste0(hybrid_last_exons$ensembl_transcript_id_last, ';', hybrid_last_exons$ensembl_transcript_id_internal),
                       paste0(hybrid_last_exons$ensembl_transcript_id_internal, ';', hybrid_last_exons$ensembl_transcript_id_last)))
   hfeList <- unique(c(paste0(hybrid_first_exons$ensembl_transcript_id_first, ';', hybrid_first_exons$ensembl_transcript_id_internal),
                       paste0(hybrid_first_exons$ensembl_transcript_id_internal, ';', hybrid_first_exons$ensembl_transcript_id_first)))
 
+  gtf <- gtf %>% dplyr::group_by(transcriptID) %>%
+    dplyr::mutate(
+      adjusted_start = if_else(strand == "+", start, -start)
+    ) %>%
+    dplyr::arrange(transcriptID, adjusted_start) %>%
+    dplyr::select(-adjusted_start) %>%
+    ungroup()
 
   return(list(gtf = gtf,
               transcript_gtf = transcript_gtf,
