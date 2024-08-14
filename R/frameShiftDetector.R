@@ -400,7 +400,7 @@ seRead <- function(addInf, coding_exons, exon_data, exon_length_df) {
       return("onePC")
     }
     se <- addInf$exonID[c(x, x+1)][addInf$exonID[c(x, x+1)] %in% newGTF$gtf$exonID[newGTF$gtf$classification == "internal"]]
-    lengthsSE <- gfs_init$exon_length_df$cds_length[gfs_init$exon_length_df$ensembl_exon_id %in% se & exon_length_df$ensembl_transcript_id]
+    lengthsSE <- exon_length_df$cds_length[exon_length_df$ensembl_exon_id %in% se & exon_length_df$ensembl_transcript_id]
     lengthsSE[is.na(lengthsSE)] <- 0
     sumLength <- sum(lengthsSE) %% 3
     if (sumLength == 0) {
