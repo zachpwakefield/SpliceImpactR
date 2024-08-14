@@ -40,8 +40,13 @@ getFrameShift <- function(fC, et, newgtf) {
                        coding_exons = gfs_init$coding_exons,
                        exon_data = gfs_init$exon_data,
                        exon_length_df = gfs_init$exon_length_df)
-  } else if (et %in% c('A3SS', 'A5SS')) {
-    fs_out <- altsRead(addInf = fC,
+  } else if (et %in% c('A3SS')) {
+    fs_out <- alt3Read(addInf = fC,
+                       coding_exons = gfs_init$coding_exons,
+                       exon_data = gfs_init$exon_data,
+                       exon_length_df = gfs_init$exon_length_df)
+  } else if (et %in% c('A5SS')) {
+    fs_out <- alt5Read(addInf = fC,
                        coding_exons = gfs_init$coding_exons,
                        exon_data = gfs_init$exon_data,
                        exon_length_df = gfs_init$exon_length_df)
@@ -156,7 +161,7 @@ alheRead <- function(addInf, et, coding_exons, exon_data, exon_length_df) {
 }
 
 
-atheRead <- function(addInf, et, coding_exons, exon_data, exon_length_df) {
+afheRead <- function(addInf, et, coding_exons, exon_data, exon_length_df) {
 
   outReads <- unlist(lapply(seq(1, nrow(addInf), by=2), function(x) {
     if (addInf$prot[x] == "none" & addInf$prot[x+1] == "none") {
