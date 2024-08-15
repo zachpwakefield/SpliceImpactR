@@ -1,7 +1,8 @@
 getFrameShiftInit <- function(newgtf) {
   ensembl <- biomaRt::useEnsembl(biomart = "ensembl",
                                  dataset = "hsapiens_gene_ensembl")
-  attributes <- c('ensembl_transcript_id', "exon_chrom_start", "exon_chrom_end", "ensembl_exon_id",'cds_start', 'cds_end', 'phase', 'end_phase', 'genomic_coding_start', 'genomic_coding_end', 'strand')
+  attributes <- c('ensembl_transcript_id', "exon_chrom_start", "exon_chrom_end", "ensembl_exon_id",'cds_start', 'cds_end', 'phase', 'end_phase',
+                  'genomic_coding_start', 'genomic_coding_end', 'strand')
   exon_data <- biomaRt::getBM(attributes = attributes, mart = ensembl)
   exon_data <- exon_data[exon_data$ensembl_exon_id %in% newGTF$gtf$exonID,]
   exon_data$exon_biotype <- "coding"
@@ -221,8 +222,8 @@ irRead <- function(addInf, coding_exons, exon_data, exon_length_df) {
     } else if (sum(c(addInf$prot[x] == "none", addInf$prot[x+1] == "none")) == 1) {
       return("onePC")
     }
-    ir <- exon_length_df$cds_length[exon_length_df$ensembl_transcript_id %in% addInf$transcriptID[x] & exon_length_df$ensembl_exon_id %in% addInf$exonID[x]]
-    sep_ex <- exon_length_df$cds_length[exon_length_df$ensembl_transcript_id %in% addInf$transcriptID[x+1] & exon_length_df$ensembl_exon_id %in% addInf$exonID[x+1]]
+    ir <- exon_length_df$cds_length[exon_length_df$ensembl_transcript_id %in% addInf$transcript[x] & exon_length_df$ensembl_exon_id %in% addInf$exonID[x]]
+    sep_ex <- exon_length_df$cds_length[exon_length_df$ensembl_transcript_id %in% addInf$transcript[x+1] & exon_length_df$ensembl_exon_id %in% addInf$exonID[x+1]]
     sep_ex[is.na(sep_ex)] <- 0
     ir[is.na(ir)] <- 0
     if (abs(sum(ir)-sum(sep_ex)) %% 3 == 0) {
@@ -241,8 +242,8 @@ mxeRead <- function(addInf, coding_exons, exon_data, exon_length_df) {
     } else if (sum(c(addInf$prot[x] == "none", addInf$prot[x+1] == "none")) == 1) {
       return("onePC")
     }
-    i_lengths <- exon_length_df$cds_length[exon_length_df$ensembl_transcript_id %in% addInf$transcriptID[x] & exon_length_df$ensembl_exon_id %in% addInf$exonID[x]]
-    j_lengths <- exon_length_df$cds_length[exon_length_df$ensembl_transcript_id %in% addInf$transcriptID[x+1] & exon_length_df$ensembl_exon_id %in% addInf$exonID[x+1]]
+    i_lengths <- exon_length_df$cds_length[exon_length_df$ensembl_transcript_id %in% addInf$transcript[x] & exon_length_df$ensembl_exon_id %in% addInf$exonID[x]]
+    j_lengths <- exon_length_df$cds_length[exon_length_df$ensembl_transcript_id %in% addInf$transcript[x+1] & exon_length_df$ensembl_exon_id %in% addInf$exonID[x+1]]
     i_lengths[is.na(i_lengths)] <- 0
     j_lengths[is.na(j_lengths)] <- 0
     if (abs(sum(i_lengths)-sum(j_lengths)) %% 3 == 0) {
@@ -270,21 +271,21 @@ alt3Read <- function(addInf, coding_exons, exon_data, exon_length_df) {
     } else if (sum(c(addInf$prot[x] == "none", addInf$prot[x+1] == "none")) == 1) {
       return("onePC")
     }
-    if (overlap(exon_length_df$genomic_coding_start[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcriptID[x]],
-                exon_length_df$genomic_coding_end[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcriptID[x]],
-                exon_length_df$genomic_coding_start[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcriptID[x+1]],
-                exon_length_df$genomic_coding_end[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcriptID[x+1
+    if (overlap(exon_length_df$genomic_coding_start[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcript[x]],
+                exon_length_df$genomic_coding_end[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcript[x]],
+                exon_length_df$genomic_coding_start[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcript[x+1]],
+                exon_length_df$genomic_coding_end[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcript[x+1
                                                                                                                                                                      ]])) {
 
-      if (exon_length_df$strand[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcriptID[x]][1] == 1) {
-        ph <- c(exon_length_df$genomic_coding_start[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcriptID[x]],
-                exon_length_df$genomic_coding_start[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcriptID[x+1]])
+      if (exon_length_df$strand[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcript[x]][1] == 1) {
+        ph <- c(exon_length_df$genomic_coding_start[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcript[x]],
+                exon_length_df$genomic_coding_start[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcript[x+1]])
 
         min.ph <- which.min(ph)
         max.ph <- c(1, 2)[-min.ph]
 
-        phaseHolder <- c(exon_length_df$phase[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcriptID[x]],
-                         exon_length_df$phase[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcriptID[x+1]])
+        phaseHolder <- c(exon_length_df$phase[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcript[x]],
+                         exon_length_df$phase[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcript[x+1]])
         phaseHolder[phaseHolder == -1] <- 0
 
         adj_max <- (((abs(ph[1]-ph[2])) %% 3) + phaseHolder[min.ph]) %% 3
@@ -294,13 +295,13 @@ alt3Read <- function(addInf, coding_exons, exon_data, exon_length_df) {
           return("FrameShift")
         }
       } else {
-        ph <- c(exon_length_df$genomic_coding_end[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcriptID[x]],
-                exon_length_df$genomic_coding_end[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcriptID[x+1]])
+        ph <- c(exon_length_df$genomic_coding_end[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcript[x]],
+                exon_length_df$genomic_coding_end[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcript[x+1]])
         min.ph <- which.min(ph)
         max.ph <- c(1, 2)[-min.ph]
 
-        phaseHolder <- c(exon_length_df$phase[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcriptID[x]],
-                         exon_length_df$phase[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcriptID[x+1]])
+        phaseHolder <- c(exon_length_df$phase[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcript[x]],
+                         exon_length_df$phase[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcript[x+1]])
         phaseHolder[phaseHolder == -1] <- 0
 
 
@@ -334,21 +335,21 @@ alt5Read <- function(addInf, coding_exons, exon_data, exon_length_df) {
     } else if (sum(c(addInf$prot[x] == "none", addInf$prot[x+1] == "none")) == 1) {
       return("onePC")
     }
-    if (overlap(exon_length_df$genomic_coding_start[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcriptID[x]],
-                exon_length_df$genomic_coding_end[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcriptID[x]],
-                exon_length_df$genomic_coding_start[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcriptID[x+1]],
-                exon_length_df$genomic_coding_end[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcriptID[x+1
+    if (overlap(exon_length_df$genomic_coding_start[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcript[x]],
+                exon_length_df$genomic_coding_end[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcript[x]],
+                exon_length_df$genomic_coding_start[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcript[x+1]],
+                exon_length_df$genomic_coding_end[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcript[x+1
                 ]])) {
 
-      if (exon_length_df$strand[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcriptID[x]][1] == 1) {
-        ph <- c(exon_length_df$genomic_coding_end[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcriptID[x]],
-                exon_length_df$genomic_coding_end[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcriptID[x+1]])
+      if (exon_length_df$strand[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcript[x]][1] == 1) {
+        ph <- c(exon_length_df$genomic_coding_end[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcript[x]],
+                exon_length_df$genomic_coding_end[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcript[x+1]])
 
         min.ph <- which.min(ph)
         max.ph <- c(1, 2)[-min.ph]
 
-        phaseHolder <- c(exon_length_df$end_phase[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcriptID[x]],
-                         exon_length_df$end_phase[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcriptID[x+1]])
+        phaseHolder <- c(exon_length_df$end_phase[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcript[x]],
+                         exon_length_df$end_phase[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcript[x+1]])
         phaseHolder[phaseHolder == -1] <- 0
 
         adj_max <- (((abs(ph[1]-ph[2])) %% 3) + phaseHolder[min.ph]) %% 3
@@ -358,13 +359,13 @@ alt5Read <- function(addInf, coding_exons, exon_data, exon_length_df) {
           return("FrameShift")
         }
       } else {
-        ph <- c(exon_length_df$genomic_coding_start[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcriptID[x]],
-                exon_length_df$genomic_coding_start[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcriptID[x+1]])
+        ph <- c(exon_length_df$genomic_coding_start[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcript[x]],
+                exon_length_df$genomic_coding_start[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcript[x+1]])
         min.ph <- which.min(ph)
         max.ph <- c(1, 2)[-min.ph]
 
-        phaseHolder <- c(exon_length_df$end_phase[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcriptID[x]],
-                         exon_length_df$end_phase[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcriptID[x+1]])
+        phaseHolder <- c(exon_length_df$end_phase[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcript[x]],
+                         exon_length_df$end_phase[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcript[x+1]])
         phaseHolder[phaseHolder == -1] <- 0
 
 
