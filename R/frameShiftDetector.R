@@ -222,6 +222,17 @@ irRead <- function(addInf, coding_exons, exon_data, exon_length_df) {
     } else if (sum(c(addInf$prot[x] == "none", addInf$prot[x+1] == "none")) == 1) {
       return("onePC")
     }
+
+    codeVal <- c(exon_length_df$cds_length[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcript[x]] > 0,
+                 exon_length_df$cds_length[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcript[x+1]] > 0)
+    codeVal[is.na(codeVal)] <- FALSE
+    codeVar <- ifelse(sum(codeVal) > 0, ifelse(sum(codeVal) == 2, "allCoding", "someNonCoding"), "allNonCoding")
+    if (codeVar == "allNonCoding#") {
+      return("PartialMatch")
+    } else if (codeVar == "someNonCoding#") {
+      return("PartialMatch")
+    } else {
+
     ir <- exon_length_df$cds_length[exon_length_df$ensembl_transcript_id %in% addInf$transcript[x] & exon_length_df$ensembl_exon_id %in% addInf$exonID[x]]
     sep_ex <- exon_length_df$cds_length[exon_length_df$ensembl_transcript_id %in% addInf$transcript[x+1] & exon_length_df$ensembl_exon_id %in% addInf$exonID[x+1]]
     sep_ex[is.na(sep_ex)] <- 0
@@ -231,6 +242,7 @@ irRead <- function(addInf, coding_exons, exon_data, exon_length_df) {
     } else {
       return("FrameShift")
     }
+      }
   }))
   return(rep(outReads, each = 2))
 }
@@ -242,6 +254,17 @@ mxeRead <- function(addInf, coding_exons, exon_data, exon_length_df) {
     } else if (sum(c(addInf$prot[x] == "none", addInf$prot[x+1] == "none")) == 1) {
       return("onePC")
     }
+
+    codeVal <- c(exon_length_df$cds_length[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcript[x]] > 0,
+                 exon_length_df$cds_length[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcript[x+1]] > 0)
+    codeVal[is.na(codeVal)] <- FALSE
+    codeVar <- ifelse(sum(codeVal) > 0, ifelse(sum(codeVal) == 2, "allCoding", "someNonCoding"), "allNonCoding")
+    if (codeVar == "allNonCoding#") {
+      return("PartialMatch")
+    } else if (codeVar == "someNonCoding#") {
+      return("PartialMatch")
+    } else {
+
     i_lengths <- exon_length_df$cds_length[exon_length_df$ensembl_transcript_id %in% addInf$transcript[x] & exon_length_df$ensembl_exon_id %in% addInf$exonID[x]]
     j_lengths <- exon_length_df$cds_length[exon_length_df$ensembl_transcript_id %in% addInf$transcript[x+1] & exon_length_df$ensembl_exon_id %in% addInf$exonID[x+1]]
     i_lengths[is.na(i_lengths)] <- 0
@@ -251,6 +274,7 @@ mxeRead <- function(addInf, coding_exons, exon_data, exon_length_df) {
     } else {
       return("FrameShift")
     }
+      }
 
   }))
   return(rep(outReads, each = 2))
@@ -271,11 +295,24 @@ alt3Read <- function(addInf, coding_exons, exon_data, exon_length_df) {
     } else if (sum(c(addInf$prot[x] == "none", addInf$prot[x+1] == "none")) == 1) {
       return("onePC")
     }
+
+
+    codeVal <- c(exon_length_df$cds_length[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcript[x]] > 0,
+                 exon_length_df$cds_length[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcript[x+1]] > 0)
+    codeVal[is.na(codeVal)] <- FALSE
+    codeVar <- ifelse(sum(codeVal) > 0, ifelse(sum(codeVal) == 2, "allCoding", "someNonCoding"), "allNonCoding")
+    if (codeVar == "allNonCoding#") {
+      return("PartialMatch")
+    } else if (codeVar == "someNonCoding#") {
+      return("PartialMatch")
+    } else {
+
+
     if (overlap(exon_length_df$genomic_coding_start[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcript[x]],
                 exon_length_df$genomic_coding_end[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcript[x]],
                 exon_length_df$genomic_coding_start[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcript[x+1]],
-                exon_length_df$genomic_coding_end[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcript[x+1
-                                                                                                                                                                     ]])) {
+                exon_length_df$genomic_coding_end[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcript[x+1]]))
+      {
 
       if (exon_length_df$strand[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcript[x]][1] == 1) {
         ph <- c(exon_length_df$genomic_coding_start[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcript[x]],
@@ -315,6 +352,7 @@ alt3Read <- function(addInf, coding_exons, exon_data, exon_length_df) {
       }
 
     } else {paste0(codeVar, "PartialMatch")}
+      }
     lengthsVers1 <- unique(exon_length_df$cds_length[exon_length_df$ensembl_exon_id == addInf$exonID[x]])
     lengthsVers2 <- unique(exon_length_df$cds_length[exon_length_df$ensembl_exon_id == addInf$exonID[x+1]])
     lengthsVers1[is.na(lengthsVers1)] <- 0
@@ -335,6 +373,17 @@ alt5Read <- function(addInf, coding_exons, exon_data, exon_length_df) {
     } else if (sum(c(addInf$prot[x] == "none", addInf$prot[x+1] == "none")) == 1) {
       return("onePC")
     }
+
+    codeVal <- c(exon_length_df$cds_length[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcript[x]] > 0,
+                 exon_length_df$cds_length[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcript[x+1]] > 0)
+    codeVal[is.na(codeVal)] <- FALSE
+    codeVar <- ifelse(sum(codeVal) > 0, ifelse(sum(codeVal) == 2, "allCoding", "someNonCoding"), "allNonCoding")
+    if (codeVar == "allNonCoding#") {
+      return("PartialMatch")
+    } else if (codeVar == "someNonCoding#") {
+      return("PartialMatch")
+    } else {
+
     if (overlap(exon_length_df$genomic_coding_start[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcript[x]],
                 exon_length_df$genomic_coding_end[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcript[x]],
                 exon_length_df$genomic_coding_start[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcript[x+1]],
@@ -379,6 +428,7 @@ alt5Read <- function(addInf, coding_exons, exon_data, exon_length_df) {
       }
 
     } else {return("PartialMatch")}
+      }
     lengthsVers1 <- unique(exon_length_df$cds_length[exon_length_df$ensembl_exon_id == addInf$exonID[x]])
     lengthsVers2 <- unique(exon_length_df$cds_length[exon_length_df$ensembl_exon_id == addInf$exonID[x+1]])
     lengthsVers1[is.na(lengthsVers1)] <- 0
@@ -400,6 +450,17 @@ seRead <- function(addInf, coding_exons, exon_data, exon_length_df) {
     } else if (sum(c(addInf$prot[x] == "none", addInf$prot[x+1] == "none")) == 1) {
       return("onePC")
     }
+
+    codeVal <- c(exon_length_df$cds_length[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcript[x]] > 0,
+                 exon_length_df$cds_length[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcript[x+1]] > 0)
+    codeVal[is.na(codeVal)] <- FALSE
+    codeVar <- ifelse(sum(codeVal) > 0, ifelse(sum(codeVal) == 2, "allCoding", "someNonCoding"), "allNonCoding")
+    if (codeVar == "allNonCoding#") {
+      return("PartialMatch")
+    } else if (codeVar == "someNonCoding#") {
+      return("PartialMatch")
+    } else {
+
     se <- addInf[c(x, x+1),][addInf$exonID[c(x, x+1)] %in% newGTF$gtf$exonID[newGTF$gtf$classification == "internal"],]
     lengthsSE <- exon_length_df$cds_length[exon_length_df$ensembl_exon_id %in% se$exonID & exon_length_df$ensembl_transcript_id %in% se$transcriptID]
     lengthsSE[is.na(lengthsSE)] <- 0
@@ -409,6 +470,7 @@ seRead <- function(addInf, coding_exons, exon_data, exon_length_df) {
     } else {
       return("FrameShift")
     }
+      }
   }
   ))
   return(rep(outReads, each = 2))
