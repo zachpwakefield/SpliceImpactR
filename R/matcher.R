@@ -304,8 +304,8 @@ MXmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
   # Skip if no exclusion
   if (length(exclusion) == 0 | length(inclusion) == 0) {return(c(0, 0))}
 
-  exclusion_rownum <- getMXE_internal(gtf_filtered, exclusion_indices, exclusion, "excl")
-  inclusion_rownum <- getMXE_internal(gtf_filtered, inclusion_indices, inclusion, "incl")
+  exclusion_rownum <- getMXE_internal(gtf_filtered, exclusion_indices, exclusion, "excl", minOverlap)
+  inclusion_rownum <- getMXE_internal(gtf_filtered, inclusion_indices, inclusion, "incl", minOverlap)
   if (sum(exclusion_rownum) == 0 | sum(inclusion_rownum) == 0) {
     return(c(0, 0))
   }
@@ -316,7 +316,7 @@ MXmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
 #' helper for MXEmatcher
 #' @return rownums for the clusion
 #' @export
-getMXE_internal <- function(g, indices, clusion, strVar) {
+getMXE_internal <- function(g, indices, clusion, strVar, minOverlap) {
   g$jaccard <- indices$jaccard_index
   g$length_jacc <- indices$length_jacc
   g <- subset(g, jaccard > minOverlap & classification == "internal" & transcriptID %in% clusion)
@@ -448,8 +448,8 @@ ASmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
   # Skip if no exclusion
   if (length(exclusion) == 0 | length(inclusion) == 0) {return(c(0, 0))}
 
-  exclusion_rownum <- getAS_internal(gtf_filtered, exclusion_overlap_indices, exclusion, "excl")
-  inclusion_rownum <- getAS_internal(gtf_filtered, inclusion_indices, inclusion, "incl")
+  exclusion_rownum <- getAS_internal(gtf_filtered, exclusion_overlap_indices, exclusion, "excl", minOverlap)
+  inclusion_rownum <- getAS_internal(gtf_filtered, inclusion_indices, inclusion, "incl", minOverlap)
 
   if (sum(exclusion_rownum) == 0 | sum(inclusion_rownum) == 0) {
     return(c(0, 0))
@@ -461,7 +461,7 @@ ASmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
 #' helper for MXEmatcher
 #' @return rownums for the clusion
 #' @export
-getAS_internal <- function(g, indices, clusion, strVar, whichType) {
+getAS_internal <- function(g, indices, clusion, strVar, whichType, minOverlap) {
   g$jaccard <- indices$jaccard_index
   g$length_jacc <- indices$length_jacc
   g <- subset(g, jaccard > minOverlap & transcriptID %in% clusion)
@@ -596,7 +596,7 @@ RImatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
   # Skip if no exclusion
   if (length(exclusion) == 0 | length(inclusion) == 0) {return(c(0, 0))}
 
-  inclusion_rownum <- getRI_internal(gtf_filtered, jaccard_indices[[1]], inclusion, "incl")
+  inclusion_rownum <- getRI_internal(gtf_filtered, jaccard_indices[[1]], inclusion, "incl", minOverlap)
 
   if (unique(gtf_filtered$strand) == "+") {
     downstream_exclusion_exon <- unlist(possible_exclusion_exons)[which.max(gtf_filtered$start[match(unlist(possible_exclusion_exons),
@@ -620,7 +620,7 @@ RImatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
 #' helper for RImatcher
 #' @return rownums for the clusion
 #' @export
-getRI_internal <- function(g, indices, clusion, strVar) {
+getRI_internal <- function(g, indices, clusion, strVar, minOverlap) {
   g$jaccard <- indices$jaccard_index
   g$length_jacc <- indices$length_jacc
   g <- subset(g, jaccard > minOverlap & transcriptID %in% clusion)
