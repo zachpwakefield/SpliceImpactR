@@ -461,7 +461,7 @@ ASmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
 #' helper for MXEmatcher
 #' @return rownums for the clusion
 #' @export
-getAS_internal <- function(g, indices, clusion, strVar, whichType, minOverlap) {
+getAS_internal <- function(g, indices, clusion, strVar, minOverlap) {
   g$jaccard <- indices$jaccard_index
   g$length_jacc <- indices$length_jacc
   g <- subset(g, jaccard > minOverlap & transcriptID %in% clusion)
