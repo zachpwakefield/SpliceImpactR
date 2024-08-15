@@ -227,9 +227,9 @@ irRead <- function(addInf, coding_exons, exon_data, exon_length_df) {
                  exon_length_df$cds_length[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcript[x+1]] > 0)
     codeVal[is.na(codeVal)] <- FALSE
     codeVar <- ifelse(sum(codeVal) > 0, ifelse(sum(codeVal) == 2, "allCoding", "someNonCoding"), "allNonCoding")
-    if (codeVar == "allNonCoding#") {
+    if (codeVar == "allNonCoding") {
       return("PartialMatch")
-    } else if (codeVar == "someNonCoding#") {
+    } else if (codeVar == "someNonCoding") {
       return("PartialMatch")
     } else {
 
@@ -259,9 +259,9 @@ mxeRead <- function(addInf, coding_exons, exon_data, exon_length_df) {
                  exon_length_df$cds_length[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcript[x+1]] > 0)
     codeVal[is.na(codeVal)] <- FALSE
     codeVar <- ifelse(sum(codeVal) > 0, ifelse(sum(codeVal) == 2, "allCoding", "someNonCoding"), "allNonCoding")
-    if (codeVar == "allNonCoding#") {
+    if (codeVar == "allNonCoding") {
       return("PartialMatch")
-    } else if (codeVar == "someNonCoding#") {
+    } else if (codeVar == "someNonCoding") {
       return("PartialMatch")
     } else {
 
@@ -301,9 +301,9 @@ alt3Read <- function(addInf, coding_exons, exon_data, exon_length_df) {
                  exon_length_df$cds_length[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcript[x+1]] > 0)
     codeVal[is.na(codeVal)] <- FALSE
     codeVar <- ifelse(sum(codeVal) > 0, ifelse(sum(codeVal) == 2, "allCoding", "someNonCoding"), "allNonCoding")
-    if (codeVar == "allNonCoding#") {
+    if (codeVar == "allNonCoding") {
       return("PartialMatch")
-    } else if (codeVar == "someNonCoding#") {
+    } else if (codeVar == "someNonCoding") {
       return("PartialMatch")
     } else {
 
@@ -378,9 +378,9 @@ alt5Read <- function(addInf, coding_exons, exon_data, exon_length_df) {
                  exon_length_df$cds_length[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcript[x+1]] > 0)
     codeVal[is.na(codeVal)] <- FALSE
     codeVar <- ifelse(sum(codeVal) > 0, ifelse(sum(codeVal) == 2, "allCoding", "someNonCoding"), "allNonCoding")
-    if (codeVar == "allNonCoding#") {
+    if (codeVar == "allNonCoding") {
       return("PartialMatch")
-    } else if (codeVar == "someNonCoding#") {
+    } else if (codeVar == "someNonCoding") {
       return("PartialMatch")
     } else {
 
@@ -455,9 +455,9 @@ seRead <- function(addInf, coding_exons, exon_data, exon_length_df) {
                  exon_length_df$cds_length[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcript[x+1]] > 0)
     codeVal[is.na(codeVal)] <- FALSE
     codeVar <- ifelse(sum(codeVal) > 0, ifelse(sum(codeVal) == 2, "allCoding", "someNonCoding"), "allNonCoding")
-    if (codeVar == "allNonCoding#") {
+    if (codeVar == "allNonCoding") {
       return("PartialMatch")
-    } else if (codeVar == "someNonCoding#") {
+    } else if (codeVar == "someNonCoding") {
       return("PartialMatch")
     } else {
 
