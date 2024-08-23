@@ -17,7 +17,15 @@ getOverviewComparison <- function(data_df, exon_type, output_location, plot = TR
   sample_list <- c(sample_types[which(unlist(lapply(sample_types, "[[", 2)) == "control")], sample_types[which(unlist(lapply(sample_types, "[[", 2)) == "test")])
 
   # Load PSI values for each sample and splicing event type
-  data_list <- lapply(sample_list, function(x) read.table(paste0(x[1], paste0(".", exon_type, "PSI")), header = TRUE, sep = '\t'))
+  data_list <- lapply(sample_list, function(x) {
+    df <- read.table(paste0(x[1], paste0(".", exon_type, "PSI")), header = TRUE, sep = '\t')
+    if (exon_type %in% c("AFE", "ALE", "HFE", "HLE")) {
+      df[((df$nUP + df$nDOWN) > minReads),]
+    } else {
+      df[((df$IJC_SAMPLE_1 + df$SJC_SAMPLE_1) > minReads),]
+    }
+
+  })
 
   ## Number of AS across phenotype
   if (exon_type %in% c("AFE", "ALE", "HFE", "HLE")) {

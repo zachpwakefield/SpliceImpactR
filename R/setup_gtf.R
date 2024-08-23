@@ -9,6 +9,8 @@ setupAnnotation <- function() {
                                  dataset = "hsapiens_gene_ensembl")
   attributes <- c("chromosome_name", "exon_chrom_start", "exon_chrom_end", "strand", "ensembl_gene_id", "ensembl_transcript_id", "gene_biotype",
                   "transcript_biotype", "external_gene_name", "rank", "ensembl_exon_id")
+
+
   exon_data <- biomaRt::getBM(attributes = attributes, mart = ensembl)
 
   exon_data_exon_label <- exon_data %>% dplyr::filter(chromosome_name %in% c(1:23, "X", "Y")) %>%
@@ -100,6 +102,8 @@ setupAnnotation <- function() {
   transcript_gtf <- transcript_gtf %>% dplyr::mutate(strand = ifelse(strand == -1, "-", "+"))
   gtf <- gtf %>% dplyr::mutate(strand = ifelse(strand == -1, "-", "+"))
 
+  hybrid_last_exons <- hybrid_last_exons[hybrid_last_exons$ensembl_transcript_id_last %in% use_transcripts & hybrid_last_exons$ensembl_transcript_id_internal %in% use_transcripts,]
+  hybrid_first_exons <- hybrid_first_exons[hybrid_first_exons$ensembl_transcript_id_first %in% use_transcripts & hybrid_first_exons$ensembl_transcript_id_internal %in% use_transcripts,]
 
   hleList <- unique(c(paste0(hybrid_last_exons$ensembl_transcript_id_last, ';', hybrid_last_exons$ensembl_transcript_id_internal),
                       paste0(hybrid_last_exons$ensembl_transcript_id_internal, ';', hybrid_last_exons$ensembl_transcript_id_last)))
@@ -113,6 +117,20 @@ setupAnnotation <- function() {
     dplyr::arrange(transcriptID, adjusted_start) %>%
     dplyr::select(-adjusted_start) %>%
     ungroup()
+
+
+  attributes <- c("ensembl_transcript_id", "chromosome_name",
+                  "transcript_biotype","transcript_tsl", "transcript_is_canonical", "transcript_appris", "transcript_gencode_basic", "transcript_mane_plus_clinical")
+  tsl <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = c(1:23, "X", "Y"), filters = 'chromosome_name')
+  tsl$transcript_tsl <- unlist(lapply(strsplit(paste0(tsl$transcript_tsl, " "), " "), "[[", 1))
+  tsl$tsl <- tsl$transcript_tsl
+  tsl$tsl[tsl$transcript_is_canonical == 1] <- "tsl1_manual_canonical"
+  tsl$tsl[tsl$transcript_gencode_basic == "GENCODE basic"] <- "tsl1_manual_gencode"
+  use_transcripts <- tsl$ensembl_transcript_id[grepl("tsl1", tsl$tsl)]
+
+  gtf <- gtf[gtf$transcriptID %in% use_transcripts,]
+  tgp_biomart <- tgp_biomart[tgp_biomart$transcript_id %in% use_transcripts,]
+  transcript_gtf <- transcript_gtf[transcript_gtf$ensembl_transcript_id %in% use_transcripts,]
 
   return(list(gtf = gtf,
               transcript_gtf = transcript_gtf,
