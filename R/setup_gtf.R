@@ -1,5 +1,5 @@
 #' setting up gtf with exon labels, first, internal, last, hybrid, etc
-#' @importFrom dplyr filter group_by mutate ungroup inner_join select case_when
+#' @importFrom dplyr filter group_by mutate ungroup inner_join select case_when n
 #' @importFrom biomaRt useEnsembl getBM
 #' @return annotated gtf and various hybrid info. also gene to transcript to protein naming dataframe
 #' @keywords internal
@@ -34,7 +34,7 @@ setupAnnotation <- function() {
                     ((exon_chrom_start_first <= exon_chrom_end_internal & exon_chrom_end_first >= exon_chrom_start_internal) |
                        (exon_chrom_start_internal <= exon_chrom_end_first & exon_chrom_end_internal >= exon_chrom_start_first))) %>%
     dplyr::group_by(ensembl_transcript_id_first, ensembl_transcript_id_internal) %>%
-    dplyr::filter(n() == 1) %>%
+    dplyr::filter(dplyr::n() == 1) %>%
     dplyr::ungroup() %>% filter(exon_label_internal == "internal")
 
   # Select relevant columns to display the hybrid exons
