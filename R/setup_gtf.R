@@ -102,13 +102,24 @@ setupAnnotation <- function() {
   transcript_gtf <- transcript_gtf %>% dplyr::mutate(strand = ifelse(strand == -1, "-", "+"))
   gtf <- gtf %>% dplyr::mutate(strand = ifelse(strand == -1, "-", "+"))
 
+
+  # attributes <- c("ensembl_transcript_id", "chromosome_name",
+  #                 "transcript_biotype","transcript_tsl", "transcript_is_canonical", "transcript_appris", "transcript_gencode_basic", "transcript_mane_plus_clinical")
+  # tsl <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = c(1:23, "X", "Y"), filters = 'chromosome_name')
+  # tsl$transcript_tsl <- unlist(lapply(strsplit(paste0(tsl$transcript_tsl, " "), " "), "[[", 1))
+  # tsl$tsl <- tsl$transcript_tsl
+  # tsl$tsl[tsl$transcript_is_canonical == 1] <- "tsl1_manual_canonical"
+  # tsl$tsl[tsl$transcript_gencode_basic == "GENCODE basic"] <- "tsl1_manual_gencode"
+  # use_transcripts <- tsl$ensembl_transcript_id[grepl("tsl1", tsl$tsl)]
+
+
   hybrid_last_exons <- hybrid_last_exons[hybrid_last_exons$ensembl_transcript_id_last %in% use_transcripts & hybrid_last_exons$ensembl_transcript_id_internal %in% use_transcripts,]
   hybrid_first_exons <- hybrid_first_exons[hybrid_first_exons$ensembl_transcript_id_first %in% use_transcripts & hybrid_first_exons$ensembl_transcript_id_internal %in% use_transcripts,]
 
-  hleList <- unique(c(paste0(hybrid_last_exons$ensembl_transcript_id_last, ';', hybrid_last_exons$ensembl_transcript_id_internal),
-                      paste0(hybrid_last_exons$ensembl_transcript_id_internal, ';', hybrid_last_exons$ensembl_transcript_id_last)))
-  hfeList <- unique(c(paste0(hybrid_first_exons$ensembl_transcript_id_first, ';', hybrid_first_exons$ensembl_transcript_id_internal),
-                      paste0(hybrid_first_exons$ensembl_transcript_id_internal, ';', hybrid_first_exons$ensembl_transcript_id_first)))
+  # hleList <- unique(c(paste0(hybrid_last_exons$ensembl_transcript_id_last, ';', hybrid_last_exons$ensembl_transcript_id_internal),
+  #                     paste0(hybrid_last_exons$ensembl_transcript_id_internal, ';', hybrid_last_exons$ensembl_transcript_id_last)))
+  # hfeList <- unique(c(paste0(hybrid_first_exons$ensembl_transcript_id_first, ';', hybrid_first_exons$ensembl_transcript_id_internal),
+  #                     paste0(hybrid_first_exons$ensembl_transcript_id_internal, ';', hybrid_first_exons$ensembl_transcript_id_first)))
 
   gtf <- gtf %>% dplyr::group_by(transcriptID) %>%
     dplyr::mutate(
@@ -119,18 +130,9 @@ setupAnnotation <- function() {
     ungroup()
 
 
-  attributes <- c("ensembl_transcript_id", "chromosome_name",
-                  "transcript_biotype","transcript_tsl", "transcript_is_canonical", "transcript_appris", "transcript_gencode_basic", "transcript_mane_plus_clinical")
-  tsl <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = c(1:23, "X", "Y"), filters = 'chromosome_name')
-  tsl$transcript_tsl <- unlist(lapply(strsplit(paste0(tsl$transcript_tsl, " "), " "), "[[", 1))
-  tsl$tsl <- tsl$transcript_tsl
-  tsl$tsl[tsl$transcript_is_canonical == 1] <- "tsl1_manual_canonical"
-  tsl$tsl[tsl$transcript_gencode_basic == "GENCODE basic"] <- "tsl1_manual_gencode"
-  use_transcripts <- tsl$ensembl_transcript_id[grepl("tsl1", tsl$tsl)]
-
-  gtf <- gtf[gtf$transcriptID %in% use_transcripts,]
-  tgp_biomart <- tgp_biomart[tgp_biomart$transcript_id %in% use_transcripts,]
-  transcript_gtf <- transcript_gtf[transcript_gtf$ensembl_transcript_id %in% use_transcripts,]
+  # gtf <- gtf[gtf$transcriptID %in% use_transcripts,]
+  # tgp_biomart <- tgp_biomart[tgp_biomart$transcript_id %in% use_transcripts,]
+  # transcript_gtf <- transcript_gtf[transcript_gtf$ensembl_transcript_id %in% use_transcripts,]
 
   return(list(gtf = gtf,
               transcript_gtf = transcript_gtf,

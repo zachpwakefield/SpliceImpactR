@@ -51,7 +51,6 @@ getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
 
     ## filter by whichever domain identifying engine(s) selected
     ips_dt <- data.table::as.data.table(ip)
-    # ips <- ip %>% dplyr::filter(X4 %in% engine)
 
     result <- ips_dt[, .(protInf = paste(domains, collapse = ";")), by = X1]
 
