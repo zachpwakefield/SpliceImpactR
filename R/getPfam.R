@@ -34,7 +34,7 @@ getPfam <- function(background, foreground, pdir, output_location, cores = 1) {
                                  foreground$proBed$start, "-",
                                  foreground$proBed$stop, ";",
                                  foreground$proBed$strand)
-  fg_out <- left_join(foreground$proBed, pfam_hg38_transcript, by = c('transcript' = 'transcriptID'))
+  fg_out <- dplyr::left_join(foreground$proBed, pfam_hg38_transcript, by = c('transcript' = 'transcriptID'))
   fg_out <- fg_out$domains[!is.na(fg_out$domains)]
 
 
@@ -45,7 +45,7 @@ getPfam <- function(background, foreground, pdir, output_location, cores = 1) {
                                  background$proBed$start, "-",
                                  background$proBed$stop, ";",
                                  background$proBed$strand)
-  bg_out <- left_join(background$proBed, pfam_hg38_transcript, by = c('transcript' = 'transcriptID'))
+  bg_out <- dplyr::left_join(background$proBed, pfam_hg38_transcript, by = c('transcript' = 'transcriptID'))
   bg_out <- bg_out$domains[!is.na(bg_out$domains)]
 
   bg_out <- rbind(bg_out, fg_out[!(fg_out$transcriptID %in% bg_out$transcriptID),])
