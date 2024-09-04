@@ -4,7 +4,7 @@
 \alias{getRI_internal}
 \title{helper for RImatcher}
 \usage{
-getRI_internal(g, indices, clusion, strVar)
+getRI_internal(g, indices, clusion, strVar, minOverlap)
 }
 \value{
 rownums for the clusion

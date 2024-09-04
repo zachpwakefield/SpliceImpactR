@@ -28,6 +28,8 @@ Imports:
   utils,
   stringr,
   biomaRt,
-  R.utils
+  R.utils,
+  AnnotationDbi,
+  PFAM.db 
 RoxygenNote: 7.2.3
 biovViews: AlternativeSplicing, DifferentialSplicing, StatisticalMethod

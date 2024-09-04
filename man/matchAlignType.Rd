@@ -9,7 +9,9 @@ matchAlignType(
   protCode,
   nucleotides,
   output_location,
-  saveAlignments = TRUE
+  saveAlignments = TRUE,
+  exon_type,
+  newgtf
 )
 }
 \arguments{

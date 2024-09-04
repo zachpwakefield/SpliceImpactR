@@ -4,7 +4,7 @@
 \alias{getAS_internal}
 \title{helper for MXEmatcher}
 \usage{
-getAS_internal(g, indices, clusion, strVar, whichType)
+getAS_internal(g, indices, clusion, strVar, minOverlap)
 }
 \value{
 rownums for the clusion
