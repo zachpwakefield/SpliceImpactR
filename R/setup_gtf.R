@@ -113,13 +113,13 @@ setupAnnotation <- function() {
   # use_transcripts <- tsl$ensembl_transcript_id[grepl("tsl1", tsl$tsl)]
 
 
-  hybrid_last_exons <- hybrid_last_exons[hybrid_last_exons$ensembl_transcript_id_last %in% use_transcripts & hybrid_last_exons$ensembl_transcript_id_internal %in% use_transcripts,]
-  hybrid_first_exons <- hybrid_first_exons[hybrid_first_exons$ensembl_transcript_id_first %in% use_transcripts & hybrid_first_exons$ensembl_transcript_id_internal %in% use_transcripts,]
+  # hybrid_last_exons <- hybrid_last_exons[hybrid_last_exons$ensembl_transcript_id_last %in% use_transcripts & hybrid_last_exons$ensembl_transcript_id_internal %in% use_transcripts,]
+  # hybrid_first_exons <- hybrid_first_exons[hybrid_first_exons$ensembl_transcript_id_first %in% use_transcripts & hybrid_first_exons$ensembl_transcript_id_internal %in% use_transcripts,]
 
-  # hleList <- unique(c(paste0(hybrid_last_exons$ensembl_transcript_id_last, ';', hybrid_last_exons$ensembl_transcript_id_internal),
-  #                     paste0(hybrid_last_exons$ensembl_transcript_id_internal, ';', hybrid_last_exons$ensembl_transcript_id_last)))
-  # hfeList <- unique(c(paste0(hybrid_first_exons$ensembl_transcript_id_first, ';', hybrid_first_exons$ensembl_transcript_id_internal),
-  #                     paste0(hybrid_first_exons$ensembl_transcript_id_internal, ';', hybrid_first_exons$ensembl_transcript_id_first)))
+  hleList <- unique(c(paste0(hybrid_last_exons$ensembl_transcript_id_last, ';', hybrid_last_exons$ensembl_transcript_id_internal),
+                      paste0(hybrid_last_exons$ensembl_transcript_id_internal, ';', hybrid_last_exons$ensembl_transcript_id_last)))
+  hfeList <- unique(c(paste0(hybrid_first_exons$ensembl_transcript_id_first, ';', hybrid_first_exons$ensembl_transcript_id_internal),
+                      paste0(hybrid_first_exons$ensembl_transcript_id_internal, ';', hybrid_first_exons$ensembl_transcript_id_first)))
 
   gtf <- gtf %>% dplyr::group_by(transcriptID) %>%
     dplyr::mutate(
