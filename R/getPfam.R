@@ -15,50 +15,38 @@ getPfam <- function(background, foreground, pdir, output_location, cores = 1) {
   iPFAM <- initPFAM()
 
   pfam_hg38_exon <- data.frame(transcriptID = iPFAM$exon_level$ensembl_transcript_id,
-                          exonID = iPFAM$exon_level$ensembl_exon_id,
-                          geneID = iPFAM$exon_level$ensembl_gene_id,
-                          domains = iPFAM$exon_level$interpro_description,
-                          domains_ipID = iPFAM$exon_level$domainIDs,
-                          domains_pfamID = iPFAM$exon_level$pfam)
+                               exonID = iPFAM$exon_level$ensembl_exon_id,
+                               geneID = iPFAM$exon_level$ensembl_gene_id,
+                               domains = iPFAM$exon_level$interpro_description,
+                               domains_ipID = iPFAM$exon_level$domainIDs,
+                               domains_pfamID = iPFAM$exon_level$pfam)
 
   pfam_hg38_transcript <- data.frame(transcriptID = iPFAM$transcript_level$ensembl_transcript_id,
-                               geneID = iPFAM$transcript_level$ensembl_gene_id,
-                               domains = iPFAM$transcript_level$interpro_description,
-                               domains_ipID = iPFAM$transcript_level$domainIDs,
-                               domains_pfamID = iPFAM$transcript_level$pfam)
-  # Process foreground data to match Pfam domains with transcripts
-  fg_out <- do.call(rbind, parallel::mclapply(1:length(foreground$proBed$transcript), mc.cores = cores, function(i) {
-    # Check if the transcript is in the Pfam reference
-    if (foreground$proBed$transcript[i] %in% pfam_hg38_exon$transcriptID) {
-      # Subset the reference data for the matching transcript
-      df <- pfam_hg38_exon[pfam_hg38_exon$exonID == foreground$proBed$exonID[i],]
-      # Construct an identifier combining various elements of the transcript
-      id <- paste0(foreground$proBed$transcript[i], "#",
-                   foreground$proBed$gene[i], ";",
-                   foreground$proBed$chr[i], ":",
-                   foreground$proBed$start[i], "-",
-                   foreground$proBed$stop[i], ";",
-                   foreground$proBed$strand[i])
-      # Replace the first column of the dataframe with the new identifier
-      df$X1 <- rep(id, nrow(df))
-      df
-    }
-  }))
+                                     geneID = iPFAM$transcript_level$ensembl_gene_id,
+                                     domains = iPFAM$transcript_level$interpro_description,
+                                     domains_ipID = iPFAM$transcript_level$domainIDs,
+                                     domains_pfamID = iPFAM$transcript_level$pfam)
+
+  # Process foreground
+  foreground$proBed$X1 <- paste0(foreground$proBed$transcript, "#",
+                                 foreground$proBed$gene, ";",
+                                 foreground$proBed$chr, ":",
+                                 foreground$proBed$start, "-",
+                                 foreground$proBed$stop, ";",
+                                 foreground$proBed$strand)
+  fg_out <- left_join(foreground$proBed, pfam_hg38_transcript, by = c('transcript' = 'transcriptID'))
+  fg_out <- fg_out$domains[!is.na(fg_out$domains)]
+
 
   # Process background data similarly to the foreground
-  bg_out <- do.call(rbind, parallel::mclapply(1:length(background$proBed$transcript), mc.cores = cores, function(i) {
-    if (background$proBed$transcript[i] %in% pfam_hg38_transcript$transcriptID) {
-      df <- pfam_hg38_transcript[pfam_hg38_transcript$transcriptID == background$proBed$transcript[i],]
-      id <- paste0(background$proBed$transcript[i], "#",
-                   background$proBed$gene[i], ";",
-                   background$proBed$chr[i], ":",
-                   background$proBed$start[i], "-",
-                   background$proBed$stop[i], ";",
-                   background$proBed$strand[i])
-      df$X1 <- rep(id, nrow(df))
-      df
-    }
-  }))
+  background$proBed$X1 <- paste0(background$proBed$transcript, "#",
+                                 background$proBed$gene, ";",
+                                 background$proBed$chr, ":",
+                                 background$proBed$start, "-",
+                                 background$proBed$stop, ";",
+                                 background$proBed$strand)
+  bg_out <- left_join(background$proBed, pfam_hg38_transcript, by = c('transcript' = 'transcriptID'))
+  bg_out <- bg_out$domains[!is.na(bg_out$domains)]
 
   bg_out <- rbind(bg_out, fg_out[!(fg_out$transcriptID %in% bg_out$transcriptID),])
 
@@ -85,8 +73,7 @@ initPFAM <- function() {
   xx <- as.list(x[mapped_keys])
   pfam2ipscan <- data.frame(pfam_id = names(xx),
                             domainIDs = unlist(xx))
-  ensembl <- try(biomaRt::useEnsembl(biomart = "ensembl",
-                                 dataset = "hsapiens_gene_ensembl"))
+
   attributes <- c("ensembl_transcript_id", "chromosome_name",
                   "transcript_biotype","interpro_description", "interpro")
   ip <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list(c(1:23, "X", "Y"), "protein_coding"), filters = c('chromosome_name', "transcript_biotype"))
@@ -104,7 +91,7 @@ initPFAM <- function() {
   b8 <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list(c(21:23), "protein_coding"), filters = c('chromosome_name', "transcript_biotype"))
   b9 <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list(c("X", "Y"), "protein_coding"), filters = c('chromosome_name', "transcript_biotype"))
 
-  attributes <- c("ensembl_transcript_id", "ensembl_exon_id", "cds_start", "cds_end")
+  attributes <- c("ensembl_gene_id", "ensembl_transcript_id", "ensembl_exon_id", "cds_start", "cds_end")
   e <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list("protein_coding"), filters = c("transcript_biotype"))
   e$cds_start_aa <- ceiling(e$cds_start/3)
   e$cds_end_aa <- ceiling(e$cds_end/3)
@@ -118,8 +105,8 @@ initPFAM <- function() {
 
   pfam_hg38 <- dplyr::inner_join(be8, pfam_to_ip, by = c('pfam' = 'pfam_id'))
 
-  transcript_level <- pfam_hg38[!duplicated(pfam_hg38[,c(1, 3, 6, 7, 12, 13)]), c(1, 3, 6, 7, 12, 13)]
-  exon_level <- pfam_hg38[with(pfam_hg38, (pfam_start <= cds_end_aa) & (pfam_end >= cds_start_aa)),]
+  transcript_level <- pfam_hg38[!duplicated(pfam_hg38[,c(8, 2, 5, 6, 7, 13, 14)]), c(8, 2, 5, 6, 7, 13, 14)]
+  exon_level <- pfam_hg38[with(pfam_hg38, (pfam_start <= cds_end_aa) & (pfam_end >= cds_start_aa)),c(8, 1, 2, 5, 13, 14)]
   return(list(transcript_level = transcript_level,
               exon_level = exon_level))
 }
