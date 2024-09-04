@@ -34,8 +34,8 @@ getPfam <- function(background, foreground, pdir, output_location, cores = 1) {
                                  foreground$proBed$start, "-",
                                  foreground$proBed$stop, ";",
                                  foreground$proBed$strand)
-  fg_out <- dplyr::left_join(foreground$proBed, pfam_hg38_transcript, by = c('transcript' = 'transcriptID'))
-  fg_out <- fg_out$domains[!is.na(fg_out$domains)]
+  fg_out <- dplyr::left_join(foreground$proBed, pfam_hg38_exon, by = c('transcript' = 'transcriptID', 'exonID'))
+  fg_out <- fg_out[!is.na(fg_out$domains),]
 
 
   # Process background data similarly to the foreground
@@ -46,9 +46,9 @@ getPfam <- function(background, foreground, pdir, output_location, cores = 1) {
                                  background$proBed$stop, ";",
                                  background$proBed$strand)
   bg_out <- dplyr::left_join(background$proBed, pfam_hg38_transcript, by = c('transcript' = 'transcriptID'))
-  bg_out <- bg_out$domains[!is.na(bg_out$domains)]
+  bg_out <- bg_out[!is.na(bg_out$domains),]
 
-  bg_out <- rbind(bg_out, fg_out[!(fg_out$transcriptID %in% bg_out$transcriptID),])
+  bg_out <- rbind(bg_out, fg_out[!(fg_out$transcript %in% bg_out$transcript),-c(which(colnames(fg_out) %in% c('delta.psi', 'p.adj', 'add_inf', 'exonID')))])
 
 
   # Write the processed foreground and background data to TSV files
