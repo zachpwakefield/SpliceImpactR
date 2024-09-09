@@ -11,7 +11,7 @@
 #' @param topViz the max number of domains to put in each visualization
 #' @param output_location location to make background directory
 #' @return the domain enrichment data and the enrichment plots
-#' @importFrom dplyr arrange filter
+#' @importFrom dplyr arrange filter first group_by
 #' @importFrom stats phyper p.adjust
 #' @importFrom ggplot2 scale_fill_manual theme_classic ggplot aes xlab ylab theme geom_bar geom_boxplot theme_classic coord_flip theme_bw ggtitle element_blank element_line
 #' @importFrom ggpubr ggarrange
@@ -27,6 +27,11 @@ getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
   ipscan <- list(pfam$bg_out, pfam$fg_out) #fg_out, bg_out
   outFast<- list(bg$proFast, fg$proFast) #fg$proFast, fg$proFast
   outBed <- list(bg$proBed, pfg$paired_proBed) #bg$proBed, bg$proBed
+
+  ## remove dup'd transcripts from bg_out to make background correctly
+  ipscan[[1]] <- ipscan[[1]] %>%
+    dplyr::group_by(transcript) %>%
+    dplyr::filter(X1 == dplyr::first(X1))
 
   system(paste0("mkdir ", output_location, "DomainEnrichment/"))
   ## Process interproscan results for background and foreground datasets
@@ -187,49 +192,34 @@ getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
   print(comb_plot)
   dev.off()
 
-  # Generate enrichment plots for upregulated and downregulated genes
-  eP <-lapply(1:2, function(x) {
-    if (dataList[[x]][1] == "none") {
-      return(NA)
-    }
-    data <- lapply(dataList, "[[", 1)
+  dataList[[1]][[1]]$reg <- "Upregulated"
+  dataList[[2]][[1]]$reg <- "Downregulated"
 
-    # Prepare data for plotting
-    sp <- data[[x]][data[[x]]$fdr <= fdr_use & data[[x]]$sample_successes >= min_sample_success,c(1, 6, 11)]
-    if (nrow(sp) == 0) {
-      message("Lower min_sample_success and/or increase fdr, none meet criteria")
-      return(NA)
-    }
-    sp$category <- "foreground"
-    colnames(sp)[2] <- c("proportion")
-    pp <- data[[x]][data[[x]]$fdr <= fdr_use & data[[x]]$sample_successes >= min_sample_success,c(1, 9, 11)]
-    pp$category <- "background"
-    colnames(pp)[2] <- c("proportion")
-    df <- rbind(sp, pp)
-    df <- df[df$rel_prop >= ifelse(nrow(df) > topViz, sort(df$rel_prop, decreasing = TRUE)[topViz], max(df$rel_prop)),]
-    # Create and save enrichment plots using ggplot2
-    enrichmentPlot <- ggplot2::ggplot(data=df, ggplot2::aes(x=domain, y=proportion, fill=category)) +
-      ggplot2::geom_bar(stat="identity", position=ggplot2::position_dodge())+
-      ggplot2::coord_flip() +
-      ggplot2::theme_bw()+
-      ggplot2::theme(axis.ticks.y=ggplot2::element_blank()  #remove y axis ticks
-      )+
-      ggplot2::scale_fill_manual(values=c('brown','chartreuse4')) + ggplot2::ggtitle(paste0("Domain Enrichment of ", ifelse(x == "1", "(+)", "(-)"),
-                                                                                            " PSI Exons")) +
-      ggplot2::theme(panel.grid.major = ggplot2::element_blank(),
-                     panel.grid.minor = ggplot2::element_blank(),
-                     panel.background = ggplot2::element_blank(),
-                     axis.line = ggplot2::element_line(colour = "black"))
+  dataFinal <- rbind(dataList[[1]][[1]], dataList[[2]][[1]])
+  dataFinal$reg <- factor(dataFinal$reg, levels = unique(dataFinal$reg))
+  dataFinal$domain2 <- 1:length(dataFinal$domain)
+  # dataFinal <- transform(dataFinal, variable=reorder(domain, domain2) )
+  enrichmentPlot <- ggplot2::ggplot(data=dataFinal, ggplot2::aes(x=reorder(domain, domain2), y=-log10(fdr), fill = reg)) +
+    ggplot2::geom_bar(stat="identity")+
+    ggplot2::coord_flip() +
+    ggplot2::theme_bw()+
+    ggplot2::theme(axis.ticks.y=ggplot2::element_blank()  #remove y axis ticks
+    )+
+    ggplot2::scale_fill_manual(values=c('brown','chartreuse4'), breaks = c("Downregulated", "Upregulated")) +
+    ggplot2::ggtitle("Global Domain Enrichment") +
+    ggplot2::theme(panel.grid.major = ggplot2::element_blank(),
+                   panel.grid.minor = ggplot2::element_blank(),
+                   panel.background = ggplot2::element_blank(),
+                   axis.line = ggplot2::element_line(colour = "black"))
 
-    pdf(paste0(output_location, "DomainEnrichment/", ifelse(x == "1", "(+)", "(-)"), 'enrichmentPlot.pdf'))
-    print(enrichmentPlot)
-    dev.off()
-    enrichmentPlot
+  pdf(paste0(output_location, "DomainEnrichment/GlobalEnrichmentPlot.pdf"))
+  print(enrichmentPlot)
+  dev.off()
+  enrichmentPlot
 
-  })
 
 
   # Return a list containing the domain enrichment data and plots
-  return(list(data=do.call(rbind, lapply(dataList, "[[", 1)),
+  return(list(data=dataFinal,
               enrichmentPlots = eP))
 }

@@ -129,7 +129,7 @@ getPaired <- function(foreground, et, nucleotides, newGTF, cores = 1, output_loc
                          col = c("Pair Type", "Pair Type", "Pair Type", "Pair Type", "Pair Type"))
 
     (propCoding <- ggplot2::ggplot(dfProp, ggplot2::aes(fill=.data$type, x = .data$col, y = .data$vals)) +
-      geom_bar(position="stack", stat="identity") +
+        ggplot2::geom_bar(position="stack", stat="identity") +
       ggplot2::scale_fill_manual(values=c('noPC' = "azure4", 'Match' = "#E69F00", 'onePC' = "#56B4E9", 'FrameShift' = "pink", 'PartialMatch' = "deeppink4")) +
       ggplot2::theme_classic() + ggplot2::xlab("") + ggplot2::ylab("Count"))
 
