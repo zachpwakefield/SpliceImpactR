@@ -309,13 +309,7 @@ getEnrichmentTTI <- function(current_transcript, t_impacts, fdr, transGeneProt,
 #' @importFrom R.utils gunzip
 #' @importFrom biomaRt useEnsembl getBM
 #' @export
-init_ddi <- function(pdir, output_location, ppidm_class = c("Gold_Standard", "Gold", "Silver", "Bronze")[1], removeDups = TRUE, cores = 1) {
-  # Read in the protein coding data from the package directory
-  ensembl <- biomaRt::useEnsembl(biomart = "ensembl",
-                                 dataset = "hsapiens_gene_ensembl")
-  attributes <- c("ensembl_gene_id", "ensembl_transcript_id", "pfam",
-                  "transcript_biotype")
-  pfam_data <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list(c(1:23, "X", "Y"), "protein_coding"), filters = c('chromosome_name', "transcript_biotype"))
+init_ddi <- function(pdir, output_location, ppidm_class = c("Gold_Standard", "Gold", "Silver", "Bronze")[1], removeDups = TRUE, cores = 1, pfam_data) {
   pfam_data <- pfam_data[pfam_data$pfam != "",]
   pfam_in <- data.frame(transcriptID = pfam_data$ensembl_transcript_id,
                         geneID = pfam_data$ensembl_gene_id,

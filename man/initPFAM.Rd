@@ -4,7 +4,7 @@
 \alias{initPFAM}
 \title{get the pfam domains and ip conversions}
 \usage{
-initPFAM()
+initPFAM(biomart_data)
 }
 \value{
 exon and transcript level domains

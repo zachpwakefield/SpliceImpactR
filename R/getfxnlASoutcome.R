@@ -23,7 +23,8 @@ getfxnlASoutcome <- function(output_location,
                              tti_location = "", full_pipe = TRUE,
                              bg = NA, mOverlap = .05, gtf,
                              plotAlignments = FALSE,
-                             transcripts, translations) {
+                             transcripts, translations,
+                             biomart_data) {
   system(paste0("mkdir ",  output_location))
   pdir <- system.file(package="SpliceImpactR")
 
@@ -63,7 +64,7 @@ getfxnlASoutcome <- function(output_location,
   }
 
   pfg <- getPaired(foreground = fg$proBed, et = exon_type, nucleotides = transcripts,
-                   output_location = output_location, newGTF = gtf, saveAlignments = plotAlignments)
+                   output_location = output_location, newGTF = gtf, saveAlignments = plotAlignments, biomart_data$fsd_exon_data)
 
   if (nrow(pfg$paired_proBed) > 1) {
     length_comparison <- getLengthComparison(data_df, pfg$paired_proBed, output_location)
@@ -84,7 +85,7 @@ getfxnlASoutcome <- function(output_location,
 
   #####
   pfam <- getPfam(foreground = fg, background = bg, pdir = pdir,
-                  cores = cores, output_location = output_location)
+                  cores = cores, output_location = output_location, biomart_data)
 
 
   gD <- getDomainData(fg = fg, bg = bg, pfg=pfg, cores = cores, pfam = pfam, output_location = output_location,

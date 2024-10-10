@@ -9,7 +9,8 @@ init_ddi(
   output_location,
   ppidm_class = c("Gold_Standard", "Gold", "Silver", "Bronze")[1],
   removeDups = TRUE,
-  cores = 1
+  cores = 1,
+  pfam_data
 )
 }
 \arguments{

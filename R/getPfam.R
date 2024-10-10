@@ -10,9 +10,9 @@
 #' @importFrom parallel mclapply
 #' @importFrom biomaRt useEnsembl getBM
 #' @export
-getPfam <- function(background, foreground, pdir, output_location, cores = 1) {
+getPfam <- function(background, foreground, pdir, output_location, cores = 1, biomart_data) {
 
-  iPFAM <- initPFAM()
+  iPFAM <- initPFAM(biomart_data)
 
   pfam_hg38_exon <- data.frame(transcriptID = iPFAM$exon_level$ensembl_transcript_id,
                                exonID = iPFAM$exon_level$ensembl_exon_id,
@@ -66,7 +66,7 @@ getPfam <- function(background, foreground, pdir, output_location, cores = 1) {
 #' @importFrom PFAM.db PFAMINTERPRO
 #' @importFrom dplyr inner_join left_join
 #' @export
-initPFAM <- function() {
+initPFAM <- function(biomart_data) {
 
   x <- PFAM.db::PFAMINTERPRO
   mapped_keys <- AnnotationDbi::mappedkeys(x)
@@ -74,31 +74,15 @@ initPFAM <- function() {
   pfam2ipscan <- data.frame(pfam_id = names(xx),
                             domainIDs = unlist(xx))
 
-  attributes <- c("ensembl_transcript_id", "chromosome_name",
-                  "transcript_biotype","interpro_description", "interpro")
-  ip <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list(c(1:23, "X", "Y"), "protein_coding"), filters = c('chromosome_name', "transcript_biotype"))
-  ip_convert <- ip[!duplicated(ip[,c(4, 5)]) & ip$interpro_description != "" & ip$interpro != "",c(4, 5)]
+  ip_convert <- biomart_data$ip[!duplicated(biomart_data$ip[,c(4, 5)]) & biomart_data$ip$interpro_description != "" & biomart_data$ip$interpro != "",c(4, 5)]
   pfam_to_ip <- dplyr::inner_join(pfam2ipscan, ip_convert, by = c('domainIDs' = 'interpro'))
 
-  attributes <- c("ensembl_transcript_id", "ensembl_exon_id", "pfam", 'chromosome_name', 'transcript_biotype', 'pfam_start', 'pfam_end')
-  b1 <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list(c(1:2), "protein_coding"), filters = c('chromosome_name', "transcript_biotype"))
-  b2 <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list(c(3:4), "protein_coding"), filters = c('chromosome_name', "transcript_biotype"))
-  b3 <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list(c(5:7), "protein_coding"), filters = c('chromosome_name', "transcript_biotype"))
-  b4 <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list(c(8:10), "protein_coding"), filters = c('chromosome_name', "transcript_biotype"))
-  b5 <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list(c(11:13), "protein_coding"), filters = c('chromosome_name', "transcript_biotype"))
-  b6 <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list(c(14:16), "protein_coding"), filters = c('chromosome_name', "transcript_biotype"))
-  b7 <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list(c(17:20), "protein_coding"), filters = c('chromosome_name', "transcript_biotype"))
-  b8 <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list(c(21:23), "protein_coding"), filters = c('chromosome_name', "transcript_biotype"))
-  b9 <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list(c("X", "Y"), "protein_coding"), filters = c('chromosome_name', "transcript_biotype"))
-
-  attributes <- c("ensembl_gene_id", "ensembl_transcript_id", "ensembl_exon_id", "cds_start", "cds_end")
-  e <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list("protein_coding"), filters = c("transcript_biotype"))
+  e <- biomart_data$code_regions
   e$cds_start_aa <- ceiling(e$cds_start/3)
   e$cds_end_aa <- ceiling(e$cds_end/3)
 
-  pfam_exon_level <- do.call(rbind, list(b1, b2, b3, b4, b5, b6, b7, b8, b9))
 
-  be8 <- left_join(pfam_exon_level, e, by = c("ensembl_transcript_id", "ensembl_exon_id"))
+  be8 <- left_join(biomart_data$pfam_exon_level, e, by = c("ensembl_transcript_id", "ensembl_exon_id"))
 
   be8 <- be8[!is.na(be8$cds_start) & !is.na(be8$cds_end),]
   be8 <- be8[!is.na(be8$pfam_start) & !is.na(be8$pfam_end),]

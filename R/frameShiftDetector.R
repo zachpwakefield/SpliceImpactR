@@ -1,9 +1,4 @@
-getFrameShiftInit <- function(newgtf) {
-  ensembl <- biomaRt::useEnsembl(biomart = "ensembl",
-                                 dataset = "hsapiens_gene_ensembl")
-  attributes <- c('ensembl_transcript_id', "exon_chrom_start", "exon_chrom_end", "ensembl_exon_id",'cds_start', 'cds_end', 'phase', 'end_phase',
-                  'genomic_coding_start', 'genomic_coding_end', 'strand')
-  exon_data <- biomaRt::getBM(attributes = attributes, mart = ensembl)
+getFrameShiftInit <- function(newgtf, exon_data) {
   exon_data <- exon_data[exon_data$ensembl_exon_id %in% newGTF$gtf$exonID,]
   exon_data$exon_biotype <- "coding"
   exon_data$exon_biotype[is.na(exon_data$cds_start) & is.na(exon_data$cds_end)] <- "noncoding"
@@ -29,8 +24,8 @@ getFrameShiftInit <- function(newgtf) {
 }
 
 
-getFrameShift <- function(fC, et, newgtf) {
-  gfs_init <- getFrameShiftInit(newgtf)
+getFrameShift <- function(fC, et, newgtf, exon_data) {
+  gfs_init <- getFrameShiftInit(newgtf, exon_data)
   if (et %in% c("AFE", "HFE")) {
     fs_out <- afheRead(addInf = fC, et,
                        coding_exons = gfs_init$coding_exons,

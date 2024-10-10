@@ -20,7 +20,8 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
                           data_df, outlier_handle = "1",
                           cutoff = .1, cores = 1, bg_pre = NA,
                           tti_location = "/projectnb/evolution/zwakefield/allison_mettl/analysis/sir/",
-                          mOverlap = .05, s_gtf, plotAlignments = FALSE, transcripts, translations) {
+                          mOverlap = .05, s_gtf, plotAlignments = FALSE, transcripts, translations,
+                          biomart_data) {
   system(paste0("mkdir ",  output_directory))
   pdir <- system.file(package="SpliceImpactR")
   ##get bg for all classes
@@ -51,7 +52,7 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
   }
   if (tti_location == "") {
     iDDI <- init_ddi(pdir = pdir, output_location = output_location,
-                     ppidm_class = "Gold_Standard", removeDups = TRUE)
+                     ppidm_class = "Gold_Standard", removeDups = TRUE, biomart_data$pfam_data)
     tti_location <- output_location
   }
 
@@ -74,7 +75,8 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
                             bg = bg,
                             gtf=s_gtf,
                             plotAlignments,
-                            transcripts, translations)
+                            transcripts, translations,
+                            biomart_data)
   })
 
 }

@@ -18,7 +18,8 @@ fullASoutcome(
   s_gtf,
   plotAlignments = FALSE,
   transcripts,
-  translations
+  translations,
+  biomart_data
 )
 }
 \arguments{

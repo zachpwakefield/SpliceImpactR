@@ -4,7 +4,7 @@
 \alias{getPfam}
 \title{get the pfam domains for each protein}
 \usage{
-getPfam(background, foreground, pdir, output_location, cores = 1)
+getPfam(background, foreground, pdir, output_location, cores = 1, biomart_data)
 }
 \arguments{
 \item{background}{output from getBackground}

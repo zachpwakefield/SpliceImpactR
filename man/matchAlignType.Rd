@@ -11,7 +11,8 @@ matchAlignType(
   output_location,
   saveAlignments = TRUE,
   exon_type,
-  newgtf
+  newgtf,
+  exon_data
 )
 }
 \arguments{

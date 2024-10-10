@@ -4,7 +4,7 @@
 \alias{setupAnnotation}
 \title{setting up gtf with exon labels, first, internal, last, hybrid, etc}
 \usage{
-setupAnnotation()
+setupAnnotation(biomart_data)
 }
 \value{
 annotated gtf and various hybrid info. also gene to transcript to protein naming dataframe
