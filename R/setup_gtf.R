@@ -142,7 +142,7 @@ setupBiomart <- function(save_location, m = '') {
   if (!(file.exists(paste0(save_location, 'setup_gtf_exon_data.csv')))) {
     attributes <- c("chromosome_name", "exon_chrom_start", "exon_chrom_end", "strand", "ensembl_gene_id", "ensembl_transcript_id", "gene_biotype",
                     "transcript_biotype", "external_gene_name", "rank", "ensembl_exon_id")
-    exon_data <- biomaRt::getBM(attributes = attributes, mart = ensembl)
+    setup_gtf_exon_data <- biomaRt::getBM(attributes = attributes, mart = ensembl)
     write_csv(setup_gtf_exon_data, paste0(save_location, 'setup_gtf_exon_data.csv'))
   } else {
     setup_gtf_exon_data <- read_csv(paste0(save_location, 'setup_gtf_exon_data.csv'))
