@@ -56,9 +56,10 @@ getTranscripts <- function(transcripts_location) {
 }
 
 #' wrapper for setup_gtf
+#' @param biomart_data output from setup_biomart
 #' @return annotated gtf and others from setup_gtf
 #' @export
-getAnnotation <- function() {
-  cg <- setupAnnotation()
+getAnnotation <- function(biomart_data) {
+  cg <- setupAnnotation(biomart_data)
   return(cg)
 }
