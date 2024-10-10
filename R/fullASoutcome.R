@@ -76,7 +76,7 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
                             gtf=s_gtf,
                             plotAlignments,
                             transcripts, translations,
-                            biomart_data)
+                            biomart_data = biomart_data)
   })
 
 }

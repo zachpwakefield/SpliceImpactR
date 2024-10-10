@@ -222,5 +222,5 @@ getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
 
   # Return a list containing the domain enrichment data and plots
   return(list(data=dataFinal,
-              enrichmentPlots = eP))
+              enrichmentPlots = enrichmentPlot))
 }
