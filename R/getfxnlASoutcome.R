@@ -64,7 +64,8 @@ getfxnlASoutcome <- function(output_location,
   }
 
   pfg <- getPaired(foreground = fg$proBed, et = exon_type, nucleotides = transcripts,
-                   output_location = output_location, newGTF = gtf, saveAlignments = plotAlignments, biomart_data$fsd_exon_data)
+                   output_location = output_location, newGTF = gtf, saveAlignments = plotAlignments,
+                   exon_data = biomart_data$fsd_exon_data)
 
   if (nrow(pfg$paired_proBed) > 1) {
     length_comparison <- getLengthComparison(data_df, pfg$paired_proBed, output_location)

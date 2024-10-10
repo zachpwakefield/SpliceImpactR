@@ -90,7 +90,7 @@ getPaired <- function(foreground, et, nucleotides, newGTF, cores = 1, output_loc
 
     # Use matchAlignType to identify protein alignment score and type
     placeholder_tri <- matchAlignType(proBed = combined_rows_df_expanded, protCode = combined_rows_df_expanded$prot, nucleotides = nucleotides, output_location = output_location,
-                                                   saveAlignments = saveAlignments, exon_type = et, newgtf = newGTF$gtf, exon_data)
+                                                   saveAlignments = saveAlignments, exon_type = et, newgtf = newGTF$gtf, exon_data = exon_data)
     proBed <- placeholder_tri[[1]]
     pMatch <- placeholder_tri[[2]]
     alignType <- placeholder_tri[[3]]
