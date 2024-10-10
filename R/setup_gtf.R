@@ -52,9 +52,10 @@ setupAnnotation <- function(biomart_data) {
   ptg_conversion <- biomart_data$ptg_init[biomart_data$ptg_init$chromosome_name %in% c(1:23, "X", "Y"),]
 
   ptg_conversion$chromosome_name <- NULL
-  ptg_conversion$external_gene_name[ptg_conversion$external_gene_name == ""] <- ptg_conversion$ensembl_gene_id[ptg_conversion$external_gene_name == ""]
-  ptg_conversion$external_transcript_name[ptg_conversion$external_transcript_name == ""] <- ptg_conversion$ensembl_gene_id[ptg_conversion$external_transcript_name == ""]
-  ptg_conversion$ensembl_peptide_id[ptg_conversion$ensembl_peptide_id == ""] <- "none"
+
+  ptg_conversion$external_gene_name[is.na(ptg_conversion$external_gene_name)] <- ptg_conversion$ensembl_gene_id[is.na(ptg_conversion$external_gene_name)]
+  ptg_conversion$external_transcript_name[is.na(ptg_conversion$external_transcript_name)] <- ptg_conversion$ensembl_gene_id[is.na(ptg_conversion$external_transcript_name)]
+  ptg_conversion$ensembl_peptide_id[is.na(ptg_conversion$ensembl_peptide_id)] <- "none"
 
   tgp_biomart <- data.frame(
     gene_id = ptg_conversion$ensembl_gene_id,
