@@ -115,7 +115,7 @@ getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
     if (sum(lengths(fg_dom_ul)) == 0) {
       noneFound <- paste0("No domains enriched in ", x, " set")
       message(noneFound)
-      return(list("none", data.frame(vals = 0, types = x), data.frame(vals = 0, types = x)))
+      return(list(data.frame(), data.frame(vals = 0, types = x), data.frame(vals = 0, types = x)))
     }
 
 
@@ -196,16 +196,8 @@ getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
   dataList[[1]][[1]]$reg <- "Upregulated"
   dataList[[2]][[1]]$reg <- "Downregulated"
 
-  domainframes <- list(dataList[[1]][[1]], dataList[[2]][[1]])
-
-  combined_df <- do.call(rbind, lapply(domainframes, function(x) {
-    if (nrow(x) > 0) {x
-      } else {
-        NULL
-      }
-    }))
-  if (nrow(combined_df) > 0) {
   dataFinal <- rbind(dataList[[1]][[1]], dataList[[2]][[1]])
+  if (nrow(dataFinal) > 0) {
   dataFinal$reg <- factor(dataFinal$reg, levels = unique(dataFinal$reg))
   dataFinal$domain2 <- 1:length(dataFinal$domain)
   # dataFinal <- transform(dataFinal, variable=reorder(domain, domain2) )
@@ -229,6 +221,7 @@ getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
   } else {
       enrichmentPlot <- NA
     }
+
 
 
   # Return a list containing the domain enrichment data and plots
