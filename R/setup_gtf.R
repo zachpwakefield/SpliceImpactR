@@ -158,7 +158,7 @@ setupBiomart <- function(save_location, m = '') {
 
   if (!(file.exists(paste0(save_location, 'transcript_data.csv')))) {
     attributes <- c("ensembl_transcript_id", "chromosome_name", "strand", "transcript_start", "transcript_end")
-    transcript_data <- biomaRt::getBM(attributes = transcript_attributes, mart = ensembl, values = c(1:23, "X", "Y"), filters = 'chromosome_name')
+    transcript_data <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = c(1:23, "X", "Y"), filters = 'chromosome_name')
     write_csv(transcript_data, paste0(save_location, 'transcript_data.csv'))
   } else {
     transcript_data <- read_csv(paste0(save_location, 'transcript_data.csv'))
