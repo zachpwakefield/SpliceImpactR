@@ -84,7 +84,7 @@ setupAnnotation <- function(biomart_data) {
 
   merge_transcript_exon <- gtf[gtf$classification == "first",c("transcriptID", "rownum")]
   merge_transcript_exon <- merge_transcript_exon[!duplicated(merge_transcript_exon),]
-  transcript_gtf <- dplyr::left_join(biomart$transcript_data, merge_transcript_exon, by = join_by('ensembl_transcript_id' == 'transcriptID'))
+  transcript_gtf <- dplyr::left_join(biomart_data$transcript_data, merge_transcript_exon, by = join_by('ensembl_transcript_id' == 'transcriptID'))
   transcript_gtf <- transcript_gtf[transcript_gtf$ensembl_transcript_id %in% gtf$transcriptID,]
   transcript_gtf$chromosome_name <- paste0('chr', transcript_gtf$chromosome_name)
   colnames(transcript_gtf) <- c('transcriptID', 'chr', 'strand', 'start', 'stop', 'rownum')
