@@ -193,10 +193,22 @@ getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
   print(comb_plot)
   dev.off()
 
-  dataList[[1]][[1]]$reg <- "Upregulated"
-  dataList[[2]][[1]]$reg <- "Downregulated"
+  if (nrow(dataList[[1]][[1]]) > 0 & nrow(dataList[[2]][[1]]) > 0) {
+    dataList[[1]][[1]]$reg <- "Upregulated"
+    dataList[[2]][[1]]$reg <- "Downregulated"
+    dataFinal <- rbind(dataList[[1]][[1]], dataList[[2]][[1]])
+  } else if (nrow(dataList[[1]][[1]]) > 0) {
+    dataList[[1]][[1]]$reg <- "Upregulated"
+    dataFinal <- dataList[[1]][[1]]
+  } else if (nrow(dataList[[2]][[1]]) > 0) {
+    dataList[[2]][[1]]$reg <- "Downregulated"
+    dataFinal <- dataList[[2]][[1]]
+  } else {
+    dataFinal <- data.frame()
+  }
 
-  dataFinal <- rbind(dataList[[1]][[1]], dataList[[2]][[1]])
+
+
   if (nrow(dataFinal) > 0) {
   dataFinal$reg <- factor(dataFinal$reg, levels = unique(dataFinal$reg))
   dataFinal$domain2 <- 1:length(dataFinal$domain)
