@@ -196,6 +196,15 @@ getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
   dataList[[1]][[1]]$reg <- "Upregulated"
   dataList[[2]][[1]]$reg <- "Downregulated"
 
+  domainframes <- list(dataList[[1]][[1]], dataList[[2]][[1]])
+
+  combined_df <- do.call(rbind, lapply(domainframes, function(x) {
+    if (nrow(x) > 0) {x
+      } else {
+        NULL
+      }
+    }))
+  if (nrow(combined_df) > 0) {
   dataFinal <- rbind(dataList[[1]][[1]], dataList[[2]][[1]])
   dataFinal$reg <- factor(dataFinal$reg, levels = unique(dataFinal$reg))
   dataFinal$domain2 <- 1:length(dataFinal$domain)
@@ -217,7 +226,9 @@ getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
   print(enrichmentPlot)
   dev.off()
   enrichmentPlot
-
+  } else {
+      enrichmentPlot <- NA
+    }
 
 
   # Return a list containing the domain enrichment data and plots
