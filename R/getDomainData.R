@@ -209,7 +209,7 @@ getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
 
 
 
-  if (nrow(dataFinal) > 0) {
+  if (nrow(dataFinal[dataFinal$sample_successes >= min_sample_success,]) > 0) {
   dataFinal$reg <- factor(dataFinal$reg, levels = unique(dataFinal$reg))
   dataFinal$domain2 <- 1:length(dataFinal$domain)
   # dataFinal <- transform(dataFinal, variable=reorder(domain, domain2) )
