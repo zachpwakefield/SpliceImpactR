@@ -4,7 +4,10 @@
 \alias{getAnnotation}
 \title{wrapper for setup_gtf}
 \usage{
-getAnnotation()
+getAnnotation(biomart_data)
+}
+\arguments{
+\item{biomart_data}{output from setup_biomart}
 }
 \value{
 annotated gtf and others from setup_gtf

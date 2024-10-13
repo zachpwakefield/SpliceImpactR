@@ -1,5 +1,5 @@
 getFrameShiftInit <- function(newgtf, exon_data) {
-  exon_data <- exon_data[exon_data$ensembl_exon_id %in% newGTF$gtf$exonID,]
+  exon_data <- exon_data[exon_data$ensembl_exon_id %in% newgtf$gtf$exonID,]
   exon_data$exon_biotype <- "coding"
   exon_data$exon_biotype[is.na(exon_data$cds_start) & is.na(exon_data$cds_end)] <- "noncoding"
   exon_data$cds_length<- exon_data$cds_end-exon_data$cds_start+1
@@ -30,12 +30,14 @@ getFrameShift <- function(fC, et, newgtf, exon_data) {
     fs_out <- afheRead(addInf = fC, et,
                        coding_exons = gfs_init$coding_exons,
                        exon_data = gfs_init$exon_data,
-                       exon_length_df = gfs_init$exon_length_df)
+                       exon_length_df = gfs_init$exon_length_df,
+                       newgtf)
   } else if (et %in% c("ALE", "HLE")) {
     fs_out <- alheRead(addInf = fC, et,
                        coding_exons = gfs_init$coding_exons,
                        exon_data = gfs_init$exon_data,
-                       exon_length_df = gfs_init$exon_length_df)
+                       exon_length_df = gfs_init$exon_length_df,
+                       newgtf)
   } else if (et %in% c('A3SS')) {
     fs_out <- alt3Read(addInf = fC,
                        coding_exons = gfs_init$coding_exons,
@@ -65,7 +67,7 @@ getFrameShift <- function(fC, et, newgtf, exon_data) {
   return(fs_out)
 }
 
-getFLOverlap <- function(transcript1, transcript2, ex, coding_exonsX, eld) {
+getFLOverlap <- function(transcript1, transcript2, ex, coding_exonsX, eld, newGTF) {
 
   df1 <- newGTF$gtf[newGTF$gtf$transcriptID %in% transcript1 & (!is.na(eld$genomic_coding_end) & !is.na(eld$genomic_coding_start)),]
 
@@ -103,7 +105,7 @@ getFLOverlap <- function(transcript1, transcript2, ex, coding_exonsX, eld) {
 }
 
 
-alheRead <- function(addInf, et, coding_exons, exon_data, exon_length_df) {
+alheRead <- function(addInf, et, coding_exons, exon_data, exon_length_df, newgtf) {
 
   outReads <- unlist(lapply(seq(1, nrow(addInf), by=2), function(x) {
     if (addInf$prot[x] == "none" & addInf$prot[x+1] == "none") {
@@ -111,7 +113,7 @@ alheRead <- function(addInf, et, coding_exons, exon_data, exon_length_df) {
     } else if (sum(c(addInf$prot[x] == "none", addInf$prot[x+1] == "none")) == 1) {
       return(paste0("onePC"))
     }
-    overlappingExon <- getFLOverlap(addInf$transcript[x], addInf$transcript[x+1], ex=et, coding_exons, exon_length_df)
+    overlappingExon <- getFLOverlap(addInf$transcript[x], addInf$transcript[x+1], ex=et, coding_exons, exon_length_df, newgtf)
     if (overlappingExon[1] == "noOverlap") {
       return(paste0("PartialMatch"))
     } else {
@@ -471,7 +473,13 @@ seRead <- function(addInf, coding_exons, exon_data, exon_length_df) {
   return(rep(outReads, each = 2))
 }
 
-
+#' score alignments of proteins
+#'
+#' @param type event type
+#' @param proBed proBed paired output
+#' @return align scores and lengths
+#' @importFrom msa msaPrettyPrint msa
+#' @export
 alignmentScorer <- function(type, proBed) {
   values <- c(
     4, -1, -2, -2,  0, -1, -1,  0, -2, -1, -1, -1, -1, -2, -1,  1,  0, -3, -2,  0, -2, -1, -1, -1, -4,
