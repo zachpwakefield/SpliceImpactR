@@ -1,5 +1,5 @@
 getFrameShiftInit <- function(newgtf, exon_data) {
-  exon_data <- exon_data[exon_data$ensembl_exon_id %in% newgtf$gtf$exonID,]
+  exon_data <- exon_data[exon_data$ensembl_exon_id %in% newgtf$exonID,]
   exon_data$exon_biotype <- "coding"
   exon_data$exon_biotype[is.na(exon_data$cds_start) & is.na(exon_data$cds_end)] <- "noncoding"
   exon_data$cds_length<- exon_data$cds_end-exon_data$cds_start+1
@@ -52,7 +52,8 @@ getFrameShift <- function(fC, et, newgtf, exon_data) {
     fs_out <- seRead(addInf = fC,
                      coding_exons = gfs_init$coding_exons,
                      exon_data = gfs_init$exon_data,
-                     exon_length_df = gfs_init$exon_length_df)
+                     exon_length_df = gfs_init$exon_length_df,
+                     newgtf)
   } else if (et == "RI") {
     fs_out <- irRead(addInf = fC,
                      coding_exons = gfs_init$coding_exons,
@@ -69,9 +70,9 @@ getFrameShift <- function(fC, et, newgtf, exon_data) {
 
 getFLOverlap <- function(transcript1, transcript2, ex, coding_exonsX, eld, newGTF) {
 
-  df1 <- newGTF$gtf[newGTF$gtf$transcriptID %in% transcript1 & (!is.na(eld$genomic_coding_end) & !is.na(eld$genomic_coding_start)),]
+  df1 <- newgtf[newgtf$transcriptID %in% transcript1 & (!is.na(eld$genomic_coding_end) & !is.na(eld$genomic_coding_start)),]
 
-  df2 <- newGTF$gtf[newGTF$gtf$transcriptID %in% transcript2 & (!is.na(eld$genomic_coding_end) & !is.na(eld$genomic_coding_start)),]
+  df2 <- newgtf[newgtf$transcriptID %in% transcript2 & (!is.na(eld$genomic_coding_end) & !is.na(eld$genomic_coding_start)),]
 
   # Find overlaps using vectorized operations
   overlap_matrix <- outer(df1$genomic_coding_start, df2$genomic_coding_end, '<=') & outer(df1$genomic_coding_end, df2$genomic_coding_start, '>=')
@@ -159,7 +160,7 @@ alheRead <- function(addInf, et, coding_exons, exon_data, exon_length_df, newgtf
 }
 
 
-afheRead <- function(addInf, et, coding_exons, exon_data, exon_length_df) {
+afheRead <- function(addInf, et, coding_exons, exon_data, exon_length_df, newgtf) {
 
   outReads <- unlist(lapply(seq(1, nrow(addInf), by=2), function(x) {
     if (addInf$prot[x] == "none" & addInf$prot[x+1] == "none") {
@@ -167,7 +168,7 @@ afheRead <- function(addInf, et, coding_exons, exon_data, exon_length_df) {
     } else if (sum(c(addInf$prot[x] == "none", addInf$prot[x+1] == "none")) == 1) {
       return(paste0("onePC"))
     }
-    overlappingExon <- getFLOverlap(addInf$transcript[x], addInf$transcript[x+1], ex=et, coding_exons, exon_length_df)
+    overlappingExon <- getFLOverlap(addInf$transcript[x], addInf$transcript[x+1], ex=et, coding_exons, exon_length_df, newgtf)
     if (overlappingExon[1] == "noOverlap") {
       return(paste0("PartialMatch"))
     } else {
@@ -440,7 +441,7 @@ alt5Read <- function(addInf, coding_exons, exon_data, exon_length_df) {
 }
 
 
-seRead <- function(addInf, coding_exons, exon_data, exon_length_df) {
+seRead <- function(addInf, coding_exons, exon_data, exon_length_df, newgtf) {
   outReads <- unlist(lapply(seq(1, nrow(addInf), by=2), function(x) {
     if (addInf$prot[x] == "none" & addInf$prot[x+1] == "none") {
       return("noPC")
@@ -458,7 +459,7 @@ seRead <- function(addInf, coding_exons, exon_data, exon_length_df) {
       return("PartialMatch")
     } else {
 
-    se <- addInf[c(x, x+1),][addInf$exonID[c(x, x+1)] %in% newGTF$gtf$exonID[newGTF$gtf$classification == "internal"],]
+    se <- addInf[c(x, x+1),][addInf$exonID[c(x, x+1)] %in% newgtf$exonID[newgtf$classification == "internal"],]
     lengthsSE <- exon_length_df$cds_length[exon_length_df$ensembl_exon_id %in% se$exonID & exon_length_df$ensembl_transcript_id %in% se$transcriptID]
     lengthsSE[is.na(lengthsSE)] <- 0
     sumLength <- sum(lengthsSE) %% 3
