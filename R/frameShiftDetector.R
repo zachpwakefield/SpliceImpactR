@@ -68,7 +68,7 @@ getFrameShift <- function(fC, et, newgtf, exon_data) {
   return(fs_out)
 }
 
-getFLOverlap <- function(transcript1, transcript2, ex, coding_exonsX, eld, newGTF) {
+getFLOverlap <- function(transcript1, transcript2, ex, coding_exonsX, eld, newgtf) {
 
   df1 <- newgtf[newgtf$transcriptID %in% transcript1 & (!is.na(eld$genomic_coding_end) & !is.na(eld$genomic_coding_start)),]
 
