@@ -1,5 +1,5 @@
 #' setting up gtf with exon labels, first, internal, last, hybrid, etc
-#' @importFrom dplyr filter group_by mutate ungroup inner_join select case_when n
+#' @importFrom dplyr filter group_by mutate ungroup inner_join select case_when n join_by
 #' @importFrom biomaRt useEnsembl getBM
 #' @return annotated gtf and various hybrid info. also gene to transcript to protein naming dataframe
 #' @keywords internal
@@ -84,7 +84,7 @@ setupAnnotation <- function(biomart_data) {
 
   merge_transcript_exon <- gtf[gtf$classification == "first",c("transcriptID", "rownum")]
   merge_transcript_exon <- merge_transcript_exon[!duplicated(merge_transcript_exon),]
-  transcript_gtf <- dplyr::left_join(biomart_data$transcript_data, merge_transcript_exon, by = join_by('ensembl_transcript_id' == 'transcriptID'))
+  transcript_gtf <- dplyr::left_join(biomart_data$transcript_data, merge_transcript_exon, by = dplyr::join_by('ensembl_transcript_id' == 'transcriptID'))
   transcript_gtf <- transcript_gtf[transcript_gtf$ensembl_transcript_id %in% gtf$transcriptID,]
   transcript_gtf$chromosome_name <- paste0('chr', transcript_gtf$chromosome_name)
   colnames(transcript_gtf) <- c('transcriptID', 'chr', 'strand', 'start', 'stop', 'rownum')
