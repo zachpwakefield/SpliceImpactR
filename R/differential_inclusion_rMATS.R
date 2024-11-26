@@ -137,11 +137,22 @@ differential_inclusion_rMATS <- function(control_names, test_names, et, cores = 
                       as.numeric(outlier_threshold))
   psi_data <- psi_data[cooks_d <= threshold & valid_group]
 
-  psi_data[, valid_group := .N > 1 && uniqueN(type) > 1, by = .(id)]
+  psi_data[, inclusion := IJC]
+  psi_data[, exclusion := SJC]
+
   psi_data[psi_data$valid_group, c("LR_stat", "p.val") := {
-    reduced_model <- lm(psi_adjusted ~ 1, data = .SD)
-    full_model <- lm(psi_adjusted ~ type, data = .SD)
-    reduced_ll <- logLik(reduced_model)
+
+    null_model <- suppressWarnings(glm(
+      cbind(inclusion, exclusion) ~ 1,
+      family = binomial(link = "logit"),
+      data = .SD
+    ))
+    full_model <- suppressWarnings(glm(
+      cbind(inclusion, exclusion) ~ type,
+      family = binomial(link = "logit"),
+      data = .SD
+    ))
+    reduced_ll <- logLik(null_model)
     full_ll <- logLik(full_model)
     LR_statistic <- -2 * (reduced_ll - full_ll)
     p.val <- pchisq(LR_statistic, df = 1, lower.tail = FALSE)

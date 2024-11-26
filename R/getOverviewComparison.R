@@ -4,6 +4,7 @@
 #' @param test_names paths of test samples
 #' @param exon_type type of AS being investigated
 #' @param output_location location where everything is being saved
+#' @importFrom data.table fread
 #' @return 4 individual plots and 1 combined plot.
 #' @export
 getOverviewComparison <- function(data_df, exon_type, output_location, plot = TRUE, minReads = 10) {
@@ -15,6 +16,17 @@ getOverviewComparison <- function(data_df, exon_type, output_location, plot = TR
 
   # Sort samples by type (control then test)
   sample_list <- c(sample_types[which(unlist(lapply(sample_types, "[[", 2)) == "control")], sample_types[which(unlist(lapply(sample_types, "[[", 2)) == "test")])
+
+  # Get normalization vals from exon files
+  if (file.exists(paste0(sample_list[[1]][1], paste0(".exon")))) {
+    depth <- sapply(sample_list, function(x) {
+      df <- data.table::fread(paste0(x[1], paste0(".exon")), select = c('nUP', 'nDOWN'))
+      depth <- mean(df$nUP + df$nDOWN)
+      depth
+    })
+  } else {
+    depth <- rep(1, length(sample_list))
+  }
 
   # Load PSI values for each sample and splicing event type
   data_list <- lapply(sample_list, function(x) {
@@ -47,13 +59,15 @@ getOverviewComparison <- function(data_df, exon_type, output_location, plot = TR
 
   dfCount <- data.frame(AScount = unlist(nASE),
                         type = unlist(lapply(sample_list, "[[", 3)))
+  dfCount$normAScount <- dfCount$AScount/depth
+
   if (length(sample_list) > 10) {
-    p1 <- ggplot2::ggplot(dfCount, ggplot2::aes(x = type, y = AScount, fill = type)) +
+    p1 <- ggplot2::ggplot(dfCount, ggplot2::aes(x = type, y = normAScount, fill = type)) +
       ggplot2::geom_violin() + ggplot2::theme_bw()+
       ggplot2::scale_fill_manual(values=c("brown", "chartreuse4"))+ ggplot2::xlab("Group") +
       ggplot2::ylab(paste0("Count of ", exon_type)) +ggplot2::geom_violin(fill = NA)
   } else {
-    p1 <- ggplot2::ggplot(dfCount, ggplot2::aes(x = type, y = AScount, fill = type)) +
+    p1 <- ggplot2::ggplot(dfCount, ggplot2::aes(x = type, y = normAScount, fill = type)) +
       ggplot2::geom_violin() + ggplot2::theme_bw()+
       ggplot2::scale_fill_manual(values=c("brown", "chartreuse4"))+ ggplot2::xlab("Group") +
       ggplot2::ylab(paste0("Count of ", exon_type))
@@ -71,13 +85,14 @@ getOverviewComparison <- function(data_df, exon_type, output_location, plot = TR
   })
   dfASpg <- data.frame(ASpg = unlist(nASpg),
                        type = unlist(lapply(sample_list, "[[", 3)))
+  dfASpg$normASpg <- dfASpg$ASpg/depth
   if (length(sample_list) > 10) {
-    p2 <- ggplot2::ggplot(dfASpg, ggplot2::aes(x = type, y = ASpg, fill = type)) + ggplot2::geom_violin() +
+    p2 <- ggplot2::ggplot(dfASpg, ggplot2::aes(x = type, y = normASpg, fill = type)) + ggplot2::geom_violin() +
       ggplot2::theme_bw()+
       ggplot2::scale_fill_manual(values=c("brown", "chartreuse4")) + ggplot2::xlab("Group") +
       ggplot2::ylab(paste0("Mean ", exon_type, " \n per gene")) + ggplot2::geom_violin(fill = NA)
   } else {
-    p2 <- ggplot2::ggplot(dfASpg, ggplot2::aes(x = type, y = ASpg, fill = type)) + ggplot2::geom_dotplot(binaxis='y', stackdir='center') + ggplot2::theme_bw()+
+    p2 <- ggplot2::ggplot(dfASpg, ggplot2::aes(x = type, y = normASpg, fill = type)) + ggplot2::geom_dotplot(binaxis='y', stackdir='center') + ggplot2::theme_bw()+
       ggplot2::scale_fill_manual(values=c("brown", "chartreuse4")) + ggplot2::xlab("Group") +
       ggplot2::ylab(paste0("Mean ", exon_type, " \n per gene"))
   }
@@ -139,13 +154,14 @@ getOverviewComparison <- function(data_df, exon_type, output_location, plot = TR
 
 
     idForDist <- lapply(data_list, function(x) {
-      y <- x[!is.na(x$IncLevel1) & x$IncLevel1 > 0.03 & x$IncLevel1 < .97 & ((x$IJC_SAMPLE_1 + x$SJC_SAMPLE_1) > minReads),]
-      getRMATSid(temp = y, et = exon_type)$id
+      y <- x[!is.na(x$IncLevel1) & x$IncLevel1 > 0.05 & x$IncLevel1 < .95 & ((x$IJC_SAMPLE_1 + x$SJC_SAMPLE_1) > minReads),]
+      rid <- getRMATSid(temp = y, et = exon_type)$id
+      unique(unlist(lapply(strsplit(rid, "#[+-]"), "[[", 1)))
     })
   }
 
-  distSummTest <- as.numeric(table(unlist(lapply(strsplit(unique(unlist(idForDist[unlist(lapply(sample_list, "[[", 2)) == "test"])), split = "#"), "[[", 1))))
-  distSummControl <- as.numeric(table(unlist(lapply(strsplit(unique(unlist(idForDist[unlist(lapply(sample_list, "[[", 2)) == "control"])), split = "#"), "[[", 1))))
+  distSummTest <- as.numeric(table(unlist(lapply(strsplit(unique(unlist(idForDist[unlist(lapply(sample_list, "[[", 2)) == "test"])), split = "[.]"), "[[", 1))))
+  distSummControl <- as.numeric(table(unlist(lapply(strsplit(unique(unlist(idForDist[unlist(lapply(sample_list, "[[", 2)) == "control"])), split = "[.]"), "[[", 1))))
 
   dfdASpg <- data.frame(ASpg = c(distSummControl, distSummTest),
                         type = c(rep("control", length(distSummControl)), rep("test", length(distSummTest))),

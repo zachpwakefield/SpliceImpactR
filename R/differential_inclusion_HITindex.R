@@ -34,6 +34,23 @@ differential_inclusion_HITindex <- function(test_names, control_names, et, cores
   psi_data <- merge(psi_data, sample_types, by = "sample_name", all.x = TRUE)
   colnames(psi_data)[grep("PSI", colnames(psi_data))] <- 'psi'
 
+  if (et == 'ALE' | et == 'HLE') {
+    filtered_data <- psi_data %>%
+      filter(nLE != 0) %>%
+      group_by(gene, sample_name) %>%
+      mutate(psi = psi / sum(psi)) %>%
+      ungroup()
+    psi_data <- data.table(filtered_data)
+  } else {
+    filtered_data <- psi_data %>%
+      filter(nFE != 0) %>%
+      group_by(gene, sample_name) %>%
+      mutate(psi = psi / sum(psi)) %>%
+      ungroup()
+    psi_data <- data.table(filtered_data)
+  }
+
+
   all_gene_exons <- unique(psi_data[, .(gene, exon, strand)])
 
   # Ensure each sample has all gene/exon combinations that appear in any sample
@@ -77,10 +94,26 @@ differential_inclusion_HITindex <- function(test_names, control_names, et, cores
                       as.numeric(outlier_threshold))
   psi_data <- psi_data[cooks_d <= threshold & valid_group]
   psi_data[, valid_group := .N > 1 && uniqueN(type) > 1, by = .(gene, exon)]
+
+  psi_data[, nDIFF := abs(nUP-nDOWN)]
+  psi_data[psi_adjusted == 0, nDIFF := 0]
+  psi_data <- psi_data[, total := sum(nDIFF), by = .(sample_name, gene)]
+  psi_data[, inclusion := nDIFF]
+  psi_data[, exclusion := total-inclusion]
+
   psi_data[psi_data$valid_group, c("LR_stat", "p.val") := {
-    reduced_model <- lm(psi_adjusted ~ 1, data = .SD)
-    full_model <- lm(psi_adjusted ~ type, data = .SD)
-    reduced_ll <- logLik(reduced_model)
+
+    null_model <- suppressWarnings(glm(
+      cbind(inclusion, exclusion) ~ 1,
+      family = binomial(link = "logit"),
+      data = .SD
+    ))
+    full_model <- suppressWarnings(glm(
+      cbind(inclusion, exclusion) ~ type,
+      family = binomial(link = "logit"),
+      data = .SD
+    ))
+    reduced_ll <- logLik(null_model)
     full_ll <- logLik(full_model)
     LR_statistic <- -2 * (reduced_ll - full_ll)
     p.val <- pchisq(LR_statistic, df = 1, lower.tail = FALSE)
