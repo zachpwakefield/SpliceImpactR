@@ -232,7 +232,6 @@ getEnrichmentTTI <- function(current_transcript, t_impacts, fdr, transGeneProt,
   GO.mf <- hypeR::msigdb_gsets("Homo sapiens", "C5", "GO:MF", clean=TRUE)
   GO.bp <- hypeR::msigdb_gsets("Homo sapiens", "C5", "GO:BP", clean=TRUE)
   genesetsC2 <- hypeR::msigdb_gsets("Homo sapiens", "C2", "CP:KEGG", clean=TRUE)
-  geneset_BIOCARTA <- hypeR::msigdb_gsets("Homo sapiens", "C2", "CP:BIOCARTA", clean=TRUE)
   genesetsH <- hypeR::msigdb_gsets("Homo sapiens", "H", clean=TRUE)
 
 
@@ -254,9 +253,6 @@ getEnrichmentTTI <- function(current_transcript, t_impacts, fdr, transGeneProt,
   kg_dots <- hypeR::hyp_dots(kg_table, fdr = fdr, title = "KEGG Enrichment", merge = TRUE,
                              top = 10, abrv = 150)
 
-  bc_table <- hypeR::hypeR(enrichment_list, geneset_BIOCARTA, background = length(backgroundGenes), test="hypergeometric")
-  bc_dots <- hypeR::hyp_dots(bc_table, fdr = fdr, title = "Biocarta Enrichment", merge = TRUE,
-                             top = 10, abrv = 150)
 
   hm_table <- hypeR::hypeR(enrichment_list, genesetsH, background = length(backgroundGenes), test="hypergeometric")
   hm_dots <- hypeR::hyp_dots(hm_table, fdr = fdr, title = "Hallmark Enrichment", merge = TRUE,
@@ -269,7 +265,6 @@ getEnrichmentTTI <- function(current_transcript, t_impacts, fdr, transGeneProt,
     print(mf_dots)
     print(bp_dots)
     print(kg_dots)
-    print(bc_dots)
     print(hm_dots)
     dev.off()
   }
@@ -279,7 +274,6 @@ getEnrichmentTTI <- function(current_transcript, t_impacts, fdr, transGeneProt,
                                   "molecularFunction" = list(table = mf_table, dots = mf_dots),
                                   "biologicalProcess" = list(table = bp_table, dots = bp_dots),
                                   "kegg" = list(table = kg_table, dots = kg_dots),
-                                  "biocarta" = list(table = bc_table, dots = bc_dots),
                                   "hallmark" = list(table = hm_table, dots = hm_dots))
 
   # Return the list containing the enrichment tables and plots
@@ -287,7 +281,6 @@ getEnrichmentTTI <- function(current_transcript, t_impacts, fdr, transGeneProt,
               "molecularFunction" = list(table = mf_table, dots = mf_dots),
               "biologicalProcess" = list(table = bp_table, dots = bp_dots),
               "kegg" = list(table = kg_table, dots = kg_dots),
-              "biocarta" = list(table = bc_table, dots = bc_dots),
               "hallmark" = list(table = hm_table, dots = hm_dots)))
 }
 

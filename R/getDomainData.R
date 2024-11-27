@@ -13,7 +13,7 @@
 #' @return the domain enrichment data and the enrichment plots
 #' @importFrom dplyr arrange filter first group_by
 #' @importFrom stats phyper p.adjust
-#' @importFrom ggplot2 scale_fill_manual theme_classic ggplot aes xlab ylab theme geom_bar geom_boxplot theme_classic coord_flip theme_bw ggtitle element_blank element_line
+#' @importFrom ggplot2 scale_fill_manual theme_classic ggplot aes xlab ylab theme geom_bar geom_boxplot theme_classic coord_flip theme_bw ggtitle element_blank element_line facet_wrap
 #' @importFrom ggpubr ggarrange
 #' @importFrom data.table as.data.table
 #' @export
@@ -196,12 +196,18 @@ getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
   if (nrow(dataList[[1]][[1]]) > 0 & nrow(dataList[[2]][[1]]) > 0) {
     dataList[[1]][[1]]$reg <- "Upregulated"
     dataList[[2]][[1]]$reg <- "Downregulated"
+    # dataList[[1]][[1]]$domain_alt <- paste0('up_', dataList[[1]][[1]]$domain)
+    # dataList[[2]][[1]]$domain_alt <- paste0('down_', dataList[[2]][[1]]$domain)
     dataFinal <- rbind(dataList[[1]][[1]], dataList[[2]][[1]])
   } else if (nrow(dataList[[1]][[1]]) > 0) {
     dataList[[1]][[1]]$reg <- "Upregulated"
+    # dataList[[1]][[1]]$domain_alt <- paste0('up_', dataList[[1]][[1]]$domain)
+
     dataFinal <- dataList[[1]][[1]]
   } else if (nrow(dataList[[2]][[1]]) > 0) {
     dataList[[2]][[1]]$reg <- "Downregulated"
+    # dataList[[2]][[1]]$domain_alt <- paste0('down_', dataList[[2]][[1]]$domain)
+
     dataFinal <- dataList[[2]][[1]]
   } else {
     dataFinal <- data.frame()
@@ -224,7 +230,7 @@ getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
     ggplot2::theme(panel.grid.major = ggplot2::element_blank(),
                    panel.grid.minor = ggplot2::element_blank(),
                    panel.background = ggplot2::element_blank(),
-                   axis.line = ggplot2::element_line(colour = "black"))
+                   axis.line = ggplot2::element_line(colour = "black")) + ggplot2::facet_wrap(~reg, ncol = 1, scales = 'free')
 
   pdf(paste0(output_location, "DomainEnrichment/GlobalEnrichmentPlot.pdf"))
   print(enrichmentPlot)

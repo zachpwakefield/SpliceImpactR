@@ -34,22 +34,6 @@ differential_inclusion_HITindex <- function(test_names, control_names, et, cores
   psi_data <- merge(psi_data, sample_types, by = "sample_name", all.x = TRUE)
   colnames(psi_data)[grep("PSI", colnames(psi_data))] <- 'psi'
 
-  if (et == 'ALE' | et == 'HLE') {
-    filtered_data <- psi_data %>%
-      filter(nLE != 0) %>%
-      group_by(gene, sample_name) %>%
-      mutate(psi = psi / sum(psi)) %>%
-      ungroup()
-    psi_data <- data.table(filtered_data)
-  } else {
-    filtered_data <- psi_data %>%
-      filter(nFE != 0) %>%
-      group_by(gene, sample_name) %>%
-      mutate(psi = psi / sum(psi)) %>%
-      ungroup()
-    psi_data <- data.table(filtered_data)
-  }
-
 
   all_gene_exons <- unique(psi_data[, .(gene, exon, strand)])
 
@@ -74,6 +58,22 @@ differential_inclusion_HITindex <- function(test_names, control_names, et, cores
 
   psi_data[, has_nonzero_psi := any(psi_adjusted > 0), by = .(sample_name, gene)]
   psi_data <- psi_data[psi_data$has_nonzero_psi]
+
+  if (et == 'ALE' | et == 'HLE') {
+    filtered_data <- psi_data %>%
+      filter(nLE != 0) %>%
+      group_by(gene, sample_name) %>%
+      mutate(psi = psi / sum(psi)) %>%
+      ungroup()
+    psi_data <- data.table(filtered_data)
+  } else {
+    filtered_data <- psi_data %>%
+      filter(nFE != 0) %>%
+      group_by(gene, sample_name) %>%
+      mutate(psi = psi / sum(psi)) %>%
+      ungroup()
+    psi_data <- data.table(filtered_data)
+  }
 
   psi_data[, c("psi_adjusted", "nDiff", "nUP", "nDOWN", "HITindex") := lapply(.SD,
                                                                               function(x) data.table::fifelse(is.na(x), 0, x)),

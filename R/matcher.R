@@ -142,7 +142,7 @@ HITmatcher <- function(i, redExon, gtf_filtered, minOverlap,
 #' specific matcher for SE
 #' @return matched transcript rownumber
 #' @export
-SEmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
+SEmatcher <- function(i, below_thresh = 0, redExon, minOverlap = .05,
                       gtf_transcripts,
                       gtf_exons,
                       protein_coding_transcripts,
@@ -177,7 +177,7 @@ SEmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
   # Function to determine if all Jaccard indices for a transcript are below a threshold
   is_below_threshold <- function(transcript_id, threshold = below_thresh) {
     jacc_indices <- jaccard_indices[[1]]$jaccard_index[gtf_filtered$transcriptID == transcript_id]
-    all(jacc_indices < threshold)
+    all(jacc_indices <= threshold)
   }
   # Compute intersections more efficiently
   possible_exclusion_transcripts <- Reduce(intersect, c(lapply(jaccard_indices[2:3], function(jacc) unique(gtf_filtered$transcriptID[jacc$jaccard_index > minOverlap])),
@@ -244,7 +244,7 @@ SEmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
 #' specific matcher for MXE
 #' @return matched transcript rownumber
 #' @export
-MXmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
+MXmatcher <- function(i, below_thresh = 0, redExon, minOverlap = .05,
                       gtf_transcripts,
                       gtf_exons,
                       protein_coding_transcripts,
@@ -275,7 +275,7 @@ MXmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
   # Function to determine if all Jaccard indices for a transcript are below a threshold
   is_below_threshold <- function(transcript_id, jacc, threshold =  below_thresh) {
     jacc_indices <- jacc$jaccard_index[gtf_filtered$transcriptID == transcript_id]
-    all(jacc_indices < threshold)
+    all(jacc_indices <= threshold)
   }
 
   possible_inclusion_transcripts <- intersect(unique(gtf_filtered$transcriptID[inclusion_indices$jaccard_index > minOverlap]),
