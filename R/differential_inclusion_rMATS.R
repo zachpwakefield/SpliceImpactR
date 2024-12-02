@@ -34,7 +34,7 @@ differential_inclusion_rMATS <- function(control_names, test_names, et, cores = 
                                    "chr", "strand", "exonStart_0base",
                                    "exonEnd", "upstreamES", "upstreamEE",
                                    "downstreamES", "downstreamEE", "IncLevel1",
-                                   "IJC_SAMPLE_1", "SJC_SAMPLE_1", 'type')
+                                   "IJC_SAMPLE_1", "SJC_SAMPLE_1", 'IncFormLen', 'SkipFormLen', 'type')
     temp$id <- paste0(temp$GeneID, "#", temp$chr, ":", temp$exonStart_0base, "-", temp$exonEnd, "#",
                       temp$strand, ";", temp$upstreamES, "-", temp$upstreamEE, ";",
                       temp$downstreamES, "-", temp$downstreamEE)
@@ -44,7 +44,7 @@ differential_inclusion_rMATS <- function(control_names, test_names, et, cores = 
                                    "longExonStart_0base", "longExonEnd",
                                    "shortES", "shortEE", "flankingES", "flankingEE",
                                    "IncLevel1", "IncLevel2", "IJC_SAMPLE_1",
-                                   "SJC_SAMPLE_1", 'type')
+                                   "SJC_SAMPLE_1", 'IncFormLen', 'SkipFormLen', 'type')
     temp$id <- paste0(temp$GeneID, "#", temp$chr, ":", temp$longExonStart_0base, "-", temp$longExonEnd, "#",
                       temp$strand, ";", temp$shortES, "-", temp$shortEE, ";",
                       temp$flankingES, "-", temp$flankingEE)
@@ -58,7 +58,7 @@ differential_inclusion_rMATS <- function(control_names, test_names, et, cores = 
                                    "X1stExonStart_0base", "X1stExonEnd", "X2ndExonStart_0base",
                                    "X2ndExonEnd", "upstreamES", "upstreamEE",
                                    "downstreamES", "downstreamEE", "IncLevel1",
-                                   "IncLevel2", "IJC_SAMPLE_1", "SJC_SAMPLE_1", 'type')
+                                   "IncLevel2", "IJC_SAMPLE_1", "SJC_SAMPLE_1", 'IncFormLen', 'SkipFormLen', 'type')
 
     temp[, X1stExonStart_0base := ifelse(strand == "+", X1stExonStart_0base, X2ndExonStart_0base)]
     temp[, X1stExonEnd := ifelse(temp$strand == "+", temp$X1stExonEnd, temp$X2ndExonEnd)]
@@ -74,7 +74,7 @@ differential_inclusion_rMATS <- function(control_names, test_names, et, cores = 
     temp <- temp %>% dplyr::select('sample_name', 'GeneID', "chr", "strand",
                                    "riExonStart_0base", "riExonEnd", "upstreamES",
                                    "upstreamEE", "downstreamES", "downstreamEE", "IncLevel1",
-                                   "IncLevel2", "IJC_SAMPLE_1", "SJC_SAMPLE_1", 'type')
+                                   "IncLevel2", "IJC_SAMPLE_1", "SJC_SAMPLE_1", 'IncFormLen', 'SkipFormLen', 'type')
     temp$id <- paste0(temp$GeneID, "#", temp$chr, ":", temp$riExonStart_0base, "-", temp$riExonEnd, "#",
                       temp$strand, ";", temp$upstreamES, "-", temp$upstreamEE, ";",
                       temp$downstreamES, "-", temp$downstreamEE)
@@ -82,16 +82,16 @@ differential_inclusion_rMATS <- function(control_names, test_names, et, cores = 
   }
 
   if (!(length(temp$IncLevel1) == sum(is.na(temp$IncLevel1)))) {
-    temp <- temp %>% dplyr::select(sample_name, id, IncLevel1, IJC_SAMPLE_1, SJC_SAMPLE_1, type)
+    temp <- temp %>% dplyr::select(sample_name, id, IncLevel1, IJC_SAMPLE_1, SJC_SAMPLE_1, IncFormLen, SkipFormLen, type)
   } else {
-    temp <- temp %>% dplyr::select(sample_name, id, IncLevel2, IJC_SAMPLE_2, SJC_SAMPLE_2, type)
+    temp <- temp %>% dplyr::select(sample_name, id, IncLevel2, IJC_SAMPLE_2, SJC_SAMPLE_2, IncFormLen, SkipFormLen, type)
   }
   colnames(temp)[3:5] <- c("psi",  "IJC", "SJC") # Rename columns for consistency
 
   # Calculate additional columns needed for analysis
   temp[, `:=` (
-    valid_reads = (IJC + SJC >= minReads),
-    psi_adjusted = fifelse((IJC + SJC >= minReads), psi, 0)
+    valid_reads = (IJC >= minReads),
+    psi_adjusted = fifelse((IJC >= minReads), psi, 0)
   )]
   temp <- temp[valid_reads == TRUE]
 
@@ -124,40 +124,64 @@ differential_inclusion_rMATS <- function(control_names, test_names, et, cores = 
 
   # Linear modeling and Cook's distance for outlier detection if enabled
   psi_data[, valid_group := .N > 1 && data.table::uniqueN(type) > 1, by = .(id)]
-  psi_data[psi_data$valid_group, cooks_d := {
-    model <- lm(psi_adjusted ~ type, data = .SD)
-    cooks.distance(model)
-  }, by = .(id)]
 
-  psi_data[is.na(psi_data$cooks_d)] <- 0
-  # Determine the threshold for outliers
+  psi_data[, inclusion := IJC]
+  psi_data[, exclusion := SJC]
+  psi_data <- psi_data[psi_data$valid_group,]
+
   threshold <- switch(outlier_threshold,
                       "4/n" = 4 / nrow(sample_types),
                       "1" = 1,
                       as.numeric(outlier_threshold))
-  psi_data <- psi_data[cooks_d <= threshold & valid_group]
 
-  psi_data[, inclusion := IJC]
-  psi_data[, exclusion := SJC]
-
-  psi_data[psi_data$valid_group, c("LR_stat", "p.val") := {
-
-    null_model <- suppressWarnings(glm(
-      cbind(inclusion, exclusion) ~ 1,
+  psi_data[, c("LR_stat", "p.val", "cooks_d") := {
+    # Full and Null Models
+    full_model <- glm(
+      cbind(inclusion, exclusion) ~ type + log(IncFormLen/SkipFormLen),
       family = binomial(link = "logit"),
       data = .SD
-    ))
-    full_model <- suppressWarnings(glm(
-      cbind(inclusion, exclusion) ~ type,
+    )
+    null_model <- glm(
+      cbind(inclusion, exclusion) ~ 1+ log(IncFormLen/SkipFormLen),
       family = binomial(link = "logit"),
       data = .SD
-    ))
-    reduced_ll <- logLik(null_model)
-    full_ll <- logLik(full_model)
-    LR_statistic <- -2 * (reduced_ll - full_ll)
-    p.val <- pchisq(LR_statistic, df = 1, lower.tail = FALSE)
-    .(LR_statistic, p.val)
+    )
+
+    # Calculate Cook's Distance
+    cooks_d <- as.numeric(cooks.distance(full_model))
+    cooks_d[is.na(cooks_d)] <- 0
+    # Threshold for Cook's Distance
+    noninfluential_points <- which(cooks_d <= threshold)
+
+    # Remove influential points and refit models
+    cleaned_data <- .SD[noninfluential_points, ]
+    if (length(unique(cleaned_data$type)) > 1) {
+      full_model_cleaned <- glm(
+        cbind(inclusion, exclusion) ~ type + log(IncFormLen/SkipFormLen),
+        family = binomial(link = "logit"),
+        data = cleaned_data
+      )
+      null_model_cleaned <- glm(
+        cbind(inclusion, exclusion) ~ 1 + log(IncFormLen/SkipFormLen),
+        family = binomial(link = "logit"),
+        data = cleaned_data
+      )
+
+      # Likelihood Ratio Test
+      reduced_ll <- logLik(null_model_cleaned)
+      full_ll <- logLik(full_model_cleaned)
+      LR_statistic <- -2 * (reduced_ll - full_ll)
+      p.val <- pchisq(LR_statistic, df = 1, lower.tail = FALSE)
+
+      # Return results
+      .(LR_statistic = as.numeric(LR_statistic), p.val = as.numeric(p.val), cooks_d)
+    } else {
+      .(LR_statistic = 0, p.val = 1, cooks_d)
+    }
+
   }, by = .(id)]
+  psi_data$cooks_d[is.na(psi_data$cooks_d)] <- 0
+  psi_data[psi_data$cooks_d <= threshold,]
 
   psi_data[, `:=` (
     delta.psi = mean(psi_adjusted[type == "test"]) - mean(psi_adjusted[type == "control"]),

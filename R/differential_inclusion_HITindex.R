@@ -34,31 +34,10 @@ differential_inclusion_HITindex <- function(test_names, control_names, et, cores
   psi_data <- merge(psi_data, sample_types, by = "sample_name", all.x = TRUE)
   colnames(psi_data)[grep("PSI", colnames(psi_data))] <- 'psi'
 
-
-  all_gene_exons <- unique(psi_data[, .(gene, exon, strand)])
-
-  # Ensure each sample has all gene/exon combinations that appear in any sample
-  expanded_data <- all_gene_exons[, .(sample_name = sample_types$sample_name), by = .(gene, exon, strand)]
-  expanded_data <- merge(expanded_data, psi_data, by = c("sample_name", "gene", "exon", "strand"), all.x = TRUE)
-  expanded_data <- merge(expanded_data, sample_types, by = "sample_name", all.x = TRUE)
-  expanded_data$type <- expanded_data$type.y
-  expanded_data$type.y <- NULL
-  expanded_data$type.x <- NULL
-  expanded_data[is.na(psi), psi := 0]  # Fill missing PSI values with 0
-  expanded_data[is.na(nUP), nUP := 0]  # Fill missing PSI values with 0
-  expanded_data[is.na(nDOWN), nDOWN := 0]  # Fill missing PSI values with 0
-  psi_data <- expanded_data
-
-  # Calculate additional columns needed for analysis
-  psi_data[, `:=` (
-    nDiff = if (et == "AFE") nDOWN - nUP else nUP - nDOWN,
-    valid_reads = (nUP + nDOWN >= minReads),
-    psi_adjusted = data.table::fifelse((nUP + nDOWN >= minReads), psi, 0)
-  )]
-
-  psi_data[, has_nonzero_psi := any(psi_adjusted > 0), by = .(sample_name, gene)]
-  psi_data <- psi_data[psi_data$has_nonzero_psi]
-
+  ## remove less than valid reads
+  psi_data[, valid_reads := (nUP + nDOWN >= minReads)]
+  psi_data <- psi_data[psi_data$valid_reads,]
+  ## remove non terminal exons
   if (et == 'ALE' | et == 'HLE') {
     filtered_data <- psi_data %>%
       filter(nLE != 0) %>%
@@ -74,63 +53,108 @@ differential_inclusion_HITindex <- function(test_names, control_names, et, cores
       ungroup()
     psi_data <- data.table(filtered_data)
   }
+  ## add back in 0s
+  if (et %in% c('HFE', 'AFE')) {
+    all_gene_exons <- unique(psi_data[, .(gene, exon, strand, nFE)])
+    # Ensure each sample has all gene/exon combinations that appear in any sample
+    expanded_data <- all_gene_exons[, .(sample_name = sample_types$sample_name), by = .(gene, exon, strand, nFE)]
+    expanded_data <- merge(expanded_data, psi_data, by = c("sample_name", "gene", "exon", "strand", 'nFE'), all.x = TRUE)
+    expanded_data <- merge(expanded_data, sample_types, by = "sample_name", all.x = TRUE)
+  } else {
+    all_gene_exons <- unique(psi_data[, .(gene, exon, strand, nLE)])
+    # Ensure each sample has all gene/exon combinations that appear in any sample
+    expanded_data <- all_gene_exons[, .(sample_name = sample_types$sample_name), by = .(gene, exon, strand, nLE)]
+    expanded_data <- merge(expanded_data, psi_data, by = c("sample_name", "gene", "exon", "strand", 'nLE'), all.x = TRUE)
+    expanded_data <- merge(expanded_data[,-c('type')], sample_types, by = "sample_name", all.x = TRUE)
+  }
+  expanded_data[is.na(psi), `:=` (
+    valid_reads = TRUE,
+    psi = 0,
+    `sumL-R` = 0,
+    nDOWN = 0,
+    nUP = 0)]
+  expanded_data[, nDiff := abs(nDOWN - nUP)]
+  psi_data <- expanded_data
 
-  psi_data[, c("psi_adjusted", "nDiff", "nUP", "nDOWN", "HITindex") := lapply(.SD,
-                                                                              function(x) data.table::fifelse(is.na(x), 0, x)),
-           .SDcols = c("psi_adjusted", "nDiff", "nUP", "nDOWN", "HITindex")]
+  ## cooks d for significance calculation
+  psi_data[, has_nonzero_psi := any(psi > 0), by = .(sample_name, gene)]
+  psi_data <- psi_data[psi_data$has_nonzero_psi]
 
 
   # Linear modeling and Cook's distance for outlier detection if enabled
   psi_data[, valid_group := .N > 1 && data.table::uniqueN(type) > 1, by = .(gene, exon)]
-  psi_data[psi_data$valid_group, cooks_d := {
-    model <- lm(psi_adjusted ~ type, data = .SD)
-    cooks.distance(model)
-  }, by = .(gene, exon)]
-
-  # Determine the threshold for outliers
   threshold <- switch(outlier_threshold,
                       "4/n" = 4 / nrow(sample_types),
                       "1" = 1,
                       as.numeric(outlier_threshold))
-  psi_data <- psi_data[cooks_d <= threshold & valid_group]
-  psi_data[, valid_group := .N > 1 && uniqueN(type) > 1, by = .(gene, exon)]
 
-  psi_data[, nDIFF := abs(nUP-nDOWN)]
-  psi_data[psi_adjusted == 0, nDIFF := 0]
-  psi_data <- psi_data[, total := sum(nDIFF), by = .(sample_name, gene)]
-  psi_data[, inclusion := nDIFF]
+  psi_data <- psi_data[, total := sum(nDiff), by = .(sample_name, gene)]
+  psi_data[, inclusion := nDiff]
   psi_data[, exclusion := total-inclusion]
 
-  psi_data[psi_data$valid_group, c("LR_stat", "p.val") := {
 
-    null_model <- suppressWarnings(glm(
-      cbind(inclusion, exclusion) ~ 1,
-      family = binomial(link = "logit"),
-      data = .SD
-    ))
-    full_model <- suppressWarnings(glm(
+  psi_data[, valid_group := .N > 1 && uniqueN(type) > 1, by = .(gene, exon)]
+  psi_data <- psi_data[psi_data$valid_group]
+
+  psi_data[, c("LR_stat", "p.val", "cooks_d") := {
+    # Full and Null Models
+    full_model <- glm(
       cbind(inclusion, exclusion) ~ type,
       family = binomial(link = "logit"),
       data = .SD
-    ))
-    reduced_ll <- logLik(null_model)
-    full_ll <- logLik(full_model)
-    LR_statistic <- -2 * (reduced_ll - full_ll)
-    p.val <- pchisq(LR_statistic, df = 1, lower.tail = FALSE)
-    .(LR_statistic, p.val)
+    )
+    null_model <- glm(
+      cbind(inclusion, exclusion) ~ 1,
+      family = binomial(link = "logit"),
+      data = .SD
+    )
+
+    # Calculate Cook's Distance
+    cooks_d <- as.numeric(cooks.distance(full_model))
+
+    # Threshold for Cook's Distance
+    noninfluential_points <- which(cooks_d <= threshold)
+
+    # Remove influential points and refit models
+    cleaned_data <- .SD[noninfluential_points, ]
+    if (length(unique(cleaned_data$type)) > 1) {
+      full_model_cleaned <- glm(
+        cbind(inclusion, exclusion) ~ type,
+        family = binomial(link = "logit"),
+        data = cleaned_data
+      )
+      null_model_cleaned <- glm(
+        cbind(inclusion, exclusion) ~ 1,
+        family = binomial(link = "logit"),
+        data = cleaned_data
+      )
+
+      # Likelihood Ratio Test
+      reduced_ll <- logLik(null_model_cleaned)
+      full_ll <- logLik(full_model_cleaned)
+      LR_statistic <- -2 * (reduced_ll - full_ll)
+      p.val <- pchisq(LR_statistic, df = 1, lower.tail = FALSE)
+
+      # Return results
+      .(LR_statistic = as.numeric(LR_statistic), p.val = as.numeric(p.val), cooks_d)
+    } else {
+      .(LR_statistic = 0, p.val = 1, cooks_d)
+    }
+
   }, by = .(gene, exon)]
 
+
   psi_data[, `:=` (
-    delta.psi = mean(psi_adjusted[type == "test"]) - mean(psi_adjusted[type == "control"]),
-    test_average_psi = mean(psi_adjusted[type == "test"]),
-    control_average_psi = mean(psi_adjusted[type == "control"])
+    delta.psi = mean(psi[type == "test" & cooks_d < threshold]) - mean(psi[type == "control" & cooks_d < threshold]),
+    test_average_psi = mean(psi[type == "test" & cooks_d < threshold]),
+    control_average_psi = mean(psi[type == "control" & cooks_d < threshold])
   ), by = .(gene, exon)]
 
 
-  psi_data[, zero_count := sum(psi_adjusted == 0), by = .(gene, exon)]
+  psi_data[, zero_count := sum(psi == 0), by = .(gene, exon)]
 
   # Filter data based on min proportion of samples per phenotype and return result
-  final_data <- psi_data[psi_data$valid_group, .(
+  final_data <- psi_data[, .(
     gene, exon, p.val, delta.psi, test_average_psi, control_average_psi,
     count_test = sum(type == "test"), count_control = sum(type == "control"), zero_count
 
