@@ -9,7 +9,7 @@
 #' @importFrom data.table := data.table fread rbindlist fifelse
 #' @importFrom dplyr arrange select
 #' @export
-differential_inclusion_rMATS <- function(control_names, test_names, et, cores = 1,
+differential_inclusion_rMATS <- function(control_names, test_names, et,
                                          outlier_threshold = c("4/n", "1", "Inf")[1],
                                          minReads = 10) {
 

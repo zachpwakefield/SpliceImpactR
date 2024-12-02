@@ -11,7 +11,7 @@
 #' @importFrom stats cooks.distance lm logLik pchisq setNames start
 #' @importFrom utils data read.csv read.delim read.table write.csv
 #' @export
-differential_inclusion_HITindex <- function(test_names, control_names, et, cores = 1,
+differential_inclusion_HITindex <- function(test_names, control_names, et,
                                             outlier_threshold = c("4/n", "1", "Inf")[1],
                                             minReads = 10) {
 
@@ -59,7 +59,7 @@ differential_inclusion_HITindex <- function(test_names, control_names, et, cores
     # Ensure each sample has all gene/exon combinations that appear in any sample
     expanded_data <- all_gene_exons[, .(sample_name = sample_types$sample_name), by = .(gene, exon, strand, nFE)]
     expanded_data <- merge(expanded_data, psi_data, by = c("sample_name", "gene", "exon", "strand", 'nFE'), all.x = TRUE)
-    expanded_data <- merge(expanded_data, sample_types, by = "sample_name", all.x = TRUE)
+    expanded_data <- merge(expanded_data[,-c('type')], sample_types, by = "sample_name", all.x = TRUE)
   } else {
     all_gene_exons <- unique(psi_data[, .(gene, exon, strand, nLE)])
     # Ensure each sample has all gene/exon combinations that appear in any sample
