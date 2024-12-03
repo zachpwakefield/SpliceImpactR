@@ -13,6 +13,8 @@
 #' @param mOverlap minimum overlap to call an exon as matched to annotation
 #' @param translations from getTranslations
 #' @param transcripts from getTranscripts
+#' @param max_zero_prop max prop of samples that can be 0
+#' @param min_prop_samples min prop of samples from each phenotype required to show a specific event
 #' @return nothing in R, output to the output_directory
 #' @export
 fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", "RI", "A5SS", "A3SS"),
@@ -21,7 +23,9 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
                           cutoff = .1, cores = 1, bg_pre = NA,
                           tti_location = "/projectnb/evolution/zwakefield/allison_mettl/analysis/sir/",
                           mOverlap = .05, s_gtf, plotAlignments = FALSE, transcripts, translations,
-                          biomart_data) {
+                          biomart_data,
+                          max_zero_prop = .5,
+                          min_prop_samples = .5) {
   system(paste0("mkdir ",  output_directory))
   pdir <- system.file(package="SpliceImpactR")
   ##get bg for all classes
@@ -76,7 +80,9 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
                             gtf=s_gtf,
                             plotAlignments,
                             transcripts, translations,
-                            biomart_data = biomart_data)
+                            biomart_data = biomart_data,
+                            max_zero_prop,
+                            min_prop_samples)
   })
 
 }

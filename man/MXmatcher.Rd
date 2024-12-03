@@ -6,7 +6,7 @@
 \usage{
 MXmatcher(
   i,
-  below_thresh = 0.2,
+  below_thresh = 0,
   redExon,
   minOverlap = 0.05,
   gtf_transcripts,

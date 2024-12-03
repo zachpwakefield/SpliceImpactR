@@ -14,6 +14,8 @@
 #' @param full_pipe if TRUE, doesn't save output to R, only writes to output_location
 #' @param translations from getTranslations
 #' @param transcripts from getTranscripts
+#' @param max_zero_prop max prop of samples that can be 0
+#' @param min_prop_samples min prop of samples from each phenotype required to show a specific event
 #' @return nothing or all output from pipeline
 #' @export
 getfxnlASoutcome <- function(output_location,
@@ -24,7 +26,9 @@ getfxnlASoutcome <- function(output_location,
                              bg = NA, mOverlap = .05, gtf,
                              plotAlignments = FALSE,
                              transcripts, translations,
-                             biomart_data) {
+                             biomart_data,
+                             max_zero_prop = .5,
+                             min_prop_samples = .5) {
   system(paste0("mkdir ",  output_location))
   pdir <- system.file(package="SpliceImpactR")
 
@@ -55,7 +59,7 @@ getfxnlASoutcome <- function(output_location,
                      exon_type=exon_type,
                      pdir=pdir,
                      output_location=output_location, gtf=gtf,
-                     max_zero_prop = .5, min_prop_samples = .5, translations)
+                     max_zero_prop, min_prop_samples, translations)
 
   if (!(exon_type %in% c("HFE", "HLE"))) {
     initial_comparison <- getOverviewComparison(data_df, exon_type, output_location)

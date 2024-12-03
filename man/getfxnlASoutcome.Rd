@@ -21,7 +21,9 @@ getfxnlASoutcome(
   plotAlignments = FALSE,
   transcripts,
   translations,
-  biomart_data
+  biomart_data,
+  max_zero_prop = 0.5,
+  min_prop_samples = 0.5
 )
 }
 \arguments{
@@ -52,6 +54,10 @@ getfxnlASoutcome(
 \item{transcripts}{from getTranscripts}
 
 \item{translations}{from getTranslations}
+
+\item{max_zero_prop}{max prop of samples that can be 0}
+
+\item{min_prop_samples}{min prop of samples from each phenotype required to show a specific event}
 }
 \value{
 nothing or all output from pipeline

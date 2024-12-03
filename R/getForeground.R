@@ -34,7 +34,7 @@ getForeground <- function(input, test_names, control_names, thresh = .1, fdr = .
   bdf.l <- significanceFilter(qdf.l, fdr = fdr, d.psi = thresh)
 
   ## Make volcano plot with make_lfcPlot()
-  lfcPlot <- make_dPsiPlot(df.l, thresh = thresh, pdir = pdir)
+  lfcPlot <- make_dPsiPlot(qdf.l, thresh = thresh, pdir = pdir)
 
   ## Make data.frame with gene, location of each exon on total foreground
   redExon <- data.frame(geneR = unlist(lapply(strsplit(bdf.l$gene, split = "[.]"), "[[", 1)),

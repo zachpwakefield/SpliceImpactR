@@ -19,7 +19,9 @@ fullASoutcome(
   plotAlignments = FALSE,
   transcripts,
   translations,
-  biomart_data
+  biomart_data,
+  max_zero_prop = 0.5,
+  min_prop_samples = 0.5
 )
 }
 \arguments{
@@ -44,6 +46,10 @@ fullASoutcome(
 \item{transcripts}{from getTranscripts}
 
 \item{translations}{from getTranslations}
+
+\item{max_zero_prop}{max prop of samples that can be 0}
+
+\item{min_prop_samples}{min prop of samples from each phenotype required to show a specific event}
 
 \item{gtf}{output from setup_gtf}
 }
