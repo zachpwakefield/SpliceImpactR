@@ -132,7 +132,7 @@ differential_inclusion_HITindex <- function(test_names, control_names, et,
       # Likelihood Ratio Test
       lrt <- anova(null_model_cleaned, full_model_cleaned, test = "Chisq")
       LR_statistic <- lrt$Deviance[2]
-      p_val <- lrt$`Pr(>Chi)`[2]
+      p.val <- lrt$`Pr(>Chi)`[2]
 
       # Return results
       .(LR_statistic = as.numeric(LR_statistic), p.val = as.numeric(p.val), cooks_d)
