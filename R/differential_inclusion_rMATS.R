@@ -168,10 +168,9 @@ differential_inclusion_rMATS <- function(control_names, test_names, et,
       )
 
       # Likelihood Ratio Test
-      reduced_ll <- logLik(null_model_cleaned)
-      full_ll <- logLik(full_model_cleaned)
-      LR_statistic <- -2 * (reduced_ll - full_ll)
-      p.val <- pchisq(LR_statistic, df = 1, lower.tail = FALSE)
+      lrt <- anova(null_model_cleaned, full_model_cleaned, test = "Chisq")
+      LR_statistic <- lrt$Deviance[2]
+      p_val <- lrt$`Pr(>Chi)`[2]
 
       # Return results
       .(LR_statistic = as.numeric(LR_statistic), p.val = as.numeric(p.val), cooks_d)
