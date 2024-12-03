@@ -27,7 +27,7 @@ make_dPsiPlot <- function(dpsi_df, thresh = .1, pdir) {
   lab_thresh <- dpsi_df %>% dplyr::arrange(desc(abs(.data$delta.psi)), .data$p.adj)
 
   # Create the dpsi change plot using ggplot2
-  deExons <- ggplot2::ggplot(dpsi_df, ggplot2::aes(x = .data$delta.psi, y = -log(.data$p.adj), color = .data$col, label = .data$hgnc)) +
+  deExons <- ggplot2::ggplot(dpsi_df, ggplot2::aes(x = .data$delta.psi, y = -log10(.data$p.adj), color = .data$col, label = .data$hgnc)) +
     ggplot2::geom_point(ggplot2::aes(shape = .data$type), size = 2, color = dpsi_df$col) +
     ggplot2::theme_classic() + ggplot2::ylab("-Log2(FDR)") +
     ggplot2::xlab("Delta Psi") +
