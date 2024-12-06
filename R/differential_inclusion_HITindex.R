@@ -5,6 +5,8 @@
 #' @param et string of the exon_type
 #' @param cores the number of cores requested
 #' @param outlier_threshold the thresholding of the cooks distance, no outlier removal is "Inf"
+#' @param minReads threshold to count an exon as present
+#' @param min_prop_samples minimum proportion of samples in either phenotype an exon has to be present in to be kept
 #' @return a dataframe with differential inclusion information
 #' @importFrom data.table := data.table fread fifelse rbindlist uniqueN
 #' @importFrom dplyr arrange
@@ -13,7 +15,8 @@
 #' @export
 differential_inclusion_HITindex <- function(test_names, control_names, et,
                                             outlier_threshold = c("4/n", "1", "Inf")[1],
-                                            minReads = 10) {
+                                            minReads = 10,
+                                            min_prop_samples = .5) {
 
   # Create sample type vector efficiently
   sample_types <- data.table::data.table(sample_name = c(test_names, control_names),
@@ -53,6 +56,16 @@ differential_inclusion_HITindex <- function(test_names, control_names, et,
       ungroup()
     psi_data <- data.table(filtered_data)
   }
+
+  psi_data$id <- paste0(psi_data$gene, ";", psi_data$exon)
+
+  keep_ids <- union(
+    names(table(psi_data$id[psi_data$type == 'control'])[table(psi_data$id[psi_data$type == 'control']) >= min_prop_samples*sum(sample_types$type == 'control')]),
+    names(table(psi_data$id[psi_data$type == 'test'])[table(psi_data$id[psi_data$type == 'test']) >= min_prop_samples*sum(sample_types$type == 'test')]))
+
+  psi_data <- psi_data[psi_data$id %in% keep_ids,]
+
+
   ## add back in 0s
   if (et %in% c('HFE', 'AFE')) {
     all_gene_exons <- unique(psi_data[, .(gene, exon, strand, nFE)])

@@ -32,9 +32,9 @@ getOverviewComparison <- function(data_df, exon_type, output_location, plot = TR
   data_list <- lapply(sample_list, function(x) {
     df <- read.table(paste0(x[1], paste0(".", exon_type, "PSI")), header = TRUE, sep = '\t')
     if (exon_type %in% c("AFE", "ALE", "HFE", "HLE")) {
-      df[((df$nUP + df$nDOWN) > minReads),]
+      df[((df$nUP + df$nDOWN) >= minReads),]
     } else {
-      df[((df$IJC_SAMPLE_1 + df$SJC_SAMPLE_1) > minReads),]
+      df[(df$IJC_SAMPLE_1  >= minReads),]
     }
 
   })

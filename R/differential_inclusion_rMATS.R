@@ -100,13 +100,11 @@ differential_inclusion_rMATS <- function(control_names, test_names, et,
   ## filter by min_prop_size to reduce compute time
   temp <- temp[!is.na(temp$psi),]
 
-  if (et == "SE") {
-    keep_ids <- union(
-      names(table(temp$id[temp$type == 'control'])[table(temp$id[temp$type == 'control']) >= min_prop_samples*sum(sample_types$type == 'control')]),
-      names(table(temp$id[temp$type == 'test'])[table(temp$id[temp$type == 'test']) >= min_prop_samples*sum(sample_types$type == 'test')]))
+  keep_ids <- union(
+    names(table(temp$id[temp$type == 'control'])[table(temp$id[temp$type == 'control']) >= min_prop_samples*sum(sample_types$type == 'control')]),
+    names(table(temp$id[temp$type == 'test'])[table(temp$id[temp$type == 'test']) >= min_prop_samples*sum(sample_types$type == 'test')]))
 
-    temp <- temp[temp$id %in% keep_ids,]
-  }
+  temp <- temp[temp$id %in% keep_ids,]
 
   all_gene_exons <- unique(temp[, .(id)])
 
