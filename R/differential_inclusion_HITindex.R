@@ -145,8 +145,8 @@ differential_inclusion_HITindex <- function(test_names, control_names, et,
 
   psi_data[, `:=` (
     delta.psi = mean(psi[type == "test" & cooks_d < threshold]) - mean(psi[type == "control" & cooks_d < threshold]),
-    test_average_psi = mean(psi[type == "test" & cooks_d < threshold]),
-    control_average_psi = mean(psi[type == "control" & cooks_d < threshold])
+    test_average_psi = mean(psi[type == "test" & cooks_d <= threshold]),
+    control_average_psi = mean(psi[type == "control" & cooks_d <= threshold])
   ), by = .(gene, exon)]
 
 

@@ -9,7 +9,8 @@ differential_inclusion_rMATS(
   test_names,
   et,
   outlier_threshold = c("4/n", "1", "Inf")[1],
-  minReads = 10
+  minReads = 10,
+  min_prop_samples = 0.5
 )
 }
 \arguments{
@@ -20,6 +21,8 @@ differential_inclusion_rMATS(
 \item{et}{string of the exon_type}
 
 \item{outlier_threshold}{the thresholding of the cooks distance, no outlier removal is "Inf"}
+
+\item{min_prop_samples}{min prop of samples to require an event to be identified in}
 
 \item{cores}{the number of cores requested}
 }

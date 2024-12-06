@@ -5,13 +5,14 @@
 #' @param et string of the exon_type
 #' @param cores the number of cores requested
 #' @param outlier_threshold the thresholding of the cooks distance, no outlier removal is "Inf"
+#' @param min_prop_samples min prop of samples to require an event to be identified in
 #' @return a dataframe with differential inclusion information
 #' @importFrom data.table := data.table fread rbindlist fifelse
 #' @importFrom dplyr arrange select
 #' @export
 differential_inclusion_rMATS <- function(control_names, test_names, et,
                                          outlier_threshold = c("4/n", "1", "Inf")[1],
-                                         minReads = 10) {
+                                         minReads = 10, min_prop_samples = .5) {
 
 
   sample_types <- data.table::data.table(sample_name = c(test_names, control_names),
@@ -96,37 +97,47 @@ differential_inclusion_rMATS <- function(control_names, test_names, et,
   temp <- temp[valid_reads == TRUE]
 
 
+  ## filter by min_prop_size to reduce compute time
   temp <- temp[!is.na(temp$psi),]
+
+  if (et == "SE") {
+    keep_ids <- union(
+      names(table(temp$id[temp$type == 'control'])[table(temp$id[temp$type == 'control']) >= min_prop_samples*sum(sample_types$type == 'control')]),
+      names(table(temp$id[temp$type == 'test'])[table(temp$id[temp$type == 'test']) >= min_prop_samples*sum(sample_types$type == 'test')]))
+
+    temp <- temp[temp$id %in% keep_ids,]
+  }
+
   all_gene_exons <- unique(temp[, .(id)])
 
   # Ensure each sample has all gene/exon combinations that appear in any sample
-  # expanded_data <- all_gene_exons[, .(sample_name = sample_types$sample_name), by = .(id)]
-  # expanded_data <- merge(expanded_data, temp, by = c("sample_name", "id"), all.x = TRUE)
-  expanded_data <- merge(temp, sample_types, by = c("sample_name"), all.x = TRUE)
+  expanded_data <- all_gene_exons[, .(sample_name = sample_types$sample_name), by = .(id)]
+  expanded_data <- merge(expanded_data,
+                         temp[,c('id', 'SkipFormLen', "IncFormLen")][!duplicated(temp[,c('id', 'SkipFormLen', "IncFormLen")])],
+                         by = "id", all.x = T)
 
-  expanded_data$type <- expanded_data$type.y
-  expanded_data$type.y <- NULL
-  expanded_data$type.x <- NULL
+  expanded_data <- merge(expanded_data, temp[,-c('SkipFormLen', 'IncFormLen')], by = c("sample_name", "id"), all.x = TRUE)
+  expanded_data <- merge(expanded_data[,-c('type')], sample_types, by = "sample_name", all.x = TRUE)
+
+  expanded_data[, median_sum_IJC_SJC := round(median(IJC + SJC, na.rm = TRUE), digits = 0), by = sample_name]
+  expanded_data$median_sum_IJC_SJC[is.na(expanded_data$median_sum_IJC_SJC)] <- median(expanded_data$median_sum_IJC_SJC, na.rm = T)
+
+  expanded_data$SJC[is.na(expanded_data$SJC)] <- expanded_data$median_sum_IJC_SJC[is.na(expanded_data$SJC)]
   expanded_data[is.na(psi), psi := 0]  # Fill missing PSI values with 0
   expanded_data[is.na(IJC), IJC := 0]  # Fill missing PSI values with 0
-  expanded_data[is.na(SJC), SJC := 0]  # Fill missing PSI values with 0
+
   expanded_data[is.na(psi_adjusted), psi_adjusted := 0]  # Fill missing PSI values with 0
   expanded_data[is.na(valid_reads), valid_reads := TRUE]  # Fill missing PSI values with 0
 
   psi_data <- expanded_data
 
-  # psi_data[, has_nonzero_psi := any(psi_adjusted > 0), by = .(sample_name, gene)]
-  # psi_data <- psi_data[psi_data$has_nonzero_psi]
-
   psi_data[, c("psi_adjusted", "IJC", "SJC") := lapply(.SD, function(x) data.table::fifelse(is.na(x), 0, x)),
            .SDcols = c("psi_adjusted", "IJC", "SJC")]
 
-
-  # Linear modeling and Cook's distance for outlier detection if enabled
   psi_data[, valid_group := .N > 1 && data.table::uniqueN(type) > 1, by = .(id)]
 
-  psi_data[, inclusion := IJC]
-  psi_data[, exclusion := SJC]
+  psi_data[, inclusion := as.integer(IJC)]
+  psi_data[, exclusion := as.integer(SJC)]
   psi_data <- psi_data[psi_data$valid_group,]
 
   threshold <- switch(outlier_threshold,
@@ -134,15 +145,11 @@ differential_inclusion_rMATS <- function(control_names, test_names, et,
                       "1" = 1,
                       as.numeric(outlier_threshold))
 
+
   psi_data[, c("LR_stat", "p.val", "cooks_d") := {
     # Full and Null Models
     full_model <- glm(
-      cbind(inclusion, exclusion) ~ type + log(IncFormLen/SkipFormLen),
-      family = binomial(link = "logit"),
-      data = .SD
-    )
-    null_model <- glm(
-      cbind(inclusion, exclusion) ~ 1+ log(IncFormLen/SkipFormLen),
+      cbind(inclusion, exclusion) ~ type,
       family = binomial(link = "logit"),
       data = .SD
     )
@@ -157,12 +164,12 @@ differential_inclusion_rMATS <- function(control_names, test_names, et,
     cleaned_data <- .SD[noninfluential_points, ]
     if (length(unique(cleaned_data$type)) > 1) {
       full_model_cleaned <- glm(
-        cbind(inclusion, exclusion) ~ type + log(IncFormLen/SkipFormLen),
+        cbind(inclusion, exclusion) ~ type,
         family = binomial(link = "logit"),
         data = cleaned_data
       )
       null_model_cleaned <- glm(
-        cbind(inclusion, exclusion) ~ 1 + log(IncFormLen/SkipFormLen),
+        cbind(inclusion, exclusion) ~ 1,
         family = binomial(link = "logit"),
         data = cleaned_data
       )
@@ -179,7 +186,6 @@ differential_inclusion_rMATS <- function(control_names, test_names, et,
     }
 
   }, by = .(id)]
-  psi_data$cooks_d[is.na(psi_data$cooks_d)] <- 0
   psi_data[psi_data$cooks_d <= threshold,]
 
   psi_data[, `:=` (

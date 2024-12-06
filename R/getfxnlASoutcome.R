@@ -45,7 +45,7 @@ getfxnlASoutcome <- function(output_location,
     } else {
     diAS <- differential_inclusion_rMATS(test_names = test_group, control_names = control_group,
                                          et = exon_type, outlier_threshold = outlier_handle,
-                                         minReads = 10)
+                                         minReads = 10, min_prop_samples)
   }
 
 
