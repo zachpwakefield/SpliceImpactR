@@ -112,11 +112,8 @@ differential_inclusion_rMATS <- function(control_names, test_names, et,
 
   # Ensure each sample has all gene/exon combinations that appear in any sample
   expanded_data <- all_gene_exons[, .(sample_name = sample_types$sample_name), by = .(id)]
-  expanded_data <- merge(expanded_data,
-                         temp[,c('id', 'SkipFormLen', "IncFormLen")][!duplicated(temp[,c('id', 'SkipFormLen', "IncFormLen")])],
-                         by = "id", all.x = T)
 
-  expanded_data <- merge(expanded_data, temp[,-c('SkipFormLen', 'IncFormLen')], by = c("sample_name", "id"), all.x = TRUE)
+  expanded_data <- merge(expanded_data, temp, by = c("sample_name", "id"), all.x = TRUE)
   expanded_data <- merge(expanded_data[,-c('type')], sample_types, by = "sample_name", all.x = TRUE)
 
   expanded_data[, median_sum_IJC_SJC := round(median(IJC + SJC, na.rm = TRUE), digits = 0), by = sample_name]
