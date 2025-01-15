@@ -145,23 +145,19 @@ getPaired <- function(foreground, et, nucleotides, newGTF, cores = 1, output_loc
     exon_pairs_df$gene <- unlist(lapply(strsplit(exon_pairs_df$gene, split = "#"), "[[", 1))
     combined_rows_df_expanded$gene <- unlist(lapply(strsplit(combined_rows_df_expanded$gene, split = "#"), "[[", 1))
 
-
-
-
     system(paste0("mkdir ", output_location, "pairedOutput/"))
     write_csv(exon_pairs_df, paste0(output_location, "pairedOutput/", "exon_pairs.csv"))
     write_csv(combined_rows_df_expanded, paste0(output_location, "pairedOutput/", "paired_combined_rows.csv"))
-
 
     pdf(paste0(output_location, "pairedOutput/", "primarySequencePlot.pdf"))
     print(gdf_comp)
     dev.off()
 
-
+    return(list(exon_pairs = exon_pairs_df,
+                paired_proBed = combined_rows_df_expanded,
+                gdf=gdf_comp))
     # Return the combined dataframe of exon pairs with their corresponding rows from the input dataframe
     # exon_pairs is minimal information
     # combined_rows is maximal information
-    return(list(exon_pairs = exon_pairs_df, paired_proBed = combined_rows_df_expanded, gdf=gdf1_comp, gdf2=gdf2_comp,gdf3=gdf3_comp, propCoding = propCoding))
   }
 }
-

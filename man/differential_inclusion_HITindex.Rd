@@ -8,8 +8,9 @@ differential_inclusion_HITindex(
   test_names,
   control_names,
   et,
-  outlier_threshold = c("4/n", "1", "Inf")[1],
-  minReads = 10
+  outlier_threshold = c("4/n", "1", "Inf")[3],
+  minReads = 10,
+  min_prop_samples = 0.5
 )
 }
 \arguments{
@@ -20,6 +21,10 @@ differential_inclusion_HITindex(
 \item{et}{string of the exon_type}
 
 \item{outlier_threshold}{the thresholding of the cooks distance, no outlier removal is "Inf"}
+
+\item{minReads}{threshold to count an exon as present}
+
+\item{min_prop_samples}{minimum proportion of samples in either phenotype an exon has to be present in to be kept}
 
 \item{cores}{the number of cores requested}
 }

@@ -11,7 +11,7 @@ getfxnlASoutcome(
   data_df,
   exon_type,
   cutoff = 0.1,
-  outlier_handle = "4/n",
+  outlier_handle = "Inf",
   cores = 1,
   tti_location = "",
   full_pipe = TRUE,

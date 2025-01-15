@@ -9,7 +9,7 @@ fullASoutcome(
   output_directory,
   data_directory,
   data_df,
-  outlier_handle = "1",
+  outlier_handle = "Inf",
   cutoff = 0.1,
   cores = 1,
   bg_pre = NA,

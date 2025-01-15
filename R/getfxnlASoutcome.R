@@ -73,6 +73,9 @@ getfxnlASoutcome <- function(output_location,
                    exon_data = biomart_data$fsd_exon_data)
 
   if (nrow(pfg$paired_proBed) > 1) {
+    if (exon_type %in% c("AFE", "ALE")) {
+      proxPlot <- getProximalShift(exon_type, pfg$exon_pairs, pfg$paired_proBed, output_location)
+    }
     length_comparison <- getLengthComparison(data_df, pfg$paired_proBed, output_location)
   }
 
