@@ -20,7 +20,7 @@
 #' @export
 getfxnlASoutcome <- function(output_location,
                              test_group,control_group,data_df,
-                             exon_type, cutoff = .1, outlier_handle = "4/n",
+                             exon_type, cutoff = .1, outlier_handle = "Inf",
                              cores = 1,
                              tti_location = "", full_pipe = TRUE,
                              bg = NA, mOverlap = .05, gtf,

@@ -85,7 +85,11 @@ getLengthComparison <- function(data_df, paired_df, output_location) {
     ggplot2::scale_fill_manual(values=c("brown", "deeppink4", "chartreuse4", "azure4"), breaks = c("bothPC",
                                                                                                    unique(data_df$phenotype_names[data_df$utc == "control"]),
                                                                                                    unique(data_df$phenotype_names[data_df$utc == "test"]),
-                                                                                                   'noPC'))
+                                                                                                   'noPC')) +
+    ggplot2::theme(panel.grid.major = ggplot2::element_blank(),
+                   panel.grid.minor = ggplot2::element_blank(),
+                   panel.background = ggplot2::element_blank(),
+                   axis.line = ggplot2::element_line(colour = "black"))
 
   comb_plot <- ggpubr::ggarrange(pairedLengthPlot, changeDistribution, proteinCodingPlot, nrow = 1, widths = c(3, 2.5, 3))
 

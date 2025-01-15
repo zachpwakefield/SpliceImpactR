@@ -11,7 +11,7 @@
 #' @importFrom dplyr arrange select
 #' @export
 differential_inclusion_rMATS <- function(control_names, test_names, et,
-                                         outlier_threshold = c("4/n", "1", "Inf")[1],
+                                         outlier_threshold = c("4/n", "1", "Inf")[3],
                                          minReads = 10, min_prop_samples = .5) {
 
 

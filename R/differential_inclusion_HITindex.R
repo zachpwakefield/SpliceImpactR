@@ -14,7 +14,7 @@
 #' @importFrom utils data read.csv read.delim read.table write.csv
 #' @export
 differential_inclusion_HITindex <- function(test_names, control_names, et,
-                                            outlier_threshold = c("4/n", "1", "Inf")[1],
+                                            outlier_threshold = c("4/n", "1", "Inf")[3],
                                             minReads = 10,
                                             min_prop_samples = .5) {
 
