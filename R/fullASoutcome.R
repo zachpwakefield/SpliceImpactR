@@ -38,9 +38,7 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
   message(messageControl)
   message(messageTest)
 
-  if (hitCompare) {
-    hitCompare <- getHitCompare(data_df)
-  }
+
 
   control_group <- data_df$sample_names[data_df$utc == "control"]
   test_group <- data_df$sample_names[data_df$utc == "test"]
@@ -67,6 +65,10 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
     messageOut <- paste0(x, " analysis...")
     message(messageOut)
     system(paste0("mkdir ",  paste0(output_directory, x, "/")))
+    if (hitCompare) {
+      system(paste0("mkdir ",  paste0(output_directory, x, "/HITindex")))
+      hitCompare <- getHitCompare(data_df, paste0(output_directory, x, "/HITindex/"), .25)
+    }
 
     fAS <- getfxnlASoutcome(output_location = paste0(output_directory, x, "/"),
                             test_group = test_group,

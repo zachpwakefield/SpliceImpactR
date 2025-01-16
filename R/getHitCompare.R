@@ -12,7 +12,7 @@
 #' @importFrom circlize colorRamp2
 #' @export
 #'
-getHitCompare <- function(data_df, output_location) {
+getHitCompare <- function(data_df, output_location, threshold = .25) {
   sample_types <- list()
   for (i in 1:nrow(data_df)) {
     sample_types <- c(sample_types, list(c(data_df$sample_names[i], data_df$utc[i], data_df$phenotype_names[i])))
@@ -46,7 +46,6 @@ getHitCompare <- function(data_df, output_location) {
 
   merged_data_df$NAcount_control <- rowMeans(NAs_df[,grep("control", colnames(NAs_df))])
   merged_data_df$NAcount_test <- rowMeans(NAs_df[,grep("test", colnames(NAs_df))])
-  threshold <- 0.25
   filtered_data <- merged_data_df[merged_data_df$NAcount_control < threshold & merged_data_df$NAcount_test < threshold,]
 
 
