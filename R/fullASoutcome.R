@@ -25,7 +25,7 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
                           mOverlap = .05, s_gtf, plotAlignments = FALSE, transcripts, translations,
                           biomart_data,
                           max_zero_prop = .5,
-                          min_prop_samples = .5) {
+                          min_prop_samples = .5, hitCompare = T) {
   system(paste0("mkdir ",  output_directory))
   pdir <- system.file(package="SpliceImpactR")
   ##get bg for all classes
@@ -38,6 +38,9 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
   message(messageControl)
   message(messageTest)
 
+  if (hitCompare) {
+    hitCompare <- getHitCompare(data_df)
+  }
 
   control_group <- data_df$sample_names[data_df$utc == "control"]
   test_group <- data_df$sample_names[data_df$utc == "test"]
