@@ -4,7 +4,7 @@
 \alias{getHitCompare}
 \title{get paired as events / exons}
 \usage{
-getHitCompare(data_df, output_location)
+getHitCompare(data_df, output_location, threshold = 0.25)
 }
 \arguments{
 \item{data_df}{input with control and test noted}
