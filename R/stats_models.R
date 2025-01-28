@@ -123,7 +123,8 @@ qbGLM_model <- function(data, threshold = Inf) {
       psi ~ type,
       weights = total,
       family = stats::quasibinomial,
-      data = data
+      data = data,
+      control = stats::glm.control(maxit = 1000)
     )
 
     # Calculate Cook's Distance
@@ -142,14 +143,16 @@ qbGLM_model <- function(data, threshold = Inf) {
         psi ~ type,
         weights = total,
         family = stats::quasibinomial,
-        data = cleaned_data
+        data = cleaned_data,
+        control = stats::glm.control(maxit = 1000)
       )
 
       null_model_cleaned <- stats::glm(
         psi ~ 1,
         weights = total,
         family = stats::quasibinomial,
-        data = cleaned_data
+        data = cleaned_data,
+        control = stats::glm.control(maxit = 1000)
       )
 
       # Perform Likelihood Ratio Test
@@ -200,7 +203,7 @@ wilcox_model <- function(data) {
 
     # Perform Wilcoxon test
     wilcox <- tryCatch({
-      stats::wilcox.test(psi ~ type, exact = TRUE, data = data)
+      stats::wilcox.test(psi ~ type, exact = FALSE, data = data)
     }, error = function(e) {
       message(paste("Wilcoxon test failed:", e$message))
       return(NULL)

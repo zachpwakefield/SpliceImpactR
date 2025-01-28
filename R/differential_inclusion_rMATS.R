@@ -6,13 +6,17 @@
 #' @param cores the number of cores requested
 #' @param outlier_threshold the thresholding of the cooks distance, no outlier removal is "Inf"
 #' @param min_prop_samples min prop of samples to require an event to be identified in
+#' @param chosen_method method for stats analysis
 #' @return a dataframe with differential inclusion information
 #' @importFrom data.table := data.table fread rbindlist fifelse
 #' @importFrom dplyr arrange select
+#' @importFrom stringr str_split_fixed
 #' @export
 differential_inclusion_rMATS <- function(control_names, test_names, et,
                                          outlier_threshold = c("4/n", "1", "Inf")[3],
-                                         minReads = 10, min_prop_samples = .5) {
+                                         minReads = 10,
+                                         min_prop_samples = .5,
+                                         chosen_method) {
 
 
   sample_types <- data.table::data.table(sample_name = c(test_names, control_names),
@@ -140,47 +144,13 @@ differential_inclusion_rMATS <- function(control_names, test_names, et,
                       "1" = 1,
                       as.numeric(outlier_threshold))
 
+  psi_data$total <- psi_data$IJC + psi_data$SJC
+  splitID <- stringr::str_split_fixed(psi_data$id, "#", 2)
+  psi_data$gene <- splitID[,1]
+  psi_data$exon <- splitID[,2]
 
-  psi_data[, c("LR_stat", "p.val", "cooks_d") := {
-    # Full and Null Models
-    full_model <- glm(
-      cbind(inclusion, exclusion) ~ type,
-      family = binomial(link = "logit"),
-      data = .SD
-    )
+  psi_data <- getSignificance(psi_data, chosen_method)
 
-    # Calculate Cook's Distance
-    cooks_d <- as.numeric(cooks.distance(full_model))
-    cooks_d[is.na(cooks_d)] <- 0
-    # Threshold for Cook's Distance
-    noninfluential_points <- which(cooks_d <= threshold)
-
-    # Remove influential points and refit models
-    cleaned_data <- .SD[noninfluential_points, ]
-    if (length(unique(cleaned_data$type)) > 1) {
-      full_model_cleaned <- glm(
-        cbind(inclusion, exclusion) ~ type,
-        family = binomial(link = "logit"),
-        data = cleaned_data
-      )
-      null_model_cleaned <- glm(
-        cbind(inclusion, exclusion) ~ 1,
-        family = binomial(link = "logit"),
-        data = cleaned_data
-      )
-
-      # Likelihood Ratio Test
-      lrt <- anova(null_model_cleaned, full_model_cleaned, test = "Chisq")
-      LR_statistic <- lrt$Deviance[2]
-      p.val <- lrt$`Pr(>Chi)`[2]
-
-      # Return results
-      .(LR_statistic = as.numeric(LR_statistic), p.val = as.numeric(p.val), cooks_d)
-    } else {
-      .(LR_statistic = 0, p.val = 1, cooks_d)
-    }
-
-  }, by = .(id)]
   psi_data[psi_data$cooks_d <= threshold,]
 
   psi_data[, `:=` (

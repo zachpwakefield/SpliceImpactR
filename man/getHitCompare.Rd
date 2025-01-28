@@ -4,15 +4,17 @@
 \alias{getHitCompare}
 \title{get paired as events / exons}
 \usage{
-getHitCompare(data_df, output_location, threshold = 0.25)
+getHitCompare(data_df, output_location, threshold = 0.1)
 }
 \arguments{
 \item{data_df}{input with control and test noted}
 
 \item{output_location}{output location for plots}
+
+\item{threshold}{for NA in HIT Index}
 }
 \value{
-figure showing proximal / distal shift and table of results
+figures about HIT Index and csv for differentially used exons
 }
 \description{
 get paired as events / exons

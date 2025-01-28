@@ -10,7 +10,8 @@ differential_inclusion_HITindex(
   et,
   outlier_threshold = c("4/n", "1", "Inf")[3],
   minReads = 10,
-  min_prop_samples = 0.5
+  min_prop_samples = 0.5,
+  chosen_method
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ differential_inclusion_HITindex(
 \item{minReads}{threshold to count an exon as present}
 
 \item{min_prop_samples}{minimum proportion of samples in either phenotype an exon has to be present in to be kept}
+
+\item{chosen_method}{stats model}
 
 \item{cores}{the number of cores requested}
 }

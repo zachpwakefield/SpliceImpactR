@@ -7,6 +7,7 @@
 #' @param outlier_threshold the thresholding of the cooks distance, no outlier removal is "Inf"
 #' @param minReads threshold to count an exon as present
 #' @param min_prop_samples minimum proportion of samples in either phenotype an exon has to be present in to be kept
+#' @param chosen_method stats model
 #' @return a dataframe with differential inclusion information
 #' @importFrom data.table := data.table fread fifelse rbindlist uniqueN
 #' @importFrom dplyr arrange
@@ -16,7 +17,8 @@
 differential_inclusion_HITindex <- function(test_names, control_names, et,
                                             outlier_threshold = c("4/n", "1", "Inf")[3],
                                             minReads = 10,
-                                            min_prop_samples = .5) {
+                                            min_prop_samples = .5,
+                                            chosen_method) {
 
   # Create sample type vector efficiently
   sample_types <- data.table::data.table(sample_name = c(test_names, control_names),
@@ -109,52 +111,7 @@ differential_inclusion_HITindex <- function(test_names, control_names, et,
   psi_data[, valid_group := .N > 1 && uniqueN(type) > 1, by = .(gene, exon)]
   psi_data <- psi_data[psi_data$valid_group]
 
-  psi_data[, c("LR_stat", "p.val", "cooks_d") := {
-    # Full and Null Models
-    full_model <- glm(
-      cbind(inclusion, exclusion) ~ type,
-      family = binomial(link = "logit"),
-      data = .SD
-    )
-    null_model <- glm(
-      cbind(inclusion, exclusion) ~ 1,
-      family = binomial(link = "logit"),
-      data = .SD
-    )
-
-    # Calculate Cook's Distance
-    cooks_d <- as.numeric(cooks.distance(full_model))
-
-    # Threshold for Cook's Distance
-    noninfluential_points <- which(cooks_d <= threshold)
-
-    # Remove influential points and refit models
-    cleaned_data <- .SD[noninfluential_points, ]
-    if (length(unique(cleaned_data$type)) > 1) {
-      full_model_cleaned <- glm(
-        cbind(inclusion, exclusion) ~ type,
-        family = binomial(link = "logit"),
-        data = cleaned_data
-      )
-      null_model_cleaned <- glm(
-        cbind(inclusion, exclusion) ~ 1,
-        family = binomial(link = "logit"),
-        data = cleaned_data
-      )
-
-      # Likelihood Ratio Test
-      lrt <- anova(null_model_cleaned, full_model_cleaned, test = "Chisq")
-      LR_statistic <- lrt$Deviance[2]
-      p.val <- lrt$`Pr(>Chi)`[2]
-
-      # Return results
-      .(LR_statistic = as.numeric(LR_statistic), p.val = as.numeric(p.val), cooks_d)
-    } else {
-      .(LR_statistic = 0, p.val = 1, cooks_d)
-    }
-
-  }, by = .(gene, exon)]
-
+  psi_data <- getSignificance(psi_data, chosen_method)
 
   psi_data[, `:=` (
     delta.psi = mean(psi[type == "test" & cooks_d < threshold]) - mean(psi[type == "control" & cooks_d < threshold]),

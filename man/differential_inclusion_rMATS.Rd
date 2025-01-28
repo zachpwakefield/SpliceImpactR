@@ -10,7 +10,8 @@ differential_inclusion_rMATS(
   et,
   outlier_threshold = c("4/n", "1", "Inf")[3],
   minReads = 10,
-  min_prop_samples = 0.5
+  min_prop_samples = 0.5,
+  chosen_method
 )
 }
 \arguments{
@@ -23,6 +24,8 @@ differential_inclusion_rMATS(
 \item{outlier_threshold}{the thresholding of the cooks distance, no outlier removal is "Inf"}
 
 \item{min_prop_samples}{min prop of samples to require an event to be identified in}
+
+\item{chosen_method}{method for stats analysis}
 
 \item{cores}{the number of cores requested}
 }
