@@ -23,7 +23,8 @@ matchAlignType <- function(proBed, protCode, nucleotides, output_location, saveA
   alignmentScore <- alignmentScores$alignScore
   alignmentScore[alignmentScore == -1] <- rep(median(alignmentScore[alignmentScore != 0]), sum(alignmentScore == -1))
 
-  alignmentTypes <- getFrameShift(df, et = exon_type, newgtf, exon_data)
+  alignmentTypesIntermediary <- getFrameShift(df, et = exon_type, newgtf, exon_data)
+  alignmentTypes <- unlist(lapply(alignmentTypesIntermediary, "[[", 1))
   alignmentTypes[alignmentScore == 1] <- "Match"
   if (saveAlignments) {
   lapply(seq(1, length(alignmentTypes), by = 2), function(i) {
@@ -39,6 +40,7 @@ matchAlignType <- function(proBed, protCode, nucleotides, output_location, saveA
   # Add matching information to the 'proBed' dataframe
   df$prop <- alignmentScore
   df$matchType <- alignmentTypes
+  df$rescue <- unlist(lapply(alignmentTypesIntermediary, "[[", 2))
 
   # Return a list containing the modified 'proBed' dataframe, match percentages, and alignment types
   return(list(df,
