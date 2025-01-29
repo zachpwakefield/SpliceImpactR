@@ -293,7 +293,7 @@ getDifferentialHIT <- function(merged_data) {
 #' @export
 #'
 diHIT_plots <- function(final_results) {
-  volcanoPlot <- ggplot2::ggplot(diHIT, ggplot2::aes(x = delta_HIT, y = -log10(fdr))) +
+  volcanoPlot <- ggplot2::ggplot(final_results, ggplot2::aes(x = delta_HIT, y = -log10(fdr))) +
     ggplot2::geom_point(ggplot2::aes(color = fdr < 0.05 & delta_HIT > .5), alpha = 0.7, size = 2) +  # Highlight significant points
     ggplot2::scale_color_manual(values = c("TRUE" = "red", "FALSE" = "gray")) +  # Red for significant, gray for others
     ggplot2::labs(
@@ -310,7 +310,7 @@ diHIT_plots <- function(final_results) {
     ggplot2::geom_hline(yintercept = -log10(0.05), linetype = "dashed", color = "blue") +  # Add threshold line for significance
     ggplot2::geom_vline(xintercept = .5, linetype = "dotted", color = "black")  # Add zero effect line
 
-  dotPlot <- ggplot2::ggplot(diHIT, ggplot2::aes(x = control_HIT, y = test_HIT)) +
+  dotPlot <- ggplot2::ggplot(final_results, ggplot2::aes(x = control_HIT, y = test_HIT)) +
     ggplot2::geom_point(ggplot2::aes(color = delta_HIT), alpha = 0.7, size = 2) +  # Color by delta_HIT for gradient effect
     ggplot2::scale_color_gradient2(
       low = "blue", mid = "white", high = "red", midpoint = 0,
