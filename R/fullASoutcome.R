@@ -62,8 +62,8 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
   }
 
   if (hitCompare) {
-    system(paste0("mkdir ",  paste0(output_directory, x, "/HITindex")))
-    hitCompare <- getHitCompare(data_df, paste0(output_directory, x, "/HITindex/"), .25)
+    system(paste0("mkdir ",  paste0(output_directory, "/HITindex")))
+    hitCompare <- getHitCompare(data_df, paste0(output_directory, "/HITindex/"), .25)
   }
   lapply(as_types, function(x) {
     messageOut <- paste0(x, " analysis...")

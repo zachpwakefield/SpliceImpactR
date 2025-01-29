@@ -190,7 +190,7 @@ getHitCompare <- function(data_df, output_location, threshold = .1) {
 
   if (length(data_df$sample_names[data_df$utc == 'test']) <= 10 &
       length(data_df$sample_names[data_df$utc == 'control']) <= 10) {
-    pdf(paste0(output_location, "Foreground/", "HITheatmap.pdf"))
+    pdf(paste0(output_location, "HITheatmap.pdf"))
     grid::grid.newpage()  # Start a new page
     grid::grid.draw(totalHeatmap$gtable)  # Draw the pheatmap plot
 
@@ -199,19 +199,19 @@ getHitCompare <- function(data_df, output_location, threshold = .1) {
     grid::grid.draw(meanHeatmap$gtable)
     dev.off()
   } else {
-    pdf(paste0(output_location, "Foreground/", "HITheatmap.pdf"))
+    pdf(paste0(output_location, "HITheatmap.pdf"))
     grid::grid.newpage()  # Start a new page
     grid::grid.draw(meanHeatmap$gtable)
     dev.off()
   }
-  pdf(paste0(output_location, "Foreground/", "dotPlotHIT.pdf"))
+  pdf(paste0(output_location, "dotPlotHIT.pdf"))
   print(diPlot$dotPlot)
   dev.off()
-  pdf(paste0(output_location, "Foreground/", "volcanoPlotHIT.pdf"))
+  pdf(paste0(output_location, "volcanoPlotHIT.pdf"))
   print(diPlot$volcanoPlot)
   dev.off()
 
-  write_csv(diHIT, paste0(output_location, "Foreground/", "deltaHIT.csv"))
+  write_csv(diHIT, paste0(output_location, "deltaHIT.csv"))
 
   return(list(totalHeatmap = totalHeatmap,
               meanHeatmap = meanHeatmap))
