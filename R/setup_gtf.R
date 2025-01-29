@@ -112,7 +112,7 @@ setupAnnotation <- function(biomart_data) {
 
   gtf <- gtf %>% dplyr::group_by(transcriptID) %>%
     dplyr::mutate(
-      adjusted_start = if_else(strand == "+", start, -start)
+      adjusted_start = ifelse(strand == "+", start, -start)
     ) %>%
     dplyr::arrange(transcriptID, adjusted_start) %>%
     dplyr::select(-adjusted_start) %>%
