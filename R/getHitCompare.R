@@ -213,8 +213,9 @@ getHitCompare <- function(data_df, output_location, threshold = .1) {
 
   write_csv(diHIT, paste0(output_location, "deltaHIT.csv"))
 
-  return(list(totalHeatmap = totalHeatmap,
-              meanHeatmap = meanHeatmap))
+  return(list(diPlot = diPlot,
+              meanHeatmap = meanHeatmap,
+              diHIT = diHIT))
 }
 
 #' get differential HIT
