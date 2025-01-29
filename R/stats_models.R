@@ -30,7 +30,7 @@ getSignificance <- function(psi_data_sf, chosen_method) {
             exon_data = gene_data[exon == exon_id, ],
             gene_data = gene_data,
             exon_of_interest = exon_id,
-            threshold = Inf, sizeFact
+            threshold = Inf
           )
         )
 
