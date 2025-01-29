@@ -28,27 +28,31 @@ getfxnlASoutcome <- function(output_location,
                              transcripts, translations,
                              biomart_data,
                              max_zero_prop = .5,
-                             min_prop_samples = .5) {
+                             min_prop_samples = .5,
+                             chosen_method) {
   system(paste0("mkdir ",  output_location))
   pdir <- system.file(package="SpliceImpactR")
 
   if (exon_type %in% c("AFE", "HFE")) {
       diHIT <- differential_inclusion_HITindex(test_names = test_group, control_names = control_group, et = "AFE",
                                                outlier_threshold = outlier_handle, minReads = 10,
-                                               min_prop_samples)
+                                               min_prop_samples, chosen_method)
 
       diAS <- diHIT[diHIT$type == "AFE",]
   } else if (exon_type %in% c("ALE", "HLE")) {
       diHIT <- differential_inclusion_HITindex(test_names = test_group, control_names = control_group, et = "ALE",
                                                outlier_threshold = outlier_handle, minReads = 10,
-                                               min_prop_samples)
+                                               min_prop_samples, chosen_method)
 
       diAS <- diHIT[diHIT$type == "ALE",]
     } else {
+      if (chosen_method == 'nbGLM') {
+        chosen_method_rmats <- 'qbGLM'
+      }
     diAS <- differential_inclusion_rMATS(test_names = test_group, control_names = control_group,
                                          et = exon_type, outlier_threshold = outlier_handle,
                                          minReads = 10,
-                                         min_prop_samples)
+                                         min_prop_samples, chosen_method_rmats)
   }
 
 

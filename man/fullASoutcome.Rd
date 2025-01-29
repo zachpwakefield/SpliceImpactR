@@ -22,7 +22,8 @@ fullASoutcome(
   biomart_data,
   max_zero_prop = 0.5,
   min_prop_samples = 0.5,
-  hitCompare = T
+  hitCompare = T,
+  chosen_method = "nbGLM"
 )
 }
 \arguments{

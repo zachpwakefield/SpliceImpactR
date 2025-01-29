@@ -25,7 +25,8 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
                           mOverlap = .05, s_gtf, plotAlignments = FALSE, transcripts, translations,
                           biomart_data,
                           max_zero_prop = .5,
-                          min_prop_samples = .5, hitCompare = T) {
+                          min_prop_samples = .5, hitCompare = T,
+                          chosen_method = 'nbGLM') {
   system(paste0("mkdir ",  output_directory))
   pdir <- system.file(package="SpliceImpactR")
   ##get bg for all classes
@@ -86,7 +87,8 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
                             transcripts, translations,
                             biomart_data = biomart_data,
                             max_zero_prop,
-                            min_prop_samples)
+                            min_prop_samples,
+                            chosen_method)
   })
 
 }

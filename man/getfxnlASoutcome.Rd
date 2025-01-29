@@ -23,7 +23,8 @@ getfxnlASoutcome(
   translations,
   biomart_data,
   max_zero_prop = 0.5,
-  min_prop_samples = 0.5
+  min_prop_samples = 0.5,
+  chosen_method
 )
 }
 \arguments{
