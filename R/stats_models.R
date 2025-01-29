@@ -6,6 +6,7 @@
 #' @importFrom data.table :=
 #' @export
 getSignificance <- function(psi_data_sf, chosen_method) {
+  psi_data_sf <- getSizeFactors(psi_data_sf)
   if (chosen_method == "nbGLM") {
     psi_data_sf[, c("LR_stat", "p.val", "cooks_d") := {
 
@@ -29,7 +30,7 @@ getSignificance <- function(psi_data_sf, chosen_method) {
             exon_data = gene_data[exon == exon_id, ],
             gene_data = gene_data,
             exon_of_interest = exon_id,
-            threshold = Inf
+            threshold = Inf, sizeFact
           )
         )
 
