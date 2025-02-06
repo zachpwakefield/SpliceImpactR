@@ -248,7 +248,8 @@ nbGLM_model <- function(exon_data, gene_data, exon_of_interest, threshold = Inf)
       full_model <- MASS::glm.nb(
         formula = nDiff ~ sample_name + exon_i + type:exon_i + offset(log(sizeFactor)),
         data    = gene_data,
-        control = stats::glm.control(maxit = 1000)
+        control = stats::glm.control(maxit = 1000),
+        init.theta = 1
       )
 
       # Calculate Cook's Distance
@@ -265,7 +266,8 @@ nbGLM_model <- function(exon_data, gene_data, exon_of_interest, threshold = Inf)
         full_model_cleaned <-  MASS::glm.nb(
           formula = nDiff ~ sample_name + exon_i + type:exon_i + offset(log(sizeFactor)),
           data    = cleaned_data,
-          control = stats::glm.control(maxit = 1000)
+          control = stats::glm.control(maxit = 1000),
+          init.theta = 1
         )
 
 
@@ -273,7 +275,8 @@ nbGLM_model <- function(exon_data, gene_data, exon_of_interest, threshold = Inf)
         null_model_cleaned <- MASS::glm.nb(
           formula = nDiff ~ sample_name + exon_i + offset(log(sizeFactor)),
           data    = cleaned_data,
-          control = stats::glm.control(maxit = 1000)
+          control = stats::glm.control(maxit = 1000),
+          init.theta = 1
         )
 
         # Perform Likelihood Ratio Test
