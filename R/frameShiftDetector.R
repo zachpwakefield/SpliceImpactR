@@ -606,9 +606,9 @@ getRescue <- function(transcript1, transcript2, e1, e2, eld) {
   if (sum(boolFS) == 0) {
     return("noRescue")
   } else {
-    return(c(frameShift_status$ensembl_transcript_id.x[which(boolFS)[1]],
-             frameShift_status$ensembl_exon_id.x[which(boolFS)[1]],
-             frameShift_status$ensembl_transcript_id.y[which(boolFS)[1]],
-             frameShift_status$ensembl_exon_id.y[which(boolFS)[1]]))
+    return(c(gwo$ensembl_transcript_id.x[which(boolFS)[1]],
+             gwo$ensembl_exon_id.x[which(boolFS)[1]],
+             gwo$ensembl_transcript_id.y[which(boolFS)[1]],
+             gwo$ensembl_exon_id.y[which(boolFS)[1]]))
   }
 }
