@@ -78,9 +78,9 @@ getFrameShiftInit <- function(newgtf, exon_data) {
 
 getFLOverlap <- function(transcript1, transcript2, ex, coding_exonsX, eld, newgtf) {
 
-  df1 <- eld[eld$transcriptID %in% transcript1 & (!is.na(eld$genomic_coding_end) & !is.na(eld$genomic_coding_start)),]
+  df1 <- eld[eld$ensembl_transcript_id %in% transcript1 & (!is.na(eld$genomic_coding_end) & !is.na(eld$genomic_coding_start)),]
 
-  df2 <- eld[eld$transcriptID %in% transcript2 & (!is.na(eld$genomic_coding_end) & !is.na(eld$genomic_coding_start)),]
+  df2 <- eld[eld$ensembl_transcript_id %in% transcript2 & (!is.na(eld$genomic_coding_end) & !is.na(eld$genomic_coding_start)),]
 
   # Find overlaps using vectorized operations
   overlap_matrix <- outer(df1$genomic_coding_start, df2$genomic_coding_end, '<=') & outer(df1$genomic_coding_end, df2$genomic_coding_start, '>=')

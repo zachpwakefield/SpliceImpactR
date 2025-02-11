@@ -21,12 +21,11 @@ getBackground <- function(input, mOverlap, cores, exon_type, pdir, output_locati
     first_exons <- unique(unlist(lapply(files, function(x) {
         in_file <- read.delim(x)
         paste(in_file$gene, ';', in_file$exon, ';',  in_file$strand, sep = "")})))
-        first_exons <- first_exons[grepl('[-]', first_exons) & grepl(';', first_exons)]
-        redExon <- data.frame(geneR = unlist(lapply(strsplit(unlist(lapply(strsplit(first_exons, split = ";"), "[[", 1)), split = '[.]'), "[[", 1)),
+    first_exons <- first_exons[grepl('[-]', first_exons) & grepl(';', first_exons)]
+    redExon <- data.frame(geneR = unlist(lapply(strsplit(unlist(lapply(strsplit(first_exons, split = ";"), "[[", 1)), split = '[.]'), "[[", 1)),
             chr = unlist(lapply(strsplit(unlist(lapply(strsplit(unlist(lapply(strsplit(first_exons, split = ";"), "[[", 2)), split = '-'), "[[", 1)), split = ":"), "[[", 1)),
             start = as.numeric(unlist(lapply(strsplit(unlist(lapply(strsplit(unlist(lapply(strsplit(first_exons, split = ";"), "[[", 2)), split = '-'), "[[", 1)), split = ":"), "[[", 2))),
-            stop = as.numeric(unlist(lapply(strsplit(unlist(lapply(strsplit(first_exons, split = ";"), "[[", 2)), split = '-'), "[[", 2))
-                 )
+            stop = as.numeric(unlist(lapply(strsplit(unlist(lapply(strsplit(first_exons, split = ";"), "[[", 2)), split = '-'), "[[", 2)))
     )
 
     ## Remove duplicate rows
