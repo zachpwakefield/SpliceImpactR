@@ -342,7 +342,7 @@ nbGLM_model <- function(exon_data, gene_data, exon_of_interest, threshold = Inf)
 #' @param data dataframe with key info for diff inc calc
 #' @param threshold threshold for cooks.d (not used here)
 #' @return p vals, LR vals, cooks d vals
-#' @importFrom plsc zeroinfl
+#' @importFrom pscl zeroinfl
 #' @importFrom lmtest lrtest
 #' @export
 zinbGLM_model <- function(exon_data, gene_data, exon_of_interest, threshold = Inf) {
