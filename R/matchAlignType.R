@@ -23,24 +23,24 @@ matchAlignType <- function(proBed, protCode, nucleotides, output_location, saveA
   alignmentScore <- alignmentScores$alignScore
   alignmentScore[alignmentScore == -1] <- rep(median(alignmentScore[alignmentScore != 0]), sum(alignmentScore == -1))
 
-  alignmentTypesIntermediary <- getFrameShift(df, et = exon_type, newgtf, exon_data)
-  alignmentTypes <- unlist(lapply(alignmentTypesIntermediary, "[[", 1))
+  alignmentTypesIntermediary <- SpliceImpactR:::getFrameShift(df, et = exon_type, newgtf, exon_data)
+  alignmentTypes <- alignmentTypesIntermediary[seq(1, length(alignmentTypesIntermediary), by = 2)]
   alignmentTypes[alignmentScore == 1] <- "Match"
   if (saveAlignments) {
-  lapply(seq(1, length(alignmentTypes), by = 2), function(i) {
-    if (alignmentTypes[i] %in% c("Match", "PartialMatch", "FrameShift")) {
-      try(msa::msaPrettyPrint(msa::msa(Biostrings::AAStringSet(c(df$prot[i], df$prot[i+1])), verbose = FALSE), askForOverwrite=FALSE,
-                              file = paste(output_location, "pairedAlignments/", proBed$transcript[i], "_", proBed$transcript[i+1],
-                                           "_", alignmentTypes[i], "_Alignment.pdf", sep = ""), output = "pdf"))
-    }
+    lapply(seq(1, length(alignmentTypes), by = 2), function(i) {
+      if (alignmentTypes[i] %in% c("Match", "PartialMatch", "FrameShift")) {
+        try(msa::msaPrettyPrint(msa::msa(Biostrings::AAStringSet(c(df$prot[i], df$prot[i+1])), verbose = FALSE), askForOverwrite=FALSE,
+                                file = paste(output_location, "pairedAlignments/", proBed$transcript[i], "_", proBed$transcript[i+1],
+                                             "_", alignmentTypes[i], "_Alignment.pdf", sep = ""), output = "pdf"))
+      }
 
-  })
-    }
+    })
+  }
 
   # Add matching information to the 'proBed' dataframe
   df$prop <- alignmentScore
   df$matchType <- alignmentTypes
-  df$rescue <- unlist(lapply(alignmentTypesIntermediary, "[[", 2))
+  df$rescue <- alignmentTypesIntermediary[seq(2, length(alignmentTypesIntermediary), by = 2)]
 
   # Return a list containing the modified 'proBed' dataframe, match percentages, and alignment types
   return(list(df,
