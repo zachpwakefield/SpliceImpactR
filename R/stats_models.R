@@ -369,7 +369,7 @@ zinbGLM_model <- function(exon_data, gene_data, exon_of_interest, threshold = In
       # Because zero-inflation models don't provide a built-in Cook's distance,
       # we return NA for all rows. If you want to skip filtering, you can remove
       # this block or set cooks_d = 0, etc.
-      cooks_d_all <- rep(NA_real_, nrow(gene_data))
+      cooks_d_all <- rep(1, nrow(gene_data))
 
       # For consistency with your old code, define "noninfluential points" as all rows.
       # (You could try your own influence measure if needed.)
