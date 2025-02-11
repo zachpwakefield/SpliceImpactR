@@ -48,6 +48,29 @@ getSignificance <- function(psi_data_sf, chosen_method) {
 
     }, by = gene]
 
+  } else if (chosen_method == 'zinbGLM') {
+    psi_data_sf[, c("LR_stat", "p.val", "cooks_d") := {
+      gene_data <- .SD
+      # Pre-allocate
+      LR_stats <- numeric(.N)
+      p_vals   <- numeric(.N)
+      cooks_ds <- numeric(.N)
+
+      for (exon_id in unique(gene_data$exon)) {
+        model_res <- zinbGLM_model(
+          exon_data = gene_data[exon == exon_id,],
+          gene_data = gene_data,
+          exon_of_interest = exon_id,
+          threshold = Inf
+        )
+        # Fill the results for this exon
+        idx <- which(gene_data$exon == exon_id)
+        LR_stats[idx] <- model_res$LR_statistic
+        p_vals[idx]   <- model_res$p.val
+        cooks_ds[idx] <- model_res$cooks_d
+      }
+      list(LR_stats, p_vals, cooks_ds)
+    }, by = gene]
   } else if (chosen_method == "qbGLM") {
     psi_data_sf[, c("LR_stat", "p.val", "cooks_d") := qbGLM_model(.SD, threshold = Inf),
                 by = .(gene, exon)]
@@ -125,7 +148,7 @@ qbGLM_model <- function(data, threshold = Inf) {
       weights = total,
       family = stats::quasibinomial,
       data = data,
-      control = stats::glm.control(maxit = 1000)
+      control = stats::glm.control(maxit = 5000)
     )
 
     # Calculate Cook's Distance
@@ -145,7 +168,7 @@ qbGLM_model <- function(data, threshold = Inf) {
         weights = total,
         family = stats::quasibinomial,
         data = cleaned_data,
-        control = stats::glm.control(maxit = 1000)
+        control = stats::glm.control(maxit = 5000)
       )
 
       null_model_cleaned <- stats::glm(
@@ -153,7 +176,7 @@ qbGLM_model <- function(data, threshold = Inf) {
         weights = total,
         family = stats::quasibinomial,
         data = cleaned_data,
-        control = stats::glm.control(maxit = 1000)
+        control = stats::glm.control(maxit = 5000)
       )
 
       # Perform Likelihood Ratio Test
@@ -170,7 +193,7 @@ qbGLM_model <- function(data, threshold = Inf) {
     }
 
   }, error = function(e) {
-    message(paste("qbGLM_model failed:", e$message))
+    # message(paste("qbGLM_model failed:", e$message))
     # Defaults are already set
   })
 
@@ -206,7 +229,7 @@ wilcox_model <- function(data) {
     wilcox <- tryCatch({
       stats::wilcox.test(psi ~ type, exact = FALSE, data = data)
     }, error = function(e) {
-      message(paste("Wilcoxon test failed:", e$message))
+      # message(paste("Wilcoxon test failed:", e$message))
       return(NULL)
     })
 
@@ -238,9 +261,9 @@ nbGLM_model <- function(exon_data, gene_data, exon_of_interest, threshold = Inf)
 
     # Initialize result list with default values
     result <- list(
-      LR_statistic = rep(3, sum(gene_data$exon == exon_of_interest)),
-      p.val        = rep(3, sum(gene_data$exon == exon_of_interest)),
-      cooks_d      = rep(3, sum(gene_data$exon == exon_of_interest))
+      LR_statistic = rep(1, sum(gene_data$exon == exon_of_interest)),
+      p.val        = rep(1, sum(gene_data$exon == exon_of_interest)),
+      cooks_d      = rep(1, sum(gene_data$exon == exon_of_interest))
     )
 
     # Try fitting the full model
@@ -248,7 +271,7 @@ nbGLM_model <- function(exon_data, gene_data, exon_of_interest, threshold = Inf)
       full_model <- MASS::glm.nb(
         formula = nDiff ~ sample_name + exon_i + type:exon_i + offset(log(sizeFactor)),
         data    = gene_data,
-        control = stats::glm.control(maxit = 1000),
+        control = stats::glm.control(maxit = 5000),
         init.theta = 1
       )
 
@@ -266,7 +289,7 @@ nbGLM_model <- function(exon_data, gene_data, exon_of_interest, threshold = Inf)
         full_model_cleaned <-  MASS::glm.nb(
           formula = nDiff ~ sample_name + exon_i + type:exon_i + offset(log(sizeFactor)),
           data    = cleaned_data,
-          control = stats::glm.control(maxit = 1000),
+          control = stats::glm.control(maxit = 5000),
           init.theta = 1
         )
 
@@ -275,7 +298,7 @@ nbGLM_model <- function(exon_data, gene_data, exon_of_interest, threshold = Inf)
         null_model_cleaned <- MASS::glm.nb(
           formula = nDiff ~ sample_name + exon_i + offset(log(sizeFactor)),
           data    = cleaned_data,
-          control = stats::glm.control(maxit = 1000),
+          control = stats::glm.control(maxit = 5000),
           init.theta = 1
         )
 
@@ -297,7 +320,7 @@ nbGLM_model <- function(exon_data, gene_data, exon_of_interest, threshold = Inf)
 
     }, error = function(e) {
       # On error, return default result with -1
-      message(paste("Model fitting failed for exon:", exon_of_interest, "\nError:", e$message))
+      # message(paste("Model fitting failed for exon:", exon_of_interest, "\nError:", e$message))
       # The default result is already set
     })
 
@@ -305,9 +328,97 @@ nbGLM_model <- function(exon_data, gene_data, exon_of_interest, threshold = Inf)
     # If only one exon, return default results
     repLength <- sum(gene_data$exon == exon_of_interest)
     result <- list(
-      LR_statistic = rep(2, repLength),
-      p.val        = rep(2, repLength),
-      cooks_d      = rep(2, repLength)
+      LR_statistic = rep(1, repLength),
+      p.val        = rep(1, repLength),
+      cooks_d      = rep(1, repLength)
+    )
+  }
+
+  return(result)
+}
+
+#' Extract significance stats for each aRNAp using zero-inflated nb model
+#'
+#' @param data dataframe with key info for diff inc calc
+#' @param threshold threshold for cooks.d (not used here)
+#' @return p vals, LR vals, cooks d vals
+#' @importFrom plsc zeroinfl
+#' @importFrom lmtest lrtest
+#' @export
+zinbGLM_model <- function(exon_data, gene_data, exon_of_interest, threshold = Inf) {
+
+  # Check if multiple exons exist and if each exon has multiple types
+  if (length(unique(gene_data$exon)) > 1 &&
+      length(unique(exon_data$type)) > 1) {
+
+    # Ensure factors are properly set
+    gene_data$sample_name <- factor(gene_data$sample_name)
+    gene_data$type        <- factor(gene_data$type)
+    gene_data$exon_i      <- factor(ifelse(gene_data$exon == exon_of_interest, 1, 0))
+
+    # Initialize result list with "default" placeholder values (3 as in your code).
+    # (You can use NA or -1 if you prefer.)
+    result <- list(
+      LR_statistic = rep(1, sum(gene_data$exon == exon_of_interest)),
+      p.val        = rep(1, sum(gene_data$exon == exon_of_interest)),
+      cooks_d      = rep(1, sum(gene_data$exon == exon_of_interest))
+    )
+
+    # Try fitting the full zero-inflated NB model
+    tryCatch({
+      # Because zero-inflation models don't provide a built-in Cook's distance,
+      # we return NA for all rows. If you want to skip filtering, you can remove
+      # this block or set cooks_d = 0, etc.
+      cooks_d_all <- rep(NA_real_, nrow(gene_data))
+
+      # For consistency with your old code, define "noninfluential points" as all rows.
+      # (You could try your own influence measure if needed.)
+      noninfluential_points <- seq_len(nrow(gene_data))
+
+      cleaned_data <- gene_data[noninfluential_points, ]
+      # Refit the full model on the cleaned data
+      full_model_cleaned <- pscl::zeroinfl(
+        formula = nDiff ~ sample_name + exon_i + type:exon_i + offset(log(sizeFactor)) | type,
+        data    = cleaned_data,
+        dist    = "negbin"
+      )
+
+      # Null model: no interaction term
+      null_model_cleaned <- pscl::zeroinfl(
+        formula = nDiff ~ sample_name + exon_i + offset(log(sizeFactor)) | type,
+        data    = cleaned_data,
+        dist    = "negbin"
+      )
+
+      # Perform Likelihood Ratio Test using lmtest::lrtest
+      lrt <- lmtest::lrtest(null_model_cleaned, full_model_cleaned)
+
+      # Extract results
+      LR_statistic <- lrt$Chisq[2]
+      dexseq_pvals <- lrt$`Pr(>Chisq)`[2]
+
+      # Because we don't have a direct Cook's distance measure, just return NA for those rows
+      cooks_d_exon <- cooks_d_all[gene_data$exon == exon_of_interest]
+
+      # Populate the result list
+      result <- list(
+        LR_statistic = rep(as.numeric(LR_statistic), length(cooks_d_exon)),
+        p.val        = rep(as.numeric(dexseq_pvals), length(cooks_d_exon)),
+        cooks_d      = cooks_d_exon
+      )
+
+    }, error = function(e) {
+      # message(paste("ZINB model fitting failed for exon:", exon_of_interest, "\nError:", e$message,))
+      # On error, return the default placeholder result
+    })
+
+  } else {
+    # If only one exon or only one type, return default results
+    repLength <- sum(gene_data$exon == exon_of_interest)
+    result <- list(
+      LR_statistic = rep(1, repLength),
+      p.val        = rep(1, repLength),
+      cooks_d      = rep(1, repLength)
     )
   }
 
