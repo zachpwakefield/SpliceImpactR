@@ -112,7 +112,7 @@ getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
     }
     bg_dom <- bg_dom[bg_dom != "none"]
 
-    if (sum(lengths(fg_dom_ul)) == 0) {
+    if (sum(lengths(lapply(fg_dom_ul, na.omit))) == 0) {
       noneFound <- paste0("No domains enriched in ", x, " set")
       message(noneFound)
       return(list(data.frame(), data.frame(vals = 0, types = x), data.frame(vals = 0, types = x)))
