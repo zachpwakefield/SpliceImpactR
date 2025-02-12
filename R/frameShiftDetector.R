@@ -250,7 +250,7 @@ mxeRead <- function(addInf, coding_exons, exon_data, exon_length_df) {
       return(c("PartialMatch", "noRescue"))
     } else {
       return(c("FrameShift",
-               paste0((getRescue(addInf$transcript[x], addInf$transcript[x+1], addInf$exonID[x], addInf$exonID[x+1], exon_length_df)), collapse = "#")))
+               paste0((getRescue(addInf$transcript[x], addInf$transcript[x+1], addInf$exonID[x], addInf$exonID[x+1], exon_length_df, filterDownstream = T)), collapse = "#")))
     }
       }
 
@@ -433,7 +433,7 @@ seRead <- function(addInf, coding_exons, exon_data, exon_length_df, newgtf) {
       return(c("PartialMatch", "noRescue"))
     } else {
       return(c("FrameShift",
-               paste0((getRescue(addInf$transcript[x], addInf$transcript[x+1], addInf$exonID[x], addInf$exonID[x+1], exon_length_df)), collapse = "#")))
+               paste0((getRescue(addInf$transcript[x], addInf$transcript[x+1], addInf$exonID[x], addInf$exonID[x+1], exon_length_df, filterDownstream = T)), collapse = "#")))
     }
       }
   }
