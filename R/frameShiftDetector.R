@@ -506,6 +506,29 @@ alignmentScorer <- function(type, proBed) {
               alignLength = alignLength))
 }
 
+#' get next downstream exon for MXE, SE
+#'
+#' @param transcript1 first transcript
+#' @param transcript2 second transcript
+#' @param e1 first exon
+#' @param e2 second exon
+#' @param eld exon_length_df from previous function
+#' @return either new exon set for limiting at least one df
+#' @export
+getNextOverlap <- function(df1, df2, e1, e2, eld) {
+  if (length(which(df1$ensembl_exon_id == e1)) == 0) {
+    e1_out <- e1
+  } else {
+    e1_out <- df1$ensembl_exon_id[which(df1$ensembl_exon_id == e1)[c(length(which(df1$ensembl_exon_id == e1)))]+1]
+  }
+  if (length(which(df2$ensembl_exon_id == e2)) == 0) {
+    e2_out <- e2
+  } else {
+    e2_out <- df2$ensembl_exon_id[which(df2$ensembl_exon_id == e2)[c(length(which(df2$ensembl_exon_id == e2)))]+1]
+  }
+
+  return(c(e1_out, e2_out))
+}
 
 #' check for rescue of the frame shifts
 #'
@@ -517,13 +540,14 @@ alignmentScorer <- function(type, proBed) {
 #' @return either noRescues or the transcript and exons that contain rescue
 #' @importFrom dplyr mutate relocate
 #' @export
-getRescue <- function(transcript1, transcript2, e1, e2, eld) {
+getRescue <- function(transcript1, transcript2, e1, e2, eld, filterDownstream = F) {
 
   df1 <- eld[eld$ensembl_transcript_id %in% transcript1 &
                (!is.na(eld$genomic_coding_end) & !is.na(eld$genomic_coding_start)),]
 
   df2 <- eld[eld$ensembl_transcript_id %in% transcript2 &
                (!is.na(eld$genomic_coding_end) & !is.na(eld$genomic_coding_start)),]
+
 
   # Find overlaps using vectorized operations
   overlap_matrix <- outer(df1$genomic_coding_start, df2$genomic_coding_end, '<=') &
@@ -538,6 +562,13 @@ getRescue <- function(transcript1, transcript2, e1, e2, eld) {
   overlapping_df1 <- df1[overlap_indices[,1], ]
   overlapping_df2 <- df2[overlap_indices[,2], ]
 
+  if (filterDownstream) {
+    exons <- getNextOverlap(df1[df1$ensembl_exon_id %in% c(e1, overlapping_df1$ensembl_exon_id),],
+                            df2[df2$ensembl_exon_id %in% c(e2, overlapping_df2$ensembl_exon_id),],
+                            e1, e2, eld)
+    e1 <- exons[1]
+    e2 <- exons[2]
+  }
   colnames(overlapping_df1) <- paste0(colnames(overlapping_df1), ".x")
   colnames(overlapping_df2) <- paste0(colnames(overlapping_df2), ".y")
 

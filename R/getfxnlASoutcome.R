@@ -46,8 +46,10 @@ getfxnlASoutcome <- function(output_location,
 
       diAS <- diHIT[diHIT$type == "ALE",]
     } else {
-      if (chosen_method == 'nbGLM') {
+      if (chosen_method == 'zinbGLM' | chosen_method == 'nbGLM') {
         chosen_method_rmats <- 'qbGLM'
+      } else {
+        chosen_method_rmats <- chosen_method
       }
     diAS <- differential_inclusion_rMATS(test_names = test_group, control_names = control_group,
                                          et = exon_type, outlier_threshold = outlier_handle,
