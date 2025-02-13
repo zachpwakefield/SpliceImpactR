@@ -568,6 +568,9 @@ getRescue <- function(transcript1, transcript2, e1, e2, eld, filterDownstream = 
                             e1, e2, eld)
     e1 <- exons[1]
     e2 <- exons[2]
+    if (any(is.na(c(e1, e2)))) {
+      return("noRescue")
+    }
   }
   colnames(overlapping_df1) <- paste0(colnames(overlapping_df1), ".x")
   colnames(overlapping_df2) <- paste0(colnames(overlapping_df2), ".y")
