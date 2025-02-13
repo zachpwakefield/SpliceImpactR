@@ -216,8 +216,8 @@ irRead <- function(addInf, coding_exons, exon_data, exon_length_df) {
     if (abs(sum(ir)-sum(sep_ex)) %% 3 == 0) {
       return(c("PartialMatch", "noRescue"))
     } else {
-      return("FrameShift",
-             paste0((getRescue(addInf$transcript[x], addInf$transcript[x+1], addInf$exonID[x], addInf$exonID[x+1], exon_length_df)), collapse = "#"))
+      return(c("FrameShift",
+             paste0((getRescue(addInf$transcript[x], addInf$transcript[x+1], addInf$exonID[x], addInf$exonID[x+1], exon_length_df)), collapse = "#")))
     }
       }
   }))
