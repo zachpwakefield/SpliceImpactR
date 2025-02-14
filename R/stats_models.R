@@ -6,7 +6,9 @@
 #' @importFrom data.table :=
 #' @export
 getSignificance <- function(psi_data_sf, chosen_method) {
-  psi_data_sf <- getSizeFactors(psi_data_sf)
+  if (chosen_method %in% c('zinbGLM', 'nbGLM')) {
+    psi_data_sf <- getSizeFactors(psi_data_sf)
+  }
   if (chosen_method == "nbGLM") {
     psi_data_sf[, c("LR_stat", "p.val", "cooks_d") := {
 
@@ -180,7 +182,7 @@ qbGLM_model <- function(data, threshold = Inf) {
       )
 
       # Perform Likelihood Ratio Test
-      lrt <- stats::anova(null_model_cleaned, full_model_cleaned, test = "Chisq")
+      lrt <- stats::anova(null_model_cleaned, full_model_cleaned, test = "F")
       LR_statistic <- lrt$Deviance[2]
       p_val <- lrt$`Pr(>Chi)`[2]
 

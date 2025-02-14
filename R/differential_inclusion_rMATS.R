@@ -112,23 +112,16 @@ differential_inclusion_rMATS <- function(control_names, test_names, et,
 
   all_gene_exons <- unique(temp[, .(id)])
 
-  # Ensure each sample has all gene/exon combinations that appear in any sample
-  expanded_data <- all_gene_exons[, .(sample_name = sample_types$sample_name), by = .(id)]
+  psi_data <- merge(
+    temp[, type := NULL]  ,
+    sample_types,
+    by = "sample_name",
+    all.x = TRUE,   # keep all rows from 'temp2'
+    all.y = FALSE   # do not add rows that appear only in 'sample_types'
+  )
 
-  expanded_data <- merge(expanded_data, temp, by = c("sample_name", "id"), all.x = TRUE)
-  expanded_data <- merge(expanded_data[,-c('type')], sample_types, by = "sample_name", all.x = TRUE)
-
-  expanded_data[, median_sum_IJC_SJC := round(median(IJC + SJC, na.rm = TRUE), digits = 0), by = sample_name]
-  expanded_data$median_sum_IJC_SJC[is.na(expanded_data$median_sum_IJC_SJC)] <- median(expanded_data$median_sum_IJC_SJC, na.rm = T)
-
-  expanded_data$SJC[is.na(expanded_data$SJC)] <- expanded_data$median_sum_IJC_SJC[is.na(expanded_data$SJC)]
-  expanded_data[is.na(psi), psi := 0]  # Fill missing PSI values with 0
-  expanded_data[is.na(IJC), IJC := 0]  # Fill missing PSI values with 0
-
-  expanded_data[is.na(psi_adjusted), psi_adjusted := 0]  # Fill missing PSI values with 0
-  expanded_data[is.na(valid_reads), valid_reads := TRUE]  # Fill missing PSI values with 0
-
-  psi_data <- expanded_data
+  psi_data[, median_sum_IJC_SJC := round(median(IJC + SJC, na.rm = TRUE), digits = 0), by = sample_name]
+  psi_data$median_sum_IJC_SJC[is.na(psi_data$median_sum_IJC_SJC)] <- median(psi_data$median_sum_IJC_SJC, na.rm = T)
 
   psi_data[, c("psi_adjusted", "IJC", "SJC") := lapply(.SD, function(x) data.table::fifelse(is.na(x), 0, x)),
            .SDcols = c("psi_adjusted", "IJC", "SJC")]
