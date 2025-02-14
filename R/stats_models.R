@@ -148,7 +148,7 @@ qbGLM_model <- function(data, threshold = Inf) {
     full_model <- stats::glm(
       psi ~ type,
       weights = total,
-      family = stats::quasibinomial,
+      family = stats::quasibinomial('logit'),
       data = data,
       control = stats::glm.control(maxit = 5000)
     )
@@ -168,7 +168,7 @@ qbGLM_model <- function(data, threshold = Inf) {
       full_model_cleaned <- stats::glm(
         psi ~ type,
         weights = total,
-        family = stats::quasibinomial,
+        family = stats::quasibinomial('logit'),
         data = cleaned_data,
         control = stats::glm.control(maxit = 5000)
       )
@@ -176,7 +176,7 @@ qbGLM_model <- function(data, threshold = Inf) {
       null_model_cleaned <- stats::glm(
         psi ~ 1,
         weights = total,
-        family = stats::quasibinomial,
+        family = stats::quasibinomial('logit'),
         data = cleaned_data,
         control = stats::glm.control(maxit = 5000)
       )
@@ -184,7 +184,7 @@ qbGLM_model <- function(data, threshold = Inf) {
       # Perform Likelihood Ratio Test
       lrt <- stats::anova(null_model_cleaned, full_model_cleaned, test = "F")
       LR_statistic <- lrt$Deviance[2]
-      p_val <- lrt$`Pr(>Chi)`[2]
+      p_val <- lrt$`Pr(>F)`[2]
 
       # Assign results
       result <- list(
