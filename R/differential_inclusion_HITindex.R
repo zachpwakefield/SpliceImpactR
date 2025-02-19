@@ -18,7 +18,8 @@ differential_inclusion_HITindex <- function(test_names, control_names, et,
                                             outlier_threshold = c("4/n", "1", "Inf")[3],
                                             minReads = 10,
                                             min_prop_samples = .5,
-                                            chosen_method) {
+                                            chosen_method,
+                                            geneIndependent = F) {
 
   # Create sample type vector efficiently
   sample_types <- data.table::data.table(sample_name = c(test_names, control_names),
@@ -91,9 +92,11 @@ differential_inclusion_HITindex <- function(test_names, control_names, et,
   expanded_data[, nDiff := abs(nDOWN - nUP)]
   psi_data <- expanded_data
 
-  ## cooks d for significance calculation
-  psi_data[, has_nonzero_psi := any(psi > 0), by = .(sample_name, gene)]
-  psi_data <- psi_data[psi_data$has_nonzero_psi]
+  ## option to add remove 0s for genes not expressed in samples
+  if (geneIndependent) {
+    psi_data[, has_nonzero_psi := any(psi > 0), by = .(sample_name, gene)]
+    psi_data <- psi_data[psi_data$has_nonzero_psi]
+  }
 
 
   # Linear modeling and Cook's distance for outlier detection if enabled
