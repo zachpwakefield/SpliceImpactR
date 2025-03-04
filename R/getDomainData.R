@@ -42,7 +42,7 @@ getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
     s$id <- paste(paste(paste(paste(s$transcript, s$gene, sep = "#"), s$chr, sep = ";"), paste(s$start, s$stop, sep = "-"), sep = ":"), s$strand, sep = ";")
     fa <- outFast[[o]]
     if (o == 2) {
-      s <- s[s$alignType %in% c("TooLong", "PartialMatch", "FrameShift"),]
+      s <- s[!(s$alignType %in% c("onePC", "noPC")),]
       fa <- fa[sort(c(which(fa %in% paste0(">", s$id)), (which(fa %in% paste0(">", s$id))+1)))]
       nFa <- fa[grep(">", fa)]
       gN <- gsub(">", "", nFa)
