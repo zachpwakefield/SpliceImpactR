@@ -18,9 +18,7 @@ getFrameShiftInit <- function(newgtf, exon_data) {
   exon_length_df <- exon_data[!(duplicated(exon_data[,c('ensembl_transcript_id', 'ensembl_exon_id', 'cds_length', 'phase', 'end_phase')])),]
   exon_length_df <- left_join(exon_length_df, newgtf[,c('exonID', 'transcriptID', 'classification')], by = c("ensembl_exon_id" = "exonID", "ensembl_transcript_id" = "transcriptID"))
 
-  exon_length_df <- exon_data[!(duplicated(exon_data[,c('ensembl_exon_id', 'cds_length', 'phase', 'end_phase')])),]
-
-  exon_length_df <- exon_length_df[!is.na(exon_length_df$cds_start) & !is.na(exon_length_df$cds_end),]
+  exon_length_df <- exon_length_df[(!is.na(exon_length_df$cds_start) | !is.na(exon_length_df$cds_end)),]
   exon_length_df$prev_phase <- exon_length_df$phase
   exon_length_df$prev_end_phase <- exon_length_df$end_phase
   exon_length_df$phase <- (exon_length_df$cds_start-1) %% 3
@@ -76,7 +74,7 @@ getFrameShiftInit <- function(newgtf, exon_data) {
   return(fs_out)
 }
 
-getFLOverlap <- function(transcript1, transcript2, ex, coding_exonsX, eld, newgtf) {
+getFLOverlap <- function(transcript1, transcript2, ex, coding_exonsX, eld) {
 
   df1 <- eld[eld$ensembl_transcript_id %in% transcript1 & (!is.na(eld$genomic_coding_end) & !is.na(eld$genomic_coding_start)),]
 
@@ -106,6 +104,9 @@ getFLOverlap <- function(transcript1, transcript2, ex, coding_exonsX, eld, newgt
       last_overlap_df1 <- df1[last_overlap_indices[1], ]
       last_overlap_df2 <- df2[last_overlap_indices[2], ]
       return(c(last_overlap_df1$ensembl_exon_id, last_overlap_df2$ensembl_exon_id))
+    } else if (ex %in% c('SE', 'MXE')) {
+      return(data.frame(t1 = df1$ensembl_exon_id[overlap_indices[,1]],
+                        t2 = df2$ensembl_exon_id[overlap_indices[,2]]))
     }
 
 
@@ -135,7 +136,7 @@ afheRead <- function(addInf, et, coding_exons, exon_data, exon_length_df, newgtf
     } else if (sum(c(addInf$prot[x] == "none", addInf$prot[x+1] == "none")) == 1) {
       return(c("onePC", "noRescue"))
     }
-    overlappingExon <- getFLOverlap(addInf$transcript[x], addInf$transcript[x+1], ex=et, coding_exons, exon_length_df, newgtf)
+    overlappingExon <- getFLOverlap(addInf$transcript[x], addInf$transcript[x+1], ex=et, coding_exons, exon_length_df)
     if (overlappingExon[1] == "noOverlap") {
       return(c("PartialMatch", "noRescue"))
     } else {
@@ -241,18 +242,68 @@ mxeRead <- function(addInf, coding_exons, exon_data, exon_length_df) {
     } else if (codeVar == "someNonCoding") {
       return(c("PartialMatch", "noRescue"))
     } else {
+      downstreamExon <- newgtf$exonID[(which(newgtf$exonID == addInf$exonID[x] &
+                                               newgtf$transcriptID == addInf$transcript[x])+1)]
 
-    i_lengths <- exon_length_df$cds_length[exon_length_df$ensembl_transcript_id %in% addInf$transcript[x] & exon_length_df$ensembl_exon_id %in% addInf$exonID[x]]
-    j_lengths <- exon_length_df$cds_length[exon_length_df$ensembl_transcript_id %in% addInf$transcript[x+1] & exon_length_df$ensembl_exon_id %in% addInf$exonID[x+1]]
-    i_lengths[is.na(i_lengths)] <- 0
-    j_lengths[is.na(j_lengths)] <- 0
-    if (abs(sum(i_lengths)-sum(j_lengths)) %% 3 == 0) {
-      return(c("PartialMatch", "noRescue"))
-    } else {
-      return(c("FrameShift",
-               paste0((getRescue(addInf$transcript[x], addInf$transcript[x+1], addInf$exonID[x], addInf$exonID[x+1], exon_length_df, filterDownstream = T)), collapse = "#")))
-    }
+      if (length(downstreamExon) == 0) {
+        return(c("PartialMatch", "noRescue"))
       }
+      strand <- unique(newgtf$strand[newgtf$transcriptID == addInf$transcript[x]])
+      seOv <- getFLOverlap2(addInf$transcript[x], addInf$transcript[x+1], ex = "SE", coding_exonsX = coding_exons,
+                            eld = exon_length_df, newgtf = newgtf)
+      if (class(seOv) == "character") {
+        return(c("PartialMatch", "noRescue"))
+      }
+      fs_invest <- seOv[unique(which(seOv$t1 %in% downstreamExon+seOv$t2 %in% downstreamExon > 0)),]
+      if (nrow(fs_invest) == 0) {
+        return(c("PartialMatch", "noRescue"))
+      }
+      if (strand == '+') {
+        ph <- c(exon_length_df$genomic_coding_start[exon_length_df$ensembl_exon_id == fs_invest$t1[1] &
+                                                      exon_length_df$ensembl_transcript_id == addInf$transcript[x]],
+                exon_length_df$genomic_coding_start[exon_length_df$ensembl_exon_id == fs_invest$t2[1] &
+                                                      exon_length_df$ensembl_transcript_id == addInf$transcript[x+1]])
+        min.ph <- which.min(ph)
+        max.ph <- c(1, 2)[-min.ph]
+
+        phaseHolder <- c(exon_length_df$phase[exon_length_df$ensembl_exon_id == fs_invest$t1[1] &
+                                                exon_length_df$ensembl_transcript_id == addInf$transcript[x]],
+                         exon_length_df$phase[exon_length_df$ensembl_exon_id == fs_invest$t2[1] &
+                                                exon_length_df$ensembl_transcript_id == addInf$transcript[x+1]])
+        phaseHolder[phaseHolder == -1] <- 0
+
+        adj_max <- (((abs(ph[1]-ph[2])) %% 3) + phaseHolder[min.ph]) %% 3
+        if (adj_max == phaseHolder[max.ph]) {
+          return(c("PartialMatch", "noRescue"))
+        } else {
+          return(c("FrameShift",
+                   paste0((getRescue(addInf$transcript[x], addInf$transcript[x+1], fs_invest$t1[1], fs_invest$t2[1], exon_length_df)), collapse = "#")))
+        }
+      } else {
+        ph <- c(exon_length_df$genomic_coding_end[exon_length_df$ensembl_exon_id == fs_invest$t1[1] &
+                                                    exon_length_df$ensembl_transcript_id == addInf$transcript[x]],
+                exon_length_df$genomic_coding_end[exon_length_df$ensembl_exon_id == fs_invest$t2[1] &
+                                                    exon_length_df$ensembl_transcript_id == addInf$transcript[x+1]])
+        min.ph <- which.min(ph)
+        max.ph <- c(1, 2)[-min.ph]
+
+        phaseHolder <- c(exon_length_df$phase[exon_length_df$ensembl_exon_id == fs_invest$t1[1] &
+                                                exon_length_df$ensembl_transcript_id == addInf$transcript[x]],
+                         exon_length_df$phase[exon_length_df$ensembl_exon_id == fs_invest$t2[1] &
+                                                exon_length_df$ensembl_transcript_id == addInf$transcript[x+1]])
+        phaseHolder[phaseHolder == -1] <- 0
+
+
+        adj_max <- (((abs(ph[1]-ph[2])) %% 3) + phaseHolder[max.ph]) %% 3
+        if (adj_max == phaseHolder[min.ph]) {
+          return(c("PartialMatch", "noRescue"))
+        } else {
+          return(c("FrameShift",
+                   paste0((getRescue(addInf$transcript[x], addInf$transcript[x+1], fs_invest$t1[1], fs_invest$t2[1], exon_length_df)), collapse = "#")))
+        }
+
+      }
+    }
 
   }))
   return(rep(outReads, each = 2))
@@ -414,32 +465,117 @@ seRead <- function(addInf, coding_exons, exon_data, exon_length_df, newgtf) {
     } else if (sum(c(addInf$prot[x] == "none", addInf$prot[x+1] == "none")) == 1) {
       return(c("onePC", "noRescue"))
     }
-
-    codeVal <- c(exon_length_df$cds_length[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcript[x]] > 0,
-                 exon_length_df$cds_length[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcript[x+1]] > 0)
+    seExon <- x+grep("Inclusion", addInf$add_inf[c(x, x+1)])-1
+    codeVal <- c(exon_length_df$cds_length[exon_length_df$ensembl_exon_id == addInf$exonID[seExon] & exon_length_df$ensembl_transcript_id == addInf$transcript[seExon]] > 0)
     codeVal[is.na(codeVal)] <- FALSE
-    codeVar <- ifelse(sum(codeVal) > 0, ifelse(sum(codeVal) == 2, "allCoding", "someNonCoding"), "allNonCoding")
+    codeVal <- ifelse(length(codeVal) == 0, FALSE, codeVal)
+    codeVar <- ifelse(sum(codeVal) == 0, "allNonCoding", "allCoding")
     if (codeVar == "allNonCoding") {
       return(c("PartialMatch", "noRescue"))
     } else if (codeVar == "someNonCoding") {
       return(c("PartialMatch", "noRescue"))
     } else {
-
-    se <- addInf[c(x, x+1),][addInf$exonID[c(x, x+1)] %in% newgtf$exonID[newgtf$classification == "internal"],]
-    lengthsSE <- exon_length_df$cds_length[exon_length_df$ensembl_exon_id %in% se$exonID & exon_length_df$ensembl_transcript_id %in% se$transcript]
-    lengthsSE[is.na(lengthsSE)] <- 0
-    sumLength <- sum(lengthsSE) %% 3
-    if (sumLength == 0) {
-      return(c("PartialMatch", "noRescue"))
-    } else {
-      return(c("FrameShift",
-               paste0((getRescue(addInf$transcript[x], addInf$transcript[x+1], addInf$exonID[x], addInf$exonID[x+1], exon_length_df, filterDownstream = T)), collapse = "#")))
-    }
+      downstreamExon <- newgtf$exonID[(which(newgtf$exonID == addInf$exonID[seExon] &
+                                               newgtf$transcriptID == addInf$transcript[seExon])+1)]
+      if (length(downstreamExon) == 0) {
+        return(c("PartialMatch", "noRescue"))
       }
+      strand <- unique(newgtf$strand[newgtf$transcriptID == addInf$transcript[seExon]])
+      seOv <- getFLOverlap(addInf$transcript[x], addInf$transcript[x+1], ex = "SE", coding_exonsX = coding_exons,
+                            eld = exon_length_df)
+      if (class(seOv) == "character") {
+        return(c("PartialMatch", "noRescue"))
+      }
+      fs_invest <- seOv[unique(which(seOv$t1 %in% downstreamExon+seOv$t2 %in% downstreamExon > 0)),]
+      if (nrow(fs_invest) == 0) {
+        return(c("PartialMatch", "noRescue"))
+      }
+      if (strand == '+') {
+        ph <- c(exon_length_df$genomic_coding_start[exon_length_df$ensembl_exon_id == fs_invest$t1[1] &
+                                                      exon_length_df$ensembl_transcript_id == addInf$transcript[x]],
+                exon_length_df$genomic_coding_start[exon_length_df$ensembl_exon_id == fs_invest$t2[1] &
+                                                      exon_length_df$ensembl_transcript_id == addInf$transcript[x+1]])
+        min.ph <- which.min(ph)
+        max.ph <- c(1, 2)[-min.ph]
+
+        phaseHolder <- c(exon_length_df$phase[exon_length_df$ensembl_exon_id == fs_invest$t1[1] &
+                                                exon_length_df$ensembl_transcript_id == addInf$transcript[x]],
+                         exon_length_df$phase[exon_length_df$ensembl_exon_id == fs_invest$t2[1] &
+                                                exon_length_df$ensembl_transcript_id == addInf$transcript[x+1]])
+        phaseHolder[phaseHolder == -1] <- 0
+
+        adj_max <- (((abs(ph[1]-ph[2])) %% 3) + phaseHolder[min.ph]) %% 3
+        if (adj_max == phaseHolder[max.ph]) {
+          return(c("PartialMatch", "noRescue"))
+        } else {
+          return(c("FrameShift",
+                   paste0((getRescue(addInf$transcript[x], addInf$transcript[x+1], fs_invest$t1[1], fs_invest$t2[1], exon_length_df)), collapse = "#")))
+        }
+      } else {
+        ph <- c(exon_length_df$genomic_coding_end[exon_length_df$ensembl_exon_id == fs_invest$t1[1] &
+                                                    exon_length_df$ensembl_transcript_id == addInf$transcript[x]],
+                exon_length_df$genomic_coding_end[exon_length_df$ensembl_exon_id == fs_invest$t2[1] &
+                                                    exon_length_df$ensembl_transcript_id == addInf$transcript[x+1]])
+        min.ph <- which.min(ph)
+        max.ph <- c(1, 2)[-min.ph]
+
+        phaseHolder <- c(exon_length_df$phase[exon_length_df$ensembl_exon_id == fs_invest$t1[1] &
+                                                exon_length_df$ensembl_transcript_id == addInf$transcript[x]],
+                         exon_length_df$phase[exon_length_df$ensembl_exon_id == fs_invest$t2[1] &
+                                                exon_length_df$ensembl_transcript_id == addInf$transcript[x+1]])
+        phaseHolder[phaseHolder == -1] <- 0
+
+
+        adj_max <- (((abs(ph[1]-ph[2])) %% 3) + phaseHolder[max.ph]) %% 3
+        if (adj_max == phaseHolder[min.ph]) {
+          return(c("PartialMatch", "noRescue"))
+        } else {
+          return(c("FrameShift",
+                   paste0((getRescue(addInf$transcript[x], addInf$transcript[x+1], fs_invest$t1[1], fs_invest$t2[1], exon_length_df)), collapse = "#")))
+        }
+
+      }
+
+
+    }
   }
   ))
   return(rep(outReads, each = 2))
 }
+
+# seRead <- function(addInf, coding_exons, exon_data, exon_length_df, newgtf) {
+#   outReads <- unlist(lapply(seq(1, nrow(addInf), by=2), function(x) {
+#     if (addInf$prot[x] == "none" & addInf$prot[x+1] == "none") {
+#       return(c("noPC", "noRescue"))
+#     } else if (sum(c(addInf$prot[x] == "none", addInf$prot[x+1] == "none")) == 1) {
+#       return(c("onePC", "noRescue"))
+#     }
+#
+#     codeVal <- c(exon_length_df$cds_length[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcript[x]] > 0,
+#                  exon_length_df$cds_length[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcript[x+1]] > 0)
+#     codeVal[is.na(codeVal)] <- FALSE
+#     codeVar <- ifelse(sum(codeVal) > 0, ifelse(sum(codeVal) == 2, "allCoding", "someNonCoding"), "allNonCoding")
+#     if (codeVar == "allNonCoding") {
+#       return(c("PartialMatch", "noRescue"))
+#     } else if (codeVar == "someNonCoding") {
+#       return(c("PartialMatch", "noRescue"))
+#     } else {
+#
+#       se <- addInf[c(x, x+1),][addInf$exonID[c(x, x+1)] %in% newgtf$exonID[newgtf$classification == "internal"],]
+#       lengthsSE <- exon_length_df$cds_length[exon_length_df$ensembl_exon_id %in% se$exonID & exon_length_df$ensembl_transcript_id %in% se$transcript]
+#       lengthsSE[is.na(lengthsSE)] <- 0
+#       sumLength <- sum(lengthsSE) %% 3
+#       if (sumLength == 0) {
+#         return(c("PartialMatch", "noRescue"))
+#       } else {
+#         return(c("FrameShift",
+#                  paste0((getRescue(addInf$transcript[x], addInf$transcript[x+1], addInf$exonID[x], addInf$exonID[x+1], exon_length_df, filterDownstream = T)), collapse = "#")))
+#       }
+#     }
+#   }
+#   ))
+#   return(rep(outReads, each = 2))
+# }
 
 #' score alignments of proteins
 #'
