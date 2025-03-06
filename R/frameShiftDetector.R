@@ -426,7 +426,7 @@ seRead <- function(addInf, coding_exons, exon_data, exon_length_df, newgtf) {
     } else {
 
     se <- addInf[c(x, x+1),][addInf$exonID[c(x, x+1)] %in% newgtf$exonID[newgtf$classification == "internal"],]
-    lengthsSE <- exon_length_df$cds_length[exon_length_df$ensembl_exon_id %in% se$exonID & exon_length_df$ensembl_transcript_id %in% se$transcriptID]
+    lengthsSE <- exon_length_df$cds_length[exon_length_df$ensembl_exon_id %in% se$exonID & exon_length_df$ensembl_transcript_id %in% se$transcript]
     lengthsSE[is.na(lengthsSE)] <- 0
     sumLength <- sum(lengthsSE) %% 3
     if (sumLength == 0) {
