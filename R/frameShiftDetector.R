@@ -251,7 +251,7 @@ mxeRead <- function(addInf, coding_exons, exon_data, exon_length_df, newgtf) {
       }
       strand <- unique(newgtf$strand[newgtf$transcriptID == addInf$transcript[x]])
       seOv <- getFLOverlap(addInf$transcript[x], addInf$transcript[x+1], ex = "SE", coding_exonsX = coding_exons,
-                            eld = exon_length_df, newgtf = newgtf)
+                            eld = exon_length_df)
       if (class(seOv) == "character") {
         return(c("PartialMatch", "noRescue"))
       }
