@@ -69,7 +69,8 @@ getFrameShiftInit <- function(newgtf, exon_data) {
     fs_out <- mxeRead(addInf = fC,
                       coding_exons = gfs_init$coding_exons,
                       exon_data = gfs_init$exon_data,
-                      exon_length_df = gfs_init$exon_length_df)
+                      exon_length_df = gfs_init$exon_length_df,
+                      newgtf)
   }
   return(fs_out)
 }
@@ -225,7 +226,7 @@ irRead <- function(addInf, coding_exons, exon_data, exon_length_df) {
   return(rep(outReads, each = 2))
 }
 
-mxeRead <- function(addInf, coding_exons, exon_data, exon_length_df) {
+mxeRead <- function(addInf, coding_exons, exon_data, exon_length_df, newgtf) {
   outReads <- unlist(lapply(seq(1, nrow(addInf), by=2), function(x) {
     if (addInf$prot[x] == "none" & addInf$prot[x+1] == "none") {
       return(c("noPC", "noRescue"))
