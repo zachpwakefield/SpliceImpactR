@@ -11,7 +11,8 @@ differential_inclusion_HITindex(
   outlier_threshold = c("4/n", "1", "Inf")[3],
   minReads = 10,
   min_prop_samples = 0.5,
-  chosen_method
+  chosen_method,
+  geneIndependent = T
 )
 }
 \arguments{
