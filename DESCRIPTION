@@ -38,7 +38,8 @@ Imports:
   lmtest,
   grid,
   MASS,
-  ComplexUpset
+  ComplexUpset,
+  scales
 RoxygenNote: 7.2.3
 biovViews: AlternativeSplicing, DifferentialSplicing, StatisticalMethod
 Suggests: 

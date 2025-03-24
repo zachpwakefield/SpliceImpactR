@@ -544,40 +544,6 @@ seRead <- function(addInf, coding_exons, exon_data, exon_length_df, newgtf) {
   return(rep(outReads, each = 2))
 }
 
-# seRead <- function(addInf, coding_exons, exon_data, exon_length_df, newgtf) {
-#   outReads <- unlist(lapply(seq(1, nrow(addInf), by=2), function(x) {
-#     if (addInf$prot[x] == "none" & addInf$prot[x+1] == "none") {
-#       return(c("noPC", "noRescue"))
-#     } else if (sum(c(addInf$prot[x] == "none", addInf$prot[x+1] == "none")) == 1) {
-#       return(c("onePC", "noRescue"))
-#     }
-#
-#     codeVal <- c(exon_length_df$cds_length[exon_length_df$ensembl_exon_id == addInf$exonID[x] & exon_length_df$ensembl_transcript_id == addInf$transcript[x]] > 0,
-#                  exon_length_df$cds_length[exon_length_df$ensembl_exon_id == addInf$exonID[x+1] & exon_length_df$ensembl_transcript_id == addInf$transcript[x+1]] > 0)
-#     codeVal[is.na(codeVal)] <- FALSE
-#     codeVar <- ifelse(sum(codeVal) > 0, ifelse(sum(codeVal) == 2, "allCoding", "someNonCoding"), "allNonCoding")
-#     if (codeVar == "allNonCoding") {
-#       return(c("PartialMatch", "noRescue"))
-#     } else if (codeVar == "someNonCoding") {
-#       return(c("PartialMatch", "noRescue"))
-#     } else {
-#
-#       se <- addInf[c(x, x+1),][addInf$exonID[c(x, x+1)] %in% newgtf$exonID[newgtf$classification == "internal"],]
-#       lengthsSE <- exon_length_df$cds_length[exon_length_df$ensembl_exon_id %in% se$exonID & exon_length_df$ensembl_transcript_id %in% se$transcript]
-#       lengthsSE[is.na(lengthsSE)] <- 0
-#       sumLength <- sum(lengthsSE) %% 3
-#       if (sumLength == 0) {
-#         return(c("PartialMatch", "noRescue"))
-#       } else {
-#         return(c("FrameShift",
-#                  paste0((getRescue(addInf$transcript[x], addInf$transcript[x+1], addInf$exonID[x], addInf$exonID[x+1], exon_length_df, filterDownstream = T)), collapse = "#")))
-#       }
-#     }
-#   }
-#   ))
-#   return(rep(outReads, each = 2))
-# }
-
 #' score alignments of proteins
 #'
 #' @param type event type
@@ -677,7 +643,7 @@ getNextOverlap <- function(df1, df2, e1, e2, eld) {
 #' @return either noRescues or the transcript and exons that contain rescue
 #' @importFrom dplyr mutate relocate
 #' @export
-getRescue <- function(transcript1, transcript2, e1, e2, eld, filterDownstream = F) {
+getRescue <- function(transcript1, transcript2, e1, e2, eld, filterDownstream = FALSE) {
 
   df1 <- eld[eld$ensembl_transcript_id %in% transcript1 &
                (!is.na(eld$genomic_coding_end) & !is.na(eld$genomic_coding_start)),]

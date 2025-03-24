@@ -23,7 +23,7 @@ differential_inclusion_rMATS <- function(control_names, test_names, et,
                                          type = rep(c("test", "control"), c(length(test_names), length(control_names))))
 
   # Load PSI values for each sample and splicing event type
-  psi_data_list <- lapply(1:nrow(sample_types), function(x) {
+  psi_data_list <- lapply(seq_len(nrow(sample_types)), function(x) {
     fdf <- data.table::fread(paste0(sample_types$sample_name[x], ".", et, "PSI"))
     fdf[,c(-1)]
   })
@@ -180,12 +180,12 @@ differential_inclusion_rMATS <- function(control_names, test_names, et,
     # extract paired results for naturally paired output
     stats_out <- paired_rMATS_helper(stats_out)
   } else if (et == "SE") {
-    stats_out <- stats_out[rep(1:nrow(stats_out), each = 2),]
-    stats_out$add_inf <- paste0(stats_out$add_inf, ";", c("seInclusion", "seExclusion"), ";", rep(1:(nrow(stats_out)/2), each = 2))
+    stats_out <- stats_out[rep(seq_len(nrow(stats_out)), each = 2),]
+    stats_out$add_inf <- paste0(stats_out$add_inf, ";", c("seInclusion", "seExclusion"), ";", rep(seq_len(nrow(stats_out)/2), each = 2))
     stats_out$delta.psi <- stats_out$delta.psi * c(1, -1)
   } else if (et == "RI") {
-    stats_out <- stats_out[rep(1:nrow(stats_out), each = 2),]
-    stats_out$add_inf <- paste0(stats_out$add_inf, ";", c("riInclusion", "riExclusion"), ";", rep(1:(nrow(stats_out)/2), each = 2))
+    stats_out <- stats_out[rep(seq_len(nrow(stats_out)), each = 2),]
+    stats_out$add_inf <- paste0(stats_out$add_inf, ";", c("riInclusion", "riExclusion"), ";", rep(seq_len(nrow(stats_out)/2), each = 2))
     stats_out$delta.psi <- stats_out$delta.psi * c(1, -1)
   }
 
@@ -197,7 +197,7 @@ differential_inclusion_rMATS <- function(control_names, test_names, et,
 paired_rMATS_helper <- function(df, type) {
   swapped_exon <- paste0(unlist(lapply(strsplit(df$exon, split = ":"), "[[", 1)), ":",
                          unlist(lapply(strsplit(df$add_inf, split = ";"), "[[", 2)))
-  mod_df <- do.call(rbind, lapply(1:nrow(df), function(x) {
+  mod_df <- do.call(rbind, lapply(seq_len(nrow(df)), function(x) {
     i_df <- data.frame(gene = c(df$gene[x], df$gene[x]),
                        exon = c(df$exon[x], swapped_exon[x]),
                        type = c(df$type[x], df$type[x]),
