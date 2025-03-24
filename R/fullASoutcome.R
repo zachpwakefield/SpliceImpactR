@@ -17,7 +17,7 @@
 #' @param min_prop_samples min prop of samples from each phenotype required to show a specific event
 #' @return nothing in R, output to the output_directory
 #' @export
-fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", "RI", "A5SS", "A3SS"),
+fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", "RI", "A5SS", "A3SS", "HIT"),
                           output_directory, data_directory,
                           data_df, outlier_handle = "Inf",
                           cutoff = .1, cores = 1, bg_pre = NA,
@@ -25,7 +25,7 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
                           mOverlap = .05, s_gtf, plotAlignments = FALSE, transcripts, translations,
                           biomart_data,
                           max_zero_prop = .5,
-                          min_prop_samples = .5, hitCompare = T,
+                          min_prop_samples = .5,
                           chosen_method = 'nbGLM') {
   system(paste0("mkdir ",  output_directory))
   pdir <- system.file(package="SpliceImpactR")
@@ -62,14 +62,14 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
     tti_location <- output_location
   }
 
-  if (hitCompare) {
-    system(paste0("mkdir ",  paste0(output_directory, "/HITindex")))
-    hitCompare <- getHitCompare(data_df, paste0(output_directory, "/HITindex/"), .25)
-  }
   lapply(as_types, function(x) {
     messageOut <- paste0(x, " analysis...")
     message(messageOut)
     system(paste0("mkdir ",  paste0(output_directory, x, "/")))
+    if (x == 'HIT') {
+      system(paste0("mkdir ",  paste0(output_directory, "/HITindex")))
+      hitCompare <- getHitCompare(data_df, paste0(output_directory, "/HITindex/"), .25)
+    } else {
     fAS <- getfxnlASoutcome(output_location = paste0(output_directory, x, "/"),
                             test_group = test_group,
                             control_group = control_group,
@@ -89,6 +89,7 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
                             max_zero_prop,
                             min_prop_samples,
                             chosen_method)
+    }
   })
 
 }

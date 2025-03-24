@@ -33,3 +33,6 @@ Imports:
   PFAM.db 
 RoxygenNote: 7.2.3
 biovViews: AlternativeSplicing, DifferentialSplicing, StatisticalMethod
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3

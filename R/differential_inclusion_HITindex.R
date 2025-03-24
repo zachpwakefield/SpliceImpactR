@@ -1,7 +1,7 @@
 #' Extract differentially included AFE, ALE from HIT Index data
 #'
-#' @param test_names a vector of test_names
-#' @param control_names a vector of control_names
+#' @param test_names character vector of test_names
+#' @param control_names character vector of control_names
 #' @param et string of the exon_type
 #' @param cores the number of cores requested
 #' @param outlier_threshold the thresholding of the cooks distance, no outlier removal is "Inf"
@@ -10,7 +10,7 @@
 #' @param chosen_method stats model
 #' @return a dataframe with differential inclusion information
 #' @importFrom data.table := data.table fread fifelse rbindlist uniqueN
-#' @importFrom dplyr arrange
+#' @importFrom dplyr arrange filter group_by mutate ungroup
 #' @importFrom stats cooks.distance lm logLik pchisq setNames start
 #' @importFrom utils data read.csv read.delim read.table write.csv
 #' @export
@@ -22,17 +22,13 @@ differential_inclusion_HITindex <- function(test_names, control_names, et,
                                             geneIndependent = T) {
 
   # Create sample type vector efficiently
-  sample_types <- data.table::data.table(sample_name = c(test_names, control_names),
-                                         type = rep(c("test", "control"),
-                                                    c(length(test_names), length(control_names))))
+  sample_types <- data.table::data.table(
+    sample_name = c(test_names, control_names),
+    type = rep(c("test", "control"),
+               c(length(test_names), length(control_names))))
 
   # Load PSI values for each sample and splicing event type
-  psi_data_list <- lapply(1:nrow(sample_types), function(x) {
-    fdf <- data.table::fread(paste0(sample_types$sample_name[x], ".", et, "PSI"))
-    fdf$type <- sample_types$type[x]
-    fdf
-  })
-  psi_data_list <- lapply(paste0(sample_types$sample_name, ".", et, "PSI"), fread)
+  psi_data_list <- lapply(paste0(sample_types$sample_name, ".", et, "PSI"), data.table::fread)
   names(psi_data_list) <- sample_types$sample_name
 
   # Bind all data tables together
@@ -46,18 +42,18 @@ differential_inclusion_HITindex <- function(test_names, control_names, et,
   ## remove non terminal exons
   if (et == 'ALE' | et == 'HLE') {
     filtered_data <- psi_data %>%
-      filter(nLE != 0) %>%
-      group_by(gene, sample_name) %>%
-      mutate(psi = psi / sum(psi)) %>%
-      ungroup()
+      dplyr::filter(nLE != 0) %>%
+      dplyr::group_by(gene, sample_name) %>%
+      dplyr::mutate(psi = psi / sum(psi)) %>%
+      dplyr::ungroup()
     psi_data <- data.table(filtered_data)
   } else {
     filtered_data <- psi_data %>%
-      filter(nFE != 0) %>%
-      group_by(gene, sample_name) %>%
-      mutate(psi = psi / sum(psi)) %>%
-      ungroup()
-    psi_data <- data.table(filtered_data)
+      dplyr::filter(nFE != 0) %>%
+      dplyr::group_by(gene, sample_name) %>%
+      dplyr::mutate(psi = psi / sum(psi)) %>%
+      dplyr::ungroup()
+    psi_data <- data.table::data.table(filtered_data)
   }
 
   psi_data$id <- paste0(psi_data$gene, ";", psi_data$exon)
@@ -96,10 +92,11 @@ differential_inclusion_HITindex <- function(test_names, control_names, et,
   if (geneIndependent) {
     psi_data[, has_nonzero_psi := any(psi > 0), by = .(sample_name, gene)]
     psi_data <- psi_data[psi_data$has_nonzero_psi]
+    if (nrow(psi_data) == 0) return(NULL)
   }
 
 
-  # Linear modeling and Cook's distance for outlier detection if enabled
+  # modeling and Cook's distance for outlier detection if enabled
   psi_data[, valid_group := .N > 1 && data.table::uniqueN(type) > 1, by = .(gene, exon)]
   threshold <- switch(outlier_threshold,
                       "4/n" = 4 / nrow(sample_types),
@@ -113,19 +110,19 @@ differential_inclusion_HITindex <- function(test_names, control_names, et,
 
   psi_data[, valid_group := .N > 1 && uniqueN(type) > 1, by = .(gene, exon)]
   psi_data <- psi_data[psi_data$valid_group]
+  if (nrow(psi_data) == 0) return(NULL)
 
   psi_data <- getSignificance(psi_data, chosen_method)
 
+
   psi_data[, `:=` (
-    delta.psi = mean(psi[type == "test" & cooks_d < threshold]) - mean(psi[type == "control" & cooks_d < threshold]),
+    delta.psi = mean(psi[type == "test" & cooks_d <= threshold]) - mean(psi[type == "control" & cooks_d <= threshold]),
     test_average_psi = mean(psi[type == "test" & cooks_d <= threshold]),
     control_average_psi = mean(psi[type == "control" & cooks_d <= threshold])
   ), by = .(gene, exon)]
 
-
+  # Add zero_test, count_test, and count_control columns and finalize cols
   psi_data[, zero_count := sum(psi == 0), by = .(gene, exon)]
-
-  # Filter data based on min proportion of samples per phenotype and return result
   final_data <- psi_data[, .(
     gene, exon, p.val, delta.psi, test_average_psi, control_average_psi,
     count_test = sum(type == "test"), count_control = sum(type == "control"), zero_count
@@ -138,6 +135,8 @@ differential_inclusion_HITindex <- function(test_names, control_names, et,
   final_data$p.adj <- p.adjust(final_data$p.val, method = "fdr")
   final_data$p.adj[is.na(final_data$p.adj)] <- 1
   final_data$p.val[is.na(final_data$p.val)] <- 1
+
+  ## Annotate
   final_data$add_inf <- "none"
   final_data$type <- et
 
