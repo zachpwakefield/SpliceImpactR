@@ -34,7 +34,10 @@ getTranscriptForeground <- function(gtf, redExon, ex_type, minOverlap = .05, cor
   out_matched <- gtf[match(valid_results, gtf$rownum), ]
 
   # Add additional information to the matched data for further analysis
-  out_matched$input_id <- paste(compliment_redExon$geneR, ";", compliment_redExon$chr, ":", compliment_redExon$start, "-", compliment_redExon$stop, sep = "")[results != 0]
+  out_matched$input_id <- paste(compliment_redExon$geneR, ";",
+                                compliment_redExon$chr, ":",
+                                compliment_redExon$start, "-",
+                                compliment_redExon$stop, sep = "")[results != 0]
   matched <- out_matched %>% dplyr::relocate(input_id)
 
   # Add additional information to the matched data for further foreground analysis
@@ -72,7 +75,10 @@ getTranscriptBackground <- function(gtf, redExon, ex_type, minOverlap = .05, cor
     out_matched <- gtf[match(valid_results, gtf$rownum), ]
 
     # Add additional information to the matched data for further analysis
-    out_matched$input_id <- paste(compliment_redExon$geneR, ";", compliment_redExon$chr, ":", compliment_redExon$start, "-", compliment_redExon$stop, sep = "")[results != 0]
+    out_matched$input_id <- paste(compliment_redExon$geneR, ";",
+                                  compliment_redExon$chr, ":",
+                                  compliment_redExon$start, "-",
+                                  compliment_redExon$stop, sep = "")[results != 0]
     matched <- out_matched %>% dplyr::relocate(input_id)
 
     # Add additional information to the matched data for further foreground analysis

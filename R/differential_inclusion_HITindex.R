@@ -19,7 +19,7 @@ differential_inclusion_HITindex <- function(test_names, control_names, et,
                                             minReads = 10,
                                             min_prop_samples = .5,
                                             chosen_method,
-                                            geneIndependent = T) {
+                                            geneIndependent = TRUE) {
 
   # Create sample type vector efficiently
   sample_types <- data.table::data.table(

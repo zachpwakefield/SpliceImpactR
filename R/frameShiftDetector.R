@@ -219,7 +219,7 @@ irRead <- function(addInf, coding_exons, exon_data, exon_length_df) {
       return(c("PartialMatch", "noRescue"))
     } else {
       return(c("FrameShift",
-             paste0((getRescue(addInf$transcript[x], addInf$transcript[x+1], addInf$exonID[x], addInf$exonID[x+1], exon_length_df, filterDownstream = T)), collapse = "#")))
+             paste0((getRescue(addInf$transcript[x], addInf$transcript[x+1], addInf$exonID[x], addInf$exonID[x+1], exon_length_df, filterDownstream = TRUE)), collapse = "#")))
     }
       }
   }))
@@ -252,7 +252,7 @@ mxeRead <- function(addInf, coding_exons, exon_data, exon_length_df, newgtf) {
       strand <- unique(newgtf$strand[newgtf$transcriptID == addInf$transcript[x]])
       seOv <- getFLOverlap(addInf$transcript[x], addInf$transcript[x+1], ex = "SE", coding_exonsX = coding_exons,
                             eld = exon_length_df)
-      if (class(seOv) == "character") {
+      if (is(seOv, "character")) {
         return(c("PartialMatch", "noRescue"))
       }
       fs_invest <- seOv[unique(which(seOv$t1 %in% downstreamExon+seOv$t2 %in% downstreamExon > 0)),]
@@ -484,7 +484,7 @@ seRead <- function(addInf, coding_exons, exon_data, exon_length_df, newgtf) {
       strand <- unique(newgtf$strand[newgtf$transcriptID == addInf$transcript[seExon]])
       seOv <- getFLOverlap(addInf$transcript[x], addInf$transcript[x+1], ex = "SE", coding_exonsX = coding_exons,
                             eld = exon_length_df)
-      if (class(seOv) == "character") {
+      if (is(seOv, "character")) {
         return(c("PartialMatch", "noRescue"))
       }
       fs_invest <- seOv[unique(which(seOv$t1 %in% downstreamExon+seOv$t2 %in% downstreamExon > 0)),]

@@ -192,8 +192,11 @@ getOverviewComparison <- function(data_df, exon_type, output_location, plot = TR
   dfECDF <- dfECDF[dfECDF$val < 1 & dfECDF$val > 0 & !is.na(dfECDF$val),]
   dfECDF <- dfECDF[!is.na(dfECDF$val),]
   p4 <- ggplot2::ggplot(dfECDF, ggplot2::aes(x = val, colour = type, fill = type)) +
-    ggplot2::stat_ecdf(geom = "step") + ggplot2::theme_bw() + ggplot2::scale_color_manual(breaks=c("control","test"),
-                                                                                          values=c("brown", "chartreuse4")) + ggplot2::xlab("PSI") + ggplot2::ylab(paste0(exon_type, " PSI eCDF"))
+    ggplot2::stat_ecdf(geom = "step") +
+    ggplot2::theme_bw() +
+    ggplot2::scale_color_manual(breaks=c("control","test"), values=c("brown", "chartreuse4")) +
+    ggplot2::xlab("PSI") +
+    ggplot2::ylab(paste0(exon_type, " PSI eCDF"))
   comb_plot <- ggpubr::ggarrange(p1, p2, p3, p4, labels = c("A", "B", "C", "D"),
                                  common.legend = TRUE, legend="bottom")
 

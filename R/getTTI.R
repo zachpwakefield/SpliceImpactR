@@ -38,7 +38,8 @@ getTTI <- function(paired_foreground, background, pdir, steps = 1, max_vertices_
   # tgp <- read.csv(paste0(pdir, '/gencodev42_transcriptGeneProtein.csv'))
 
   # Read edgelist output from initTTI -- using the ppidm class used previously
-  edgeList <- read.table(paste0(tti_location,  "tti_igraph_edgelist_", paste(ppidm_class, collapse = ""), "_removeDups"), sep = " ", row.names = NULL)
+  edgeList <- read.table(paste0(tti_location,  "tti_igraph_edgelist_", paste(ppidm_class, collapse = ""), "_removeDups"),
+                         sep = " ", row.names = NULL)
 
   # Convert the edgelist to a matrix format
   edgeList_Matrix <- matrix(c(edgeList$V1, edgeList$V2), ncol = 2)
@@ -74,9 +75,13 @@ getTTI <- function(paired_foreground, background, pdir, steps = 1, max_vertices_
       # Optionally write the ego graphs to files
       if (write_igraphs) {
 
-        igraph::write_graph(eg[[1]], paste0(output_location, "tti/transcript_igraph_edgelists/", paired_foreground$gene[tr], "_", paired_foreground$transcript[tr], "_igraph"),
+        igraph::write_graph(eg[[1]], paste0(output_location, "tti/transcript_igraph_edgelists/",
+                                            paired_foreground$gene[tr], "_",
+                                            paired_foreground$transcript[tr], "_igraph"),
                             format = "ncol")
-        igraph::write_graph(eg[[2]], paste0(output_location, "tti/transcript_igraph_edgelists/", paired_foreground$gene[tr+1], "_", paired_foreground$transcript[tr+1], "_igraph"),
+        igraph::write_graph(eg[[2]], paste0(output_location, "tti/transcript_igraph_edgelists/",
+                                            paired_foreground$gene[tr+1], "_",
+                                            paired_foreground$transcript[tr+1], "_igraph"),
                             format = "ncol")
       }
 
@@ -93,7 +98,13 @@ getTTI <- function(paired_foreground, background, pdir, steps = 1, max_vertices_
 
         # Get iGraph plots for the transcripts
         # if (g1_check | g2_check) {
-        tti_igraph <- getTTIiGraphPlot(paired_foreground$transcript[c(tr, tr+1)], gene = paired_foreground$gene[tr], full_graph = g, steps = steps, max_vertices_for_viz = max_vertices_for_viz, plot_bool = TRUE, output_location = output_location)
+        tti_igraph <- getTTIiGraphPlot(paired_foreground$transcript[c(tr, tr+1)],
+                                       gene = paired_foreground$gene[tr],
+                                       full_graph = g,
+                                       steps = steps,
+                                       max_vertices_for_viz = max_vertices_for_viz,
+                                       plot_bool = TRUE,
+                                       output_location = output_location)
         # }
 
         # Perform enrichment analysis for unique vertices
@@ -134,8 +145,10 @@ getTTI <- function(paired_foreground, background, pdir, steps = 1, max_vertices_
   results <- data.frame(transcript1 = paired_foreground$transcript[seq(1, length(paired_foreground$transcript), by=2)],
                         transcript2 = paired_foreground$transcript[seq(2, length(paired_foreground$transcript), by=2)],
                         gene = paired_foreground$gene[seq(1, length(paired_foreground$transcript), by=2)],
-                        transcript1_setdiff = as.numeric(lapply(lapply(differences, function(yy) {unlist(lapply(yy, function(yy2) {length(yy2[[1]])}))}), "[[", 1)),
-                        transcript2_setdiff = as.numeric(lapply(lapply(differences, function(yy) {unlist(lapply(yy, function(yy2) {length(yy2[[1]])}))}), "[[", 2))
+                        transcript1_setdiff = as.numeric(lapply(lapply(differences, function(yy) {
+                          unlist(lapply(yy, function(yy2) {length(yy2[[1]])}))}), "[[", 1)),
+                        transcript2_setdiff = as.numeric(lapply(lapply(differences, function(yy) {
+                          unlist(lapply(yy, function(yy2) {length(yy2[[1]])}))}), "[[", 2))
                         )
   results <- results[results$transcript1_setdiff > 1 | results$transcript2_setdiff > 1,]
   write_csv(results, paste0(output_location, "tti/tti_change_results.csv"))
@@ -180,17 +193,32 @@ getTTIiGraphPlot <- function(paired_transcript, gene, steps, full_graph, max_ver
   # Highlight unique vertices and edges in e1g not present in e2g
   if (length(setdiff(unique(igraph::V(e1g)), unique(igraph::V(e2g)))) > 0){
 
-    igraph::V(e1g)$color[setdiff(unique(igraph::V(e1g)), unique(igraph::V(e2g)))] <- rep("red", length(setdiff(unique(igraph::V(e1g)), unique(igraph::V(e2g)))))
-    igraph::E(e1g)$color[setdiff(unique(igraph::E(e1g)), unique(igraph::E(e2g)))] <- rep("brown", length(setdiff(unique(igraph::E(e1g)), unique(igraph::E(e2g)))))
-    igraph::E(e1g)$color[igraph::E(e1g) %in% igraph::E(e1g)[from(igraph::V(e1g)[setdiff(unique(igraph::V(e1g)), unique(igraph::V(e2g)))])]] <- rep("brown", length(igraph::E(e1g)[from(igraph::V(e1g)[setdiff(unique(igraph::V(e1g)), unique(igraph::V(e2g)))])]))
+    igraph::V(e1g)$color[setdiff(unique(igraph::V(e1g)),
+                                 unique(igraph::V(e2g)))] <- rep("red", length(setdiff(unique(igraph::V(e1g)),
+                                                                                       unique(igraph::V(e2g)))))
+    igraph::E(e1g)$color[setdiff(unique(igraph::E(e1g)),
+                                 unique(igraph::E(e2g)))] <- rep("brown", length(setdiff(unique(igraph::E(e1g)),
+                                                                                         unique(igraph::E(e2g)))))
+
+    igraph::E(e1g)$color[igraph::E(e1g) %in% igraph::E(e1g)[from(igraph::V(e1g)[setdiff(unique(igraph::V(e1g)),
+                                                                                        unique(igraph::V(e2g)))])]] <- rep("brown",
+                                                                                                                           length(igraph::E(e1g)[from(igraph::V(e1g)[setdiff(unique(igraph::V(e1g)),
+                                                                                                                                                                             unique(igraph::V(e2g)))])]))
   }
 
   # Highlight unique vertices and edges in e2g not present in e1g
   if (length(setdiff(unique(igraph::V(e2g)), unique(igraph::V(e1g)))) > 0){
 
-    igraph::V(e2g)$color[setdiff(unique(igraph::V(e2g)), unique(igraph::V(e1g)))] <- rep("chartreuse4", length(setdiff(unique(igraph::V(e2g)), unique(igraph::V(e1g)))))
-    igraph::E(e2g)$color[setdiff(unique(igraph::E(e2g)), unique(igraph::E(e1g)))] <- rep("blue", length(setdiff(unique(igraph::E(e2g)), unique(igraph::E(e1g)))))
-    igraph::E(e2g)$color[igraph::E(e2g) %in% igraph::E(e2g)[from(igraph::V(e2g)[setdiff(unique(igraph::V(e2g)), unique(igraph::V(e1g)))])]] <- rep("blue", length(igraph::E(e2g)[from(igraph::V(e2g)[setdiff(unique(igraph::V(e2g)), unique(igraph::V(e1g)))])]))
+    igraph::V(e2g)$color[setdiff(unique(igraph::V(e2g)),
+                                 unique(igraph::V(e1g)))] <- rep("chartreuse4", length(setdiff(unique(igraph::V(e2g)),
+                                                                                               unique(igraph::V(e1g)))))
+    igraph::E(e2g)$color[setdiff(unique(igraph::E(e2g)),
+                                 unique(igraph::E(e1g)))] <- rep("blue", length(setdiff(unique(igraph::E(e2g)),
+                                                                                        unique(igraph::E(e1g)))))
+    igraph::E(e2g)$color[igraph::E(e2g) %in% igraph::E(e2g)[from(igraph::V(e2g)[setdiff(unique(igraph::V(e2g)),
+                                                                                        unique(igraph::V(e1g)))])]] <- rep("blue",
+                                                                                                                           length(igraph::E(e2g)[from(igraph::V(e2g)[setdiff(unique(igraph::V(e2g)),
+                                                                                                                                                                             unique(igraph::V(e1g)))])]))
   }
 
   # Highlight the nodes representing the paired transcripts in gold

@@ -121,7 +121,7 @@ differential_inclusion_rMATS <- function(control_names, test_names, et,
   )
 
   psi_data[, median_sum_IJC_SJC := round(median(IJC + SJC, na.rm = TRUE), digits = 0), by = sample_name]
-  psi_data$median_sum_IJC_SJC[is.na(psi_data$median_sum_IJC_SJC)] <- median(psi_data$median_sum_IJC_SJC, na.rm = T)
+  psi_data$median_sum_IJC_SJC[is.na(psi_data$median_sum_IJC_SJC)] <- median(psi_data$median_sum_IJC_SJC, na.rm = TRUE)
 
   psi_data[, c("psi_adjusted", "IJC", "SJC") := lapply(.SD, function(x) data.table::fifelse(is.na(x), 0, x)),
            .SDcols = c("psi_adjusted", "IJC", "SJC")]

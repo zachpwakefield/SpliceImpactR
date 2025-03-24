@@ -138,8 +138,8 @@ getHitCompare <- function(data_df, output_location, threshold = .1) {
       cluster_rows = FALSE,  # Disable row clustering
       cluster_cols = FALSE,  # Disable column clustering
       color = custom_colors_total(seq(-1, 1, length.out = 100)),  # Gradient between control and test colors
-      show_rownames = F,  # Show row names (gene_exon)
-      show_colnames = F,  # Show column names (control and test)
+      show_rownames = FALSE,  # Show row names (gene_exon)
+      show_colnames = FALSE,  # Show column names (control and test)
       annotation_col = total_col_annotation,  # Add labels for control and test
       annotation_colors = list(group = control_test_colors)  # Apply custom colors
     )
@@ -182,8 +182,8 @@ getHitCompare <- function(data_df, output_location, threshold = .1) {
     cluster_rows = FALSE,  # Disable row clustering
     cluster_cols = FALSE,  # Disable column clustering
     color = custom_colors_mean(seq(-1, 1, length.out = 100)),  # Gradient between control and test colors
-    show_rownames = F,  # Show row names (gene_exon)
-    show_colnames = F,  # Show column names (control and test)
+    show_rownames = FALSE,  # Show row names (gene_exon)
+    show_colnames = FALSE,  # Show column names (control and test)
     annotation_col = mean_col_annotation,  # Add labels for control and test
     annotation_colors = list(group = control_test_colors)  # Apply custom colors
   )

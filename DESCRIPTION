@@ -30,7 +30,15 @@ Imports:
   biomaRt,
   R.utils,
   AnnotationDbi,
-  PFAM.db 
+  PFAM.db,
+  circlize,
+  purrr,
+  pscl,
+  pheatmap,
+  lmtest,
+  grid,
+  MASS,
+  ComplexUpset
 RoxygenNote: 7.2.3
 biovViews: AlternativeSplicing, DifferentialSplicing, StatisticalMethod
 Suggests: 

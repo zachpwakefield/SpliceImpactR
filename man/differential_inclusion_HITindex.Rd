@@ -12,13 +12,13 @@ differential_inclusion_HITindex(
   minReads = 10,
   min_prop_samples = 0.5,
   chosen_method,
-  geneIndependent = T
+  geneIndependent = TRUE
 )
 }
 \arguments{
-\item{test_names}{a vector of test_names}
+\item{test_names}{character vector of test_names}
 
-\item{control_names}{a vector of control_names}
+\item{control_names}{character vector of control_names}
 
 \item{et}{string of the exon_type}
 

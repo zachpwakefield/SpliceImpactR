@@ -5,7 +5,7 @@
 \title{Extract differentially included AFE, ALE from HIT Index data}
 \usage{
 fullASoutcome(
-  as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", "RI", "A5SS", "A3SS"),
+  as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", "RI", "A5SS", "A3SS", "HIT"),
   output_directory,
   data_directory,
   data_df,
@@ -22,7 +22,6 @@ fullASoutcome(
   biomart_data,
   max_zero_prop = 0.5,
   min_prop_samples = 0.5,
-  hitCompare = T,
   chosen_method = "nbGLM"
 )
 }
