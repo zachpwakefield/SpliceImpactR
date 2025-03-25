@@ -3,45 +3,53 @@ Type: Package
 Title: An R pacakge to identify functional impacts due to alternative splicing events 
 Version: 0.99.0
 Authors@R: person("Zachary", "Wakefield",
-  email = "zachpw@bu.edu",
-  role = c("cre", "aut"))
-Description: SpliceImpactR employs 4 primary methods—differential inclusion analysis, 
-  primary sequence analysis, domain analysis, and isoform-specific domain-derived protein-protein 
-  interactions (ISPPI) —to elucidate the proteomic consequences of AS events.
+    email = "zachpw@bu.edu",
+    role = c("cre", "aut"))
+Description: SpliceImpactR begins by importing all alternative RNA processing events that vary across conditions (1). 
+    It uses rMATS to identify retained introns (RI), skipped exons (SE), alternative 5’ (A5SS) and 3’ splice sites (A3SS), and mutually 
+    exclusive exons (MXE). he HIT Index detects alternative first exons (AFEs), hybrid first (HFE) and last exons (HLE), and alternative 
+    last exons (ALE). First, SpliceImpactR analyzes global patterns of alternative RNA processing across experimental conditions. 
+    It then performs differential inclusion analysis to identify event pairs preferentially used in each condition (2). 
+    These paired events are matched to annotations and linked to their corresponding transcripts and proteins. 
+    Using these transcript-protein pairs, SpliceImpactR determines changes in protein-coding status and primary sequence similarity (3). 
+    It also detects frameshifted regions caused by alternative events. Additionally, InterPro annotations help identify alternative 
+    event-driven domain changes (3). Next, it examines local and global shifts in domain usage (5) and integrates 3did’s domain-domain 
+    interaction data to assess how these domain changes impact protein-protein interactions (6). Finally, SpliceImpactR performs holistic 
+    analysis, identifying co-regulated events and the relative use of each alternative RNA processing event type (7) 
 License: What license is it under?
 Encoding: UTF-8
 Imports: 
-  readr,
-  ggpubr, 
-  msa, 
-  data.table, 
-  Biostrings, 
-  parallel, 
-  igraph, 
-  hypeR,
-  rtracklayer,
-  tidyr,
-  ggplot2,
-  dplyr,
-  grDevices,
-  stats,
-  utils,
-  stringr,
-  biomaRt,
-  R.utils,
-  AnnotationDbi,
-  PFAM.db,
-  circlize,
-  purrr,
-  pscl,
-  pheatmap,
-  lmtest,
-  grid,
-  MASS,
-  ComplexUpset,
-  scales
+    readr,
+    ggpubr, 
+    msa, 
+    data.table, 
+    Biostrings, 
+    parallel, 
+    igraph, 
+    hypeR,
+    rtracklayer,
+    tidyr,
+    ggplot2,
+    dplyr,
+    grDevices,
+    stats,
+    utils,
+    stringr,
+    biomaRt,
+    R.utils,
+    AnnotationDbi,
+    PFAM.db,
+    circlize,
+    purrr,
+    pscl,
+    pheatmap,
+    lmtest,
+    grid,
+    MASS,
+    ComplexUpset,
+    scales
 RoxygenNote: 7.2.3
-biovViews: AlternativeSplicing, DifferentialSplicing, StatisticalMethod
+biocViews: AlternativeSplicing, DifferentialSplicing, StatisticalMethod
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
