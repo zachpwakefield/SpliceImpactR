@@ -14,9 +14,9 @@
 #' @importFrom stats cooks.distance lm logLik pchisq setNames start
 #' @importFrom utils data read.csv read.delim read.table write.csv
 #' @examples
-#' dataDirectory <- 'testthat/testData/rawData/'
-#' test_group <- c('test1','test2', 'test3')
-#' control_group <- c('control1', 'control2', 'control3')
+#' dataDirectory <- "testthat/testData/rawData/"
+#' test_group <- paste0(dataDirectory, c("test1","test2", "test3"))
+#' control_group <- paste0(dataDirectory, c("control1", "control2", "control3"))
 #'
 #' result <- differential_inclusion_HITindex(test_names = test_group,
 #'                                           control_names = control_group,
