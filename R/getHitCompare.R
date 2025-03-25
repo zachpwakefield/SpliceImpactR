@@ -160,7 +160,7 @@ getHitCompare <- function(data_df, output_location, threshold = .1) {
       show_rownames = FALSE,  # Show row names (gene_exon)
       show_colnames = FALSE,  # Show column names (control and test)
       annotation_col = total_col_annotation,  # Add labels for control and test
-      annotation_colors = list(group = control_test_colors), silent = T # Apply custom colors
+      annotation_colors = list(group = control_test_colors), silent = TRUE # Apply custom colors
 
     )
   }
@@ -205,7 +205,7 @@ getHitCompare <- function(data_df, output_location, threshold = .1) {
     show_rownames = FALSE,  # Show row names (gene_exon)
     show_colnames = FALSE,  # Show column names (control and test)
     annotation_col = mean_col_annotation,  # Add labels for control and test
-    annotation_colors = list(group = control_test_colors), silent = T  # Apply custom colors
+    annotation_colors = list(group = control_test_colors), silent = TRUE  # Apply custom colors
   )
   if (!is.null(output_location)) {
     if (length(data_df$sample_names[data_df$utc == 'test']) <= 10 &
