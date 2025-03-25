@@ -17,3 +17,4 @@ the input dataframe with
 \description{
 add colors to differential inclusion analysis for plotting
 }
+\keyword{internal}

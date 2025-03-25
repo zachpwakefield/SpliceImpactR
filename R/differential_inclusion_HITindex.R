@@ -13,6 +13,20 @@
 #' @importFrom dplyr arrange filter group_by mutate ungroup
 #' @importFrom stats cooks.distance lm logLik pchisq setNames start
 #' @importFrom utils data read.csv read.delim read.table write.csv
+#' @examples
+#' dataDirectory <- 'testthat/testData/rawData/'
+#' test_group <- c(test1',test2', test3')
+#' control_group <- c(control1', control2', control3')
+#'
+#' result <- differential_inclusion_HITindex(test_names = test_group,
+#'                                           control_names = control_group,
+#'                                           et = "AFE",
+#'                                           outlier_threshold = "Inf",
+#'                                           minReads = 10,
+#'                                           min_prop_samples = 0,
+#'                                           chosen_method = "qbGLM"
+#'                                           )
+#'
 #' @export
 differential_inclusion_HITindex <- function(test_names, control_names, et,
                                             outlier_threshold = c("4/n", "1", "Inf")[3],
