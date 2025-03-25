@@ -129,7 +129,7 @@ differential_inclusion_HITindex <- function(test_names, control_names, et,
 
   ), by = .(gene, exon)]
 
-  final_data <- final_data[!duplicated(final_data),-c(1:2)] %>% dplyr::arrange(.data$gene)
+  final_data <- final_data[!duplicated(final_data),-c(1, 2)] %>% dplyr::arrange(.data$gene)
 
   # Adjust p-values for multiple testing
   final_data$p.adj <- p.adjust(final_data$p.val, method = "fdr")
