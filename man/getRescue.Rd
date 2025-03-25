@@ -4,7 +4,7 @@
 \alias{getRescue}
 \title{check for rescue of the frame shifts}
 \usage{
-getRescue(transcript1, transcript2, e1, e2, eld, filterDownstream = F)
+getRescue(transcript1, transcript2, e1, e2, eld, filterDownstream = FALSE)
 }
 \arguments{
 \item{transcript1}{first transcript}

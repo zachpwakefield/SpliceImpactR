@@ -34,12 +34,6 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
   # Annotate control / test groups
   data_df$utc <- "control"
   data_df$utc[data_df$phenotype_names == unique(data_df$phenotype_names)[2]] <- "test"
-  messageControl <- paste0(unique(data_df$phenotype_names)[1], ": control group")
-  messageTest <- paste0(unique(data_df$phenotype_names)[2], ": test group")
-  message(messageControl)
-  message(messageTest)
-
-
 
   control_group <- data_df$sample_names[data_df$utc == "control"]
   test_group <- data_df$sample_names[data_df$utc == "test"]

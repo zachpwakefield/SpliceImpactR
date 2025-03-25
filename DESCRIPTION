@@ -16,7 +16,7 @@ Description: SpliceImpactR begins by importing all alternative RNA processing ev
     event-driven domain changes (3). Next, it examines local and global shifts in domain usage (5) and integrates 3did’s domain-domain 
     interaction data to assess how these domain changes impact protein-protein interactions (6). Finally, SpliceImpactR performs holistic 
     analysis, identifying co-regulated events and the relative use of each alternative RNA processing event type (7) 
-License: What license is it under?
+License: GPL (>= 3)
 Encoding: UTF-8
 Imports: 
     readr,
