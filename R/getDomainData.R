@@ -35,7 +35,7 @@ getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
 
   system(paste0("mkdir ", output_location, "DomainEnrichment/"))
   ## Process interproscan results for background and foreground datasets
-  interproscan_results <- lapply(1:2, function(o) {
+  interproscan_results <- lapply(c(1, 2), function(o) {
     # Read domain scan results and sequence information
     ip <- ipscan[[o]]
     s <- outBed[[o]]
@@ -99,13 +99,13 @@ getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
       bg_dom <- unlist(lapply(interproscan_results[[1]]$protInfor, function(dom) {
         unique(unlist(strsplit(dom, split = ";")))
       }))
-      fg_dom_ul <- lapply(1:nrow(fg_ip), function(ind) {
+      fg_dom_ul <- lapply(seq_len(nrow(fg_ip)), function(ind) {
         setdiff(c(unique(unlist(strsplit(fg_ip$protInfor[ind], split = ";"))), "none"), c(unique(unlist(strsplit(fg_sc$protInfor[ind], split = ";"))), "none"))
       })
       fg_dom <- unlist(fg_dom_ul)
     } else if (repeatingDomains) {
       bg_dom <- unlist(strsplit(interproscan_results[[1]]$protInfor, split = ';'))
-      fg_dom_ul <- lapply(1:nrow(fg_ip), function(ind) {
+      fg_dom_ul <- lapply(seq_len(nrow(fg_ip)), function(ind) {
         setdiff(c(unlist(strsplit(fg_ip$protInfor[ind], split = ";")), "none"), c(unlist(strsplit(fg_sc$protInfor[ind], split = ";")), "none"))
       })
       fg_dom <- unlist(fg_dom_ul)
@@ -217,7 +217,7 @@ getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
 
   if (nrow(dataFinal[dataFinal$sample_successes >= min_sample_success,]) > 0) {
   dataFinal$reg <- factor(dataFinal$reg, levels = unique(dataFinal$reg))
-  dataFinal$domain2 <- 1:length(dataFinal$domain)
+  dataFinal$domain2 <- seq_along(dataFinal$domain)
   # dataFinal <- transform(dataFinal, variable=reorder(domain, domain2) )
   enrichmentPlot <- ggplot2::ggplot(data=dataFinal, ggplot2::aes(x=reorder(domain, domain2), y=-log10(fdr), fill = reg)) +
     ggplot2::geom_bar(stat="identity")+

@@ -79,7 +79,7 @@ getPaired <- function(foreground, et, nucleotides, newGTF, cores = 1, output_loc
     exon_pairs_df <- do.call(rbind, exon_pairs_list) %>% dplyr::relocate(gene)
     # Combine all rows into a single data frame
     combined_rows_df <- do.call(rbind, combined_rows)
-    combined_rows_df_expanded <- do.call(rbind, lapply(1:nrow(combined_rows_df), function(x) {
+    combined_rows_df_expanded <- do.call(rbind, lapply(seq_len(nrow(combined_rows_df)), function(x) {
       rbind(foreground[foreground$exon_id == combined_rows_df$pos_exon_id[x] &
                          foreground$add_inf == combined_rows_df$add_inf.pos[x] &
                          foreground$gene == combined_rows_df$gene[x],],

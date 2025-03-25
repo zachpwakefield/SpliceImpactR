@@ -376,7 +376,7 @@ init_ddi <- function(pdir, output_location, ppidm_class = c("Gold_Standard", "Go
   colnames(d6) <- c("n1", "n2")
 
   # Generate a dataframe of transcript pairs from the filtered PPIDM interactions
-  tti <- do.call(rbind, parallel::mclapply(1:length(d6$n1), function(x) {
+  tti <- do.call(rbind, parallel::mclapply(seq_alone(d6$n1), function(x) {
     # Check if both interacting proteins are in the domain-transcript list
     if (sum(names(d_transcripts) == d6$n1[x]) > 0 & sum(names(d_transcripts) ==
                                                         d6$n2[x]) > 0) {
@@ -388,7 +388,7 @@ init_ddi <- function(pdir, output_location, ppidm_class = c("Gold_Standard", "Go
 
   if (removeDups) {
     # Sort and deduplicate the transcript pairs [This can be time consuming]
-    list_noDups <- parallel::mclapply(1:nrow(tti), mc.cores = cores, function(x) {
+    list_noDups <- parallel::mclapply(seq_len(nrow(tti)), mc.cores = cores, function(x) {
       sort(as.character(tti[x,]))
     })
     list_noDuplicates <- list_noDups[!duplicated(list_noDups)]

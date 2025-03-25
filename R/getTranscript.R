@@ -15,14 +15,6 @@ getTranscriptForeground <- function(gtf, redExon, ex_type, minOverlap = .05, cor
 
   # Double for convenience if not AFE/ALE
   compliment_redExon <- redExon
-  # if (ex_type != "SE") {
-  #   compliment_redExon <- redExon
-  # } else {
-  #   compliment_redExon <- redExon[rep(1:nrow(redExon), each = 2),]
-  #   add_inf_extension <- rep(1:nrow(redExon), each = 2)
-  #
-  #   compliment_redExon$add_inf <- paste0(compliment_redExon$add_inf, rep(c("inclusion;", ";exclusion"), nrow(redExon)))
-  # }
 
   # Filter out 0s and ensure results are unique to minimize redundant operations
   valid_results <- results[results != 0]
@@ -63,7 +55,7 @@ getTranscriptBackground <- function(gtf, redExon, ex_type, minOverlap = .05, cor
 
     # Parallel computation for each exon in redExon using multiple cores
     results <- matcher(ex_type, TRUE, cores, redExon, minOverlap, gtf, transcript_gtf)
-    compliment_redExon <- redExon[rep(1:nrow(redExon), each = 1),]
+    compliment_redExon <- redExon[rep(seq_len(nrow(redExon)), each = 1),]
 
     # Filter out 0s
     valid_results <- results[results != 0]

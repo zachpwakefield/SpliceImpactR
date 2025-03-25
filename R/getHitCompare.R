@@ -15,7 +15,7 @@
 #'
 getHitCompare <- function(data_df, output_location, threshold = .1) {
   sample_types <- list()
-  for (i in 1:nrow(data_df)) {
+  for (i in seq_len(nrow(data_df))) {
     sample_types <- c(sample_types, list(c(data_df$sample_names[i], data_df$utc[i], data_df$phenotype_names[i])))
   }
   sample_list <- c(sample_types[which(unlist(lapply(sample_types, "[[", 2)) == "control")],

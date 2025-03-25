@@ -14,8 +14,8 @@ getTranslations <- function(translations_location) {
   }
   c_trans_pre <- readr::read_lines(paste0(translations_location, "gencode.v45.pc_translations.fa"))
   transcript_title <- c(grep(">", c_trans_pre), (length(c_trans_pre)+1))
-  tts <- unlist(lapply(strsplit(unlist(lapply(strsplit(c_trans_pre[transcript_title[1:(length(transcript_title)-1)]], split = "[|]"), "[[", 2)), split = "[.]"), "[[", 1))
-  c_trans <- unlist(lapply(1:(length(transcript_title)-1), function(x) {
+  tts <- unlist(lapply(strsplit(unlist(lapply(strsplit(c_trans_pre[transcript_title[seq_len(length(transcript_title)-1)]], split = "[|]"), "[[", 2)), split = "[.]"), "[[", 1))
+  c_trans <- unlist(lapply(seq_len(length(transcript_title)-1), function(x) {
     c(tts[x], paste(c_trans_pre[(transcript_title[x]+1):(transcript_title[x+1]-1)], collapse = ""))
   }))
   return(c_trans)
@@ -37,15 +37,15 @@ getTranscripts <- function(transcripts_location) {
   }
   nc <- readr::read_lines(paste0(transcripts_location, "gencode.v45.pc_transcripts.fa"))
   transcript_title <- c(grep(">", nc), (length(nc)+1))
-  splitF <- strsplit(nc[(transcript_title[1:(length(transcript_title)-1)])], split = "[|]")
+  splitF <- strsplit(nc[(transcript_title[seq_len(length(transcript_title)-1)])], split = "[|]")
   cdsL <- unlist(lapply(splitF, function(x) grep("CDS:", x)))
-  tts <- gsub(">", "", unlist(lapply(strsplit(unlist(lapply(strsplit(nc[transcript_title[1:(length(transcript_title)-1)]],
+  tts <- gsub(">", "", unlist(lapply(strsplit(unlist(lapply(strsplit(nc[transcript_title[seq_len(length(transcript_title)-1)]],
                                                                      split = "[|]"), "[[", 1)), split = "[.]"), "[[", 1)))
-  cds_locs <- unlist(lapply(1:(length(transcript_title)-1), function(x) {
+  cds_locs <- unlist(lapply(seq_len(length(transcript_title)-1), function(x) {
     strsplit(unlist(lapply(strsplit(unlist(lapply(strsplit(nc[transcript_title[x]], split = "[|]"), "[[", cdsL[x])),
                                     split = ":"), "[[", 2)), split = "[-]")
   }), recursive = FALSE)
-  c_trans <- unlist(lapply(1:(length(transcript_title)-1), function(x) {
+  c_trans <- unlist(lapply(seq_len(length(transcript_title)-1), function(x) {
     c(tts[x], substr(paste(nc[(transcript_title[x]+1):(transcript_title[x+1]-1)], collapse = ""),
                      as.numeric(cds_locs[[x]][1]), as.numeric(cds_locs[[x]][2]) ))
   }))

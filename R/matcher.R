@@ -31,7 +31,7 @@ matcher <- function(ex_type, background = FALSE, cores = 1, redExon, minOverlap=
   if (background) {
     gtf_filtered <- gtf[gtf$classification %in% c("first", "internal", "last"),]
     gtf_filtered_globe <- gtf_filtered  # Explicitly evaluate `gtf_filtered`
-    results <- unlist(parallel::mclapply(1:nrow(redExon_globe), mc.cores = cores, function(i) {
+    results <- unlist(parallel::mclapply(seq_len(nrow(redExon_globe)), mc.cores = cores, function(i) {
       HITmatcher(i, redExon = redExon_globe,
                  gtf_filtered=gtf_filtered_globe,
                  minOverlap = minOverlap_globe,
@@ -46,7 +46,7 @@ matcher <- function(ex_type, background = FALSE, cores = 1, redExon, minOverlap=
       lim <- "last"
       gtf_filtered_globe <- gtf[gtf$classification == lim,]
     }
-    results <- unlist(parallel::mclapply(1:nrow(redExon_globe), mc.cores = cores, function(i) {
+    results <- unlist(parallel::mclapply(seq_len(nrow(redExon_globe)), mc.cores = cores, function(i) {
       HITmatcher(i, redExon = redExon_globe,
                  gtf_filtered=gtf_filtered_globe,
                  minOverlap = minOverlap_globe,

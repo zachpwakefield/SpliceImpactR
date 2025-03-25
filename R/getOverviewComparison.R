@@ -10,7 +10,7 @@
 getOverviewComparison <- function(data_df, exon_type, output_location, plot = TRUE, minReads = 10) {
   sample_types <- list()
 
-  for (i in 1:nrow(data_df)) {
+  for (i in seq_len(nrow(data_df))) {
     sample_types <- c(sample_types, list(c(data_df$sample_names[i], data_df$utc[i], data_df$phenotype_names[i])))
   }
 
@@ -187,7 +187,7 @@ getOverviewComparison <- function(data_df, exon_type, output_location, plot = TR
   ## PSI distribution across phenotype
   psiVals <- lapply(data_list, function(x) x[,grep(colNameInc, colnames(x))])
   dfECDF <- data.frame(val = unlist(psiVals),
-                       type = unlist(lapply(1:length(psiVals), function(x) rep(unlist(lapply(sample_list, "[[", 2))[x], length(psiVals[[x]])))))
+                       type = unlist(lapply(seq_along(psiVals), function(x) rep(unlist(lapply(sample_list, "[[", 2))[x], length(psiVals[[x]])))))
 
   dfECDF <- dfECDF[dfECDF$val < 1 & dfECDF$val > 0 & !is.na(dfECDF$val),]
   dfECDF <- dfECDF[!is.na(dfECDF$val),]
