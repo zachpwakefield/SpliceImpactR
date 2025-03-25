@@ -39,9 +39,9 @@ a dataframe with differential inclusion information
 Extract differentially included AFE, ALE from HIT Index data
 }
 \examples{
-dataDirectory <- 'testthat/testData/rawData/'
-test_group <- c(test1',test2', test3')
-control_group <- c(control1', control2', control3')
+dataDirectory <- "testthat/testData/rawData/"
+test_group <- paste0(dataDirectory, c("test1","test2", "test3"))
+control_group <- paste0(dataDirectory, c("control1", "control2", "control3"))
 
 result <- differential_inclusion_HITindex(test_names = test_group,
                                           control_names = control_group,
