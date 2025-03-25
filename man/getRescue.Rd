@@ -16,6 +16,8 @@ getRescue(transcript1, transcript2, e1, e2, eld, filterDownstream = FALSE)
 \item{e2}{second exon}
 
 \item{eld}{exon_length_df from previous function}
+
+\item{filterDownstream}{param to choose whether or not to filter to downstream of exons}
 }
 \value{
 either noRescues or the transcript and exons that contain rescue

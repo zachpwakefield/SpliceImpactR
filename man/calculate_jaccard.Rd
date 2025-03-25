@@ -12,3 +12,4 @@ jaccard index and alt jacc length
 \description{
 calculates jaccard between sequences
 }
+\keyword{internal}

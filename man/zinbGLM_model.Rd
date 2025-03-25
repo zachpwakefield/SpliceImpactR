@@ -17,3 +17,4 @@ p vals, LR vals, cooks d vals
 \description{
 Extract significance stats for each aRNAp using zero-inflated nb model
 }
+\keyword{internal}

@@ -9,7 +9,7 @@
 #' @param gtf_transcript dataframe from setup_gtf
 #' @return figures and dataframes with paired data
 #' @importFrom parallel mclapply
-#' @export
+#' @keywords internal
 matcher <- function(ex_type, background = FALSE, cores = 1, redExon, minOverlap=.05, gtf, gtf_transcripts) {
 
   gtf_exons <- gtf
@@ -90,7 +90,7 @@ matcher <- function(ex_type, background = FALSE, cores = 1, redExon, minOverlap=
 
 #' specific matcher for HIT
 #' @return matched transcript rownumber
-#' @export
+#' @keywords internal
 HITmatcher <- function(i, redExon, gtf_filtered, minOverlap,
                        protein_coding_transcripts) {
 
@@ -141,7 +141,7 @@ HITmatcher <- function(i, redExon, gtf_filtered, minOverlap,
 
 #' specific matcher for SE
 #' @return matched transcript rownumber
-#' @export
+#' @keywords internal
 SEmatcher <- function(i, below_thresh = 0, redExon, minOverlap = .05,
                       gtf_transcripts,
                       gtf_exons,
@@ -243,7 +243,7 @@ SEmatcher <- function(i, below_thresh = 0, redExon, minOverlap = .05,
 
 #' specific matcher for MXE
 #' @return matched transcript rownumber
-#' @export
+#' @keywords internal
 MXmatcher <- function(i, below_thresh = 0, redExon, minOverlap = .05,
                       gtf_transcripts,
                       gtf_exons,
@@ -315,7 +315,7 @@ MXmatcher <- function(i, below_thresh = 0, redExon, minOverlap = .05,
 
 #' helper for MXEmatcher
 #' @return rownums for the clusion
-#' @export
+#' @keywords internal
 getMXE_internal <- function(g, indices, clusion, strVar, minOverlap) {
   g$jaccard <- indices$jaccard_index
   g$length_jacc <- indices$length_jacc
@@ -357,7 +357,7 @@ getMXE_internal <- function(g, indices, clusion, strVar, minOverlap) {
 
 #' specific matcher for A5SS/A3SS
 #' @return matched transcript rownumber
-#' @export
+#' @keywords internal
 ASmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
                       gtf_transcripts,
                       gtf_exons,
@@ -460,7 +460,7 @@ ASmatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
 
 #' helper for MXEmatcher
 #' @return rownums for the clusion
-#' @export
+#' @keywords internal
 getAS_internal <- function(g, indices, clusion, strVar, minOverlap) {
   g$jaccard <- indices$jaccard_index
   g$length_jacc <- indices$length_jacc
@@ -502,7 +502,7 @@ getAS_internal <- function(g, indices, clusion, strVar, minOverlap) {
 
 #' specific matcher for RI
 #' @return matched transcript rownumber
-#' @export
+#' @keywords internal
 RImatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
                       gtf_transcripts,
                       gtf_exons,
@@ -619,7 +619,7 @@ RImatcher <- function(i, below_thresh = .2, redExon, minOverlap = .05,
 
 #' helper for RImatcher
 #' @return rownums for the clusion
-#' @export
+#' @keywords internal
 getRI_internal <- function(g, indices, clusion, strVar, minOverlap) {
   g$jaccard <- indices$jaccard_index
   g$length_jacc <- indices$length_jacc

@@ -15,3 +15,4 @@ a dataframe with sizeFactors added
 \description{
 Extract size factors for each sample
 }
+\keyword{internal}

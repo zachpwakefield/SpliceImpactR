@@ -1,3 +1,10 @@
+#' initialize get frame shift with data
+#' @param newgtf from setupgtf
+#' @param exon_data exon_data from earlier
+#' @return multiple dfs with different info and organization related to coding exons
+#'
+#' @importFrom dplyr group_by mutate arrange select ungroup
+#' @keywords internal
 getFrameShiftInit <- function(newgtf, exon_data) {
   exon_data <- exon_data[exon_data$ensembl_exon_id %in% newgtf$exonID,]
   exon_data$exon_biotype <- "coding"
@@ -10,7 +17,7 @@ getFrameShiftInit <- function(newgtf, exon_data) {
     ) %>%
     dplyr::arrange(ensembl_transcript_id, adjusted_start) %>%
     dplyr::select(-adjusted_start) %>%
-    ungroup()
+    dplyr::ungroup()
 
 
   coding_exons <- exon_data[exon_data$exon_biotype =="coding",]
@@ -30,7 +37,15 @@ getFrameShiftInit <- function(newgtf, exon_data) {
 }
 
 
- getFrameShift <- function(fC, et, newgtf, exon_data) {
+#' identify frame shifts due to aRNAp events
+#' @param fC addinf col
+#' @param et aRNAp type
+#' @param newgtf newgtf from setupGTF
+#' @param exon_data exon data data frame
+#' @return a character vector of types of alignmetns of each pair
+#'
+#' @keywords internal
+getFrameShift <- function(fC, et, newgtf, exon_data) {
   gfs_init <- getFrameShiftInit(newgtf, exon_data)
   if (et %in% c("AFE", "HFE")) {
     fs_out <- afheRead(addInf = fC, et,
@@ -75,6 +90,16 @@ getFrameShiftInit <- function(newgtf, exon_data) {
   return(fs_out)
 }
 
+
+#' Get 1st, last, or general overlapping exons between 2 transcripts
+#' @param transcript1 transcript 1
+#' @param transcript2 transcript 2
+#' @param ex exon_type
+#' @param coding_exonsX coding exons from initFrameShift
+#' @param eld exon_length_df from initFrameShift
+#' @return a character vector of types of alignmetns of each pair
+#'
+#' @keywords internal
 getFLOverlap <- function(transcript1, transcript2, ex, coding_exonsX, eld) {
 
   df1 <- eld[eld$ensembl_transcript_id %in% transcript1 & (!is.na(eld$genomic_coding_end) & !is.na(eld$genomic_coding_start)),]
@@ -115,6 +140,16 @@ getFLOverlap <- function(transcript1, transcript2, ex, coding_exonsX, eld) {
 
 }
 
+#' Get alignment status of last or hybrid last exons
+#' @param addInf addInf column passed -- extra info
+#' @param et exon_type
+#' @param coding_exons coding exons from initFrameShift
+#' @param exon_length exon_data from initFrameShift
+#' @param exon_length_df exon_length_df from initFrameShift
+#' @param newgtf from setup_gtf
+#' @return a character vector of types of alignmetns of each pair
+#'
+#' @keywords internal
 alheRead <- function(addInf, et, coding_exons, exon_data, exon_length_df, newgtf) {
   outReads <- unlist(lapply(seq(1, nrow(addInf), by=2), function(x) {
     if (addInf$prot[x] == "none" & addInf$prot[x+1] == "none") {
@@ -129,6 +164,16 @@ alheRead <- function(addInf, et, coding_exons, exon_data, exon_length_df, newgtf
 }
 
 
+#' Get alignment status of first or hybrid first exons
+#' @param addInf addInf column passed -- extra info
+#' @param et exon_type
+#' @param coding_exons coding exons from initFrameShift
+#' @param exon_length exon_data from initFrameShift
+#' @param exon_length_df exon_length_df from initFrameShift
+#' @param newgtf from setup_gtf
+#' @return a character vector of types of alignmetns of each pair
+#'
+#' @keywords internal
 afheRead <- function(addInf, et, coding_exons, exon_data, exon_length_df, newgtf) {
 
   outReads <- unlist(lapply(seq(1, nrow(addInf), by=2), function(x) {
@@ -193,6 +238,14 @@ afheRead <- function(addInf, et, coding_exons, exon_data, exon_length_df, newgtf
   return(rep(outReads, each = 2))
 }
 
+#' Get alignment status of introns
+#' @param addInf addInf column passed -- extra info
+#' @param coding_exons coding exons from initFrameShift
+#' @param exon_length exon_data from initFrameShift
+#' @param exon_length_df exon_length_df from initFrameShift
+#' @return a character vector of types of alignmetns of each pair
+#'
+#' @keywords internal
 irRead <- function(addInf, coding_exons, exon_data, exon_length_df) {
   outReads <- unlist(lapply(seq(1, nrow(addInf), by=2), function(x) {
     if (addInf$prot[x] == "none" & addInf$prot[x+1] == "none") {
@@ -226,6 +279,14 @@ irRead <- function(addInf, coding_exons, exon_data, exon_length_df) {
   return(rep(outReads, each = 2))
 }
 
+#' Get alignment status of introns
+#' @param addInf addInf column passed -- extra info
+#' @param coding_exons coding exons from initFrameShift
+#' @param exon_length exon_data from initFrameShift
+#' @param exon_length_df exon_length_df from initFrameShift
+#' @return a character vector of types of alignmetns of each pair
+#'
+#' @keywords internal
 mxeRead <- function(addInf, coding_exons, exon_data, exon_length_df, newgtf) {
   outReads <- unlist(lapply(seq(1, nrow(addInf), by=2), function(x) {
     if (addInf$prot[x] == "none" & addInf$prot[x+1] == "none") {
@@ -310,6 +371,14 @@ mxeRead <- function(addInf, coding_exons, exon_data, exon_length_df, newgtf) {
   return(rep(outReads, each = 2))
 }
 
+#' Find overlap between two sequences
+#' @param start1 sequence 1 start
+#' @param end1 sequence 1 end
+#' @param start2 sequence 2 start
+#' @param end2 sequence 2 end
+#' @return which sequences are overlapping
+#'
+#' @keywords internal
 overlap <- function(start1, end1, start2, end2) {
   start_min <- min(start1, end1)
   end_max <- max(start1, end1)
@@ -318,6 +387,14 @@ overlap <- function(start1, end1, start2, end2) {
   return(pmax(start_min, start2) <= pmin(end_max, end2))
 }
 
+#' Get alignment status of a3ss
+#' @param addInf addInf column passed -- extra info
+#' @param coding_exons coding exons from initFrameShift
+#' @param exon_length exon_data from initFrameShift
+#' @param exon_length_df exon_length_df from initFrameShift
+#' @return a character vector of types of alignmetns of each pair
+#'
+#' @keywords internal
 alt3Read <- function(addInf, coding_exons, exon_data, exon_length_df) {
   outReads <- unlist(lapply(seq(1, nrow(addInf), by=2), function(x) {
     if (addInf$prot[x] == "none" & addInf$prot[x+1] == "none") {
@@ -389,6 +466,15 @@ alt3Read <- function(addInf, coding_exons, exon_data, exon_length_df) {
   return(rep(outReads, each = 2))
 }
 
+
+#' Get alignment status of a5ss
+#' @param addInf addInf column passed -- extra info
+#' @param coding_exons coding exons from initFrameShift
+#' @param exon_length exon_data from initFrameShift
+#' @param exon_length_df exon_length_df from initFrameShift
+#' @return a character vector of types of alignmetns of each pair
+#'
+#' @keywords internal
 alt5Read <- function(addInf, coding_exons, exon_data, exon_length_df) {
   outReads <- unlist(lapply(seq(1, nrow(addInf), by=2), function(x) {
     if (addInf$prot[x] == "none" & addInf$prot[x+1] == "none") {
@@ -458,7 +544,14 @@ alt5Read <- function(addInf, coding_exons, exon_data, exon_length_df) {
   return(rep(outReads, each = 2))
 }
 
-
+#' Get alignment status of se
+#' @param addInf addInf column passed -- extra info
+#' @param coding_exons coding exons from initFrameShift
+#' @param exon_length exon_data from initFrameShift
+#' @param exon_length_df exon_length_df from initFrameShift
+#' @return a character vector of types of alignmetns of each pair
+#'
+#' @keywords internal
 seRead <- function(addInf, coding_exons, exon_data, exon_length_df, newgtf) {
   outReads <- unlist(lapply(seq(1, nrow(addInf), by=2), function(x) {
     if (addInf$prot[x] == "none" & addInf$prot[x+1] == "none") {
@@ -550,7 +643,7 @@ seRead <- function(addInf, coding_exons, exon_data, exon_length_df, newgtf) {
 #' @param proBed proBed paired output
 #' @return align scores and lengths
 #' @importFrom msa msaPrettyPrint msa
-#' @export
+#' @keywords internal
 alignmentScorer <- function(type, proBed) {
   values <- c(
     4, -1, -2, -2,  0, -1, -1,  0, -2, -1, -1, -1, -1, -2, -1,  1,  0, -3, -2,  0, -2, -1, -1, -1, -4,
@@ -611,13 +704,13 @@ alignmentScorer <- function(type, proBed) {
 
 #' get next downstream exon for MXE, SE
 #'
-#' @param transcript1 first transcript
-#' @param transcript2 second transcript
+#' @param df1 info related to first transcript
+#' @param df2 info related to second transcript
 #' @param e1 first exon
 #' @param e2 second exon
 #' @param eld exon_length_df from previous function
 #' @return either new exon set for limiting at least one df
-#' @export
+#' @keywords internal
 getNextOverlap <- function(df1, df2, e1, e2, eld) {
   if (length(which(df1$ensembl_exon_id == e1)) == 0) {
     e1_out <- e1
@@ -640,6 +733,7 @@ getNextOverlap <- function(df1, df2, e1, e2, eld) {
 #' @param e1 first exon
 #' @param e2 second exon
 #' @param eld exon_length_df from previous function
+#' @param filterDownstream param to choose whether or not to filter to downstream of exons
 #' @return either noRescues or the transcript and exons that contain rescue
 #' @importFrom dplyr mutate relocate
 #' @export

@@ -32,3 +32,4 @@ altered probed and alignment info
 \description{
 getPaired helper function to identify align classifications
 }
+\keyword{internal}

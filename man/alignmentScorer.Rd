@@ -17,3 +17,4 @@ align scores and lengths
 \description{
 score alignments of proteins
 }
+\keyword{internal}

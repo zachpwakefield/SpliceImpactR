@@ -12,3 +12,4 @@ rownums for the clusion
 \description{
 helper for RImatcher
 }
+\keyword{internal}

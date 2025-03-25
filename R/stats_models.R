@@ -4,7 +4,7 @@
 #' @param psi_data_sf a df with exons for signifcance calc
 #' @return a dataframe with psi values, LR, cooks d
 #' @importFrom data.table :=
-#' @export
+#' @keywords internal
 getSignificance <- function(psi_data_sf, chosen_method) {
   if (chosen_method %in% c('zinbGLM', 'nbGLM')) {
     psi_data_sf <- getSizeFactors(psi_data_sf)
@@ -93,7 +93,7 @@ getSignificance <- function(psi_data_sf, chosen_method) {
 #' @importFrom data.table :=
 #' @importFrom tidyr pivot_wider
 #' @importFrom dplyr group_by summarize left_join
-#' @export
+#' @keywords internal
 getSizeFactors <- function(df) {
   df$reads <- df$nUP + df$nDOWN
   counts_wide <- df %>%
@@ -128,7 +128,7 @@ getSizeFactors <- function(df) {
 #' @param threshold threshold for cooks.d
 #' @return p vals, LR vals, cooks d vals
 #' @importFrom stats cooks.distance glm anova quasibinomial
-#' @export
+#' @keywords internal
 qbGLM_model <- function(data, threshold = Inf) {
   # Ensure necessary columns are present
   required_cols <- c("psi", "type", "total")
@@ -207,7 +207,7 @@ qbGLM_model <- function(data, threshold = Inf) {
 #' @param data dataframe with key info for diff inc calc
 #' @return p vals for each event
 #' @importFrom stats wilcox.test
-#' @export
+#' @keywords internal
 wilcox_model <- function(data) {
   # Ensure necessary columns are present
   required_cols <- c("psi", "type")
@@ -250,7 +250,7 @@ wilcox_model <- function(data) {
 #' @return p vals, LR vals, cooks d vals
 #' @importFrom stats cooks.distance glm anova glm.control
 #' @importFrom MASS glm.nb
-#' @export
+#' @keywords internal
 nbGLM_model <- function(exon_data, gene_data, exon_of_interest, threshold = Inf) {
 
   # Check if multiple exons exist and if each exon has
@@ -346,7 +346,7 @@ nbGLM_model <- function(exon_data, gene_data, exon_of_interest, threshold = Inf)
 #' @return p vals, LR vals, cooks d vals
 #' @importFrom pscl zeroinfl
 #' @importFrom lmtest lrtest
-#' @export
+#' @keywords internal
 zinbGLM_model <- function(exon_data, gene_data, exon_of_interest, threshold = Inf) {
 
   # Check if multiple exons exist and if each exon has multiple types

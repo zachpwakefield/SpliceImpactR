@@ -15,3 +15,4 @@ p vals for each event
 \description{
 Extract significance stats for each aRNAp
 }
+\keyword{internal}

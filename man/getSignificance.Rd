@@ -17,3 +17,4 @@ a dataframe with psi values, LR, cooks d
 \description{
 Extract significance stats for each aRNAp
 }
+\keyword{internal}

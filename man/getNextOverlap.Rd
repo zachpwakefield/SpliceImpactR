@@ -7,15 +7,15 @@
 getNextOverlap(df1, df2, e1, e2, eld)
 }
 \arguments{
+\item{df1}{info related to first transcript}
+
+\item{df2}{info related to second transcript}
+
 \item{e1}{first exon}
 
 \item{e2}{second exon}
 
 \item{eld}{exon_length_df from previous function}
-
-\item{transcript1}{first transcript}
-
-\item{transcript2}{second transcript}
 }
 \value{
 either new exon set for limiting at least one df
@@ -23,3 +23,4 @@ either new exon set for limiting at least one df
 \description{
 get next downstream exon for MXE, SE
 }
+\keyword{internal}

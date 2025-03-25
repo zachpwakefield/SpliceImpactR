@@ -248,7 +248,7 @@ getTTIiGraphPlot <- function(paired_transcript, gene, steps, full_graph, max_ver
 }
 #' enrichment helper function
 #' @return geneset enrichment from hypeR
-#' @export
+#' @keywords internal
 getEnrichmentTTI <- function(current_transcript, t_impacts, fdr, transGeneProt,
                              backgroundGenes, steps, plot_bool, output_location) {
 
