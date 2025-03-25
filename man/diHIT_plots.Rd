@@ -15,3 +15,4 @@ figures showing hit index plots (dot plot, volcano)
 \description{
 get HITindex plots
 }
+\keyword{internal}

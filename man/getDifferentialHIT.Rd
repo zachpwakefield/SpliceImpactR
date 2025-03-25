@@ -15,3 +15,4 @@ final_results a dataframe for HIT Index summary
 \description{
 get differential HIT
 }
+\keyword{internal}

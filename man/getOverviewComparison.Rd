@@ -4,18 +4,12 @@
 \alias{getOverviewComparison}
 \title{Get comparison between phenotypes: count of AS event, count of AS event per gene, ECDF compare and save to Foreground subdir}
 \usage{
-getOverviewComparison(
-  data_df,
-  exon_type,
-  output_location,
-  plot = TRUE,
-  minReads = 10
-)
+getOverviewComparison(data_df, exon_type, output_location, minReads = 10)
 }
 \arguments{
 \item{exon_type}{type of AS being investigated}
 
-\item{output_location}{location where everything is being saved}
+\item{output_location}{location where everything is being saved, NULL if not desired}
 
 \item{control_names}{paths of control samples}
 
@@ -26,4 +20,16 @@ getOverviewComparison(
 }
 \description{
 Get comparison between phenotypes: count of AS event, count of AS event per gene, ECDF compare and save to Foreground subdir
+}
+\examples{
+dataDirectory <- "testthat/testData/rawData/"
+test_group <- paste0(dataDirectory, c("test1","test2", "test3"))
+control_group <- paste0(dataDirectory, c("control1", "control2", "control3"))
+data_df <- data.frame(sample_names = c(control_group, test_group),
+                      phenotype_names = c(rep("control", length(control_group)), rep("test", length(test_group))))
+
+data_df$utc <- "control"
+data_df$utc[data_df$phenotype_names == unique(data_df$phenotype_names)[2]] <- "test"
+overview <- getOverviewComparison(data_df, "AFE", output_location = NULL, minReads = 10)
+
 }

@@ -35,3 +35,18 @@ a dataframe with differential inclusion information
 \description{
 Extract differentially included AS events from HIT Index data
 }
+\examples{
+dataDirectory <- "testthat/testData/rawData/"
+test_group <- paste0(dataDirectory, c("test1","test2", "test3"))
+control_group <- paste0(dataDirectory, c("control1", "control2", "control3"))
+
+result <- differential_inclusion_rMATS(test_names = test_group,
+                                          control_names = control_group,
+                                          et = "AFE",
+                                          outlier_threshold = "Inf",
+                                          minReads = 10,
+                                          min_prop_samples = 0,
+                                          chosen_method = "qbGLM"
+                                          )
+
+}

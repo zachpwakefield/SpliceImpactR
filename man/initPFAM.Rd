@@ -12,3 +12,4 @@ exon and transcript level domains
 \description{
 get the pfam domains and ip conversions
 }
+\keyword{internal}

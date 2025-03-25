@@ -12,4 +12,3 @@ various biomaRt results for use downstream in pipeline
 \description{
 import / load + save biomaRt data
 }
-\keyword{internal}

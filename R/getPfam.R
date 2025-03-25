@@ -65,7 +65,7 @@ getPfam <- function(background, foreground, pdir, output_location, cores = 1, bi
 #' @importFrom biomaRt useEnsembl getBM
 #' @importFrom PFAM.db PFAMINTERPRO
 #' @importFrom dplyr inner_join left_join
-#' @export
+#' @keywords internal
 initPFAM <- function(biomart_data) {
 
   x <- PFAM.db::PFAMINTERPRO

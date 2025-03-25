@@ -225,7 +225,7 @@ getHitCompare <- function(data_df, output_location, threshold = .1) {
 #' @importFrom stats wilcox.test p.adjust
 #' @importFrom dplyr left_join mutate select summarise group_by
 #' @importFrom tidyr pivot_wider pivot_longer
-#' @export
+#' @keywords internal
 #'
 #'
 getDifferentialHIT <- function(merged_data) {
@@ -290,7 +290,7 @@ getDifferentialHIT <- function(merged_data) {
 #' @param final_results from getDifferentialHIT
 #' @return figures showing hit index plots (dot plot, volcano)
 #' @importFrom ggplot2 ggplot aes geom_point scale_color_manual labs theme_minimal theme element_text geom_hline geom_vline scale_color_gradient2 labs geom_abline
-#' @export
+#' @keywords internal
 #'
 diHIT_plots <- function(final_results) {
   volcanoPlot <- ggplot2::ggplot(final_results, ggplot2::aes(x = delta_HIT, y = -log10(fdr))) +
