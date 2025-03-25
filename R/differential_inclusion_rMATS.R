@@ -13,7 +13,7 @@
 #' @importFrom stringr str_split_fixed
 #'
 #' @examples
-#' dataDirectory <- "testthat/testData/rawData/"
+#' dataDirectory <- "tests/testData/rawData/"
 #' test_group <- paste0(dataDirectory, c("test1","test2", "test3"))
 #' control_group <- paste0(dataDirectory, c("control1", "control2", "control3"))
 #'

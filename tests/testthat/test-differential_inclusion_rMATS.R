@@ -1,14 +1,10 @@
 test_that("differential_inclusion_rMATS works", {
-  test_group <- c(
-    "/projectnb2/evolution/zwakefield/SpliceImpactR/tests/testdata/rawData/test1",
-    "/projectnb2/evolution/zwakefield/SpliceImpactR/tests/testdata/rawData/test2",
-    "/projectnb2/evolution/zwakefield/SpliceImpactR/tests/testdata/rawData/test3"
-  )
-  control_group <- c(
-    "/projectnb2/evolution/zwakefield/SpliceImpactR/tests/testdata/rawData/control1",
-    "/projectnb2/evolution/zwakefield/SpliceImpactR/tests/testdata/rawData/control2",
-    "/projectnb2/evolution/zwakefield/SpliceImpactR/tests/testdata/rawData/control3"
-  )
+  dataDirectory <- "tests/testdata/rawData/"
+
+  skip_if_not(dir.exists(dataDirectory), "Data directory not found.")
+
+  test_group <- paste0(dataDirectory, c("test1", "test2", "test3"))
+  control_group <- paste0(dataDirectory, c("control1", "control2", "control3"))
 
   result <- differential_inclusion_rMATS(
     test_names = test_group,
