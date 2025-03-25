@@ -19,3 +19,20 @@ figures about HIT Index and csv for differentially used exons
 \description{
 get paired as events / exons
 }
+\examples{
+dataDirectory <- "tests/testdata/rawData/"
+test_group <- paste0(dataDirectory, c("test1", "test2", "test3"))
+control_group <- paste0(dataDirectory, c("control1", "control2", "control3"))
+data_df <- data.frame(
+    sample_names = c(control_group, test_group),
+    phenotype_names = c(
+      rep("control", length(control_group)),
+      rep("test", length(test_group))
+     ),
+   stringsAsFactors = FALSE
+  )
+  data_df$utc <- "control"
+  data_df$utc[data_df$phenotype_names == unique(data_df$phenotype_names)[2]] <- "test"
+compareHIT <- getHitCompare(data_df, output_location = NULL, threshold = .1)
+
+}

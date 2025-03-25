@@ -4,13 +4,32 @@
 #' @param output_location output location for plots
 #' @param threshold for NA in HIT Index
 #' @return figures about HIT Index and csv for differentially used exons
-#' @importFrom dplyr %>% full_join ungroup mutate group_by summarise filter arrange desc left_join
+#' @importFrom dplyr %>% full_join ungroup mutate group_by summarise filter arrange desc left_join cur_group_id
 #' @importFrom pheatmap pheatmap
 #' @importFrom tidyr pivot_wider pivot_longer
-#' @importFrom data.table fread
+#' @importFrom data.table fread setnames
 #' @importFrom purrr reduce
 #' @importFrom grid grid.newpage grid.draw
 #' @importFrom circlize colorRamp2
+#' @importFrom tibble column_to_rownames
+#'
+#' @examples
+#' dataDirectory <- "tests/testdata/rawData/"
+#' test_group <- paste0(dataDirectory, c("test1", "test2", "test3"))
+#' control_group <- paste0(dataDirectory, c("control1", "control2", "control3"))
+#' data_df <- data.frame(
+#'     sample_names = c(control_group, test_group),
+#'     phenotype_names = c(
+#'       rep("control", length(control_group)),
+#'       rep("test", length(test_group))
+#'      ),
+#'    stringsAsFactors = FALSE
+#'   )
+#'   data_df$utc <- "control"
+#'   data_df$utc[data_df$phenotype_names == unique(data_df$phenotype_names)[2]] <- "test"
+
+#' compareHIT <- getHitCompare(data_df, output_location = NULL, threshold = .1)
+#'
 #' @export
 #'
 getHitCompare <- function(data_df, output_location, threshold = .1) {
@@ -36,7 +55,7 @@ getHitCompare <- function(data_df, output_location, threshold = .1) {
       data <- data[data$nUP > 10 | data$nDOWN > 10,c('gene', 'exon', 'HITindex')]
 
       # Rename HITindex column to include the 2nd element and its position in u
-      setnames(data, "HITindex", paste0("HITindex_", i[2], "_", j))
+      data.table::setnames(data, "HITindex", paste0("HITindex_", i[2], "_", j))
       return(data)
     }) %>%
     purrr::reduce(function(df1, df2) {
@@ -62,7 +81,7 @@ getHitCompare <- function(data_df, output_location, threshold = .1) {
       values_to = "HITindex"
     ) %>%
     dplyr::group_by(gene, exon) %>%
-    dplyr::mutate(row_id = cur_group_id()) %>%
+    dplyr::mutate(row_id = dplyr::cur_group_id()) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(condition = factor(condition, levels = c(
       grep("control", unique(condition), value = TRUE),
@@ -112,7 +131,7 @@ getHitCompare <- function(data_df, output_location, threshold = .1) {
   heatmap_matrix <- heatmap_data_sorted %>%
     dplyr::select(gene_exon, condition, HITindex) %>%
     tidyr::pivot_wider(names_from = condition, values_from = HITindex) %>%
-    column_to_rownames(var = "gene_exon") %>%
+    tibble::column_to_rownames(var = "gene_exon") %>%
     as.matrix()
 
   # Remove columns with NA in their names (if applicable)
@@ -141,7 +160,8 @@ getHitCompare <- function(data_df, output_location, threshold = .1) {
       show_rownames = FALSE,  # Show row names (gene_exon)
       show_colnames = FALSE,  # Show column names (control and test)
       annotation_col = total_col_annotation,  # Add labels for control and test
-      annotation_colors = list(group = control_test_colors)  # Apply custom colors
+      annotation_colors = list(group = control_test_colors), silent = T # Apply custom colors
+
     )
   }
   heatmap_mean_data <- heatmap_data_filled %>%
@@ -160,7 +180,7 @@ getHitCompare <- function(data_df, output_location, threshold = .1) {
 
   # Convert to matrix format for heatmap
   mean_heatmap_matrix <- mean_heatmap_data_sorted %>%
-    column_to_rownames(var = "gene_exon") %>%
+    tibble::column_to_rownames(var = "gene_exon") %>%
     as.matrix()
 
   # Define custom colors for the mean heatmap
@@ -185,33 +205,36 @@ getHitCompare <- function(data_df, output_location, threshold = .1) {
     show_rownames = FALSE,  # Show row names (gene_exon)
     show_colnames = FALSE,  # Show column names (control and test)
     annotation_col = mean_col_annotation,  # Add labels for control and test
-    annotation_colors = list(group = control_test_colors)  # Apply custom colors
+    annotation_colors = list(group = control_test_colors), silent = T  # Apply custom colors
   )
+  if (!is.null(output_location)) {
+    if (length(data_df$sample_names[data_df$utc == 'test']) <= 10 &
+        length(data_df$sample_names[data_df$utc == 'control']) <= 10) {
+      pdf(paste0(output_location, "HITheatmap.pdf"))
+      grid::grid.newpage()  # Start a new page
+      grid::grid.draw(totalHeatmap$gtable)  # Draw the pheatmap plot
 
-  if (length(data_df$sample_names[data_df$utc == 'test']) <= 10 &
-      length(data_df$sample_names[data_df$utc == 'control']) <= 10) {
-    pdf(paste0(output_location, "HITheatmap.pdf"))
-    grid::grid.newpage()  # Start a new page
-    grid::grid.draw(totalHeatmap$gtable)  # Draw the pheatmap plot
+      # Print the mean heatmap on the second page
+      grid::grid.newpage()  # Start a new page
+      grid::grid.draw(meanHeatmap$gtable)
+      dev.off()
+    } else {
+      pdf(paste0(output_location, "HITheatmap.pdf"))
+      grid::grid.newpage()  # Start a new page
+      grid::grid.draw(meanHeatmap$gtable)
+      dev.off()
+    }
 
-    # Print the mean heatmap on the second page
-    grid::grid.newpage()  # Start a new page
-    grid::grid.draw(meanHeatmap$gtable)
+    pdf(paste0(output_location, "dotPlotHIT.pdf"))
+    print(diPlot$dotPlot)
     dev.off()
-  } else {
-    pdf(paste0(output_location, "HITheatmap.pdf"))
-    grid::grid.newpage()  # Start a new page
-    grid::grid.draw(meanHeatmap$gtable)
+    pdf(paste0(output_location, "volcanoPlotHIT.pdf"))
+    print(diPlot$volcanoPlot)
     dev.off()
+
+    write_csv(diHIT, paste0(output_location, "deltaHIT.csv"))
   }
-  pdf(paste0(output_location, "dotPlotHIT.pdf"))
-  print(diPlot$dotPlot)
-  dev.off()
-  pdf(paste0(output_location, "volcanoPlotHIT.pdf"))
-  print(diPlot$volcanoPlot)
-  dev.off()
 
-  write_csv(diHIT, paste0(output_location, "deltaHIT.csv"))
 
   return(list(diPlot = diPlot,
               meanHeatmap = meanHeatmap,
