@@ -4,8 +4,8 @@ test_that("getAnnotation produces the expected structure", {
 
   biomart_data_sample <- list(
     setup_gtf_exon_data = readr::read_csv(paste0(dataDirectory, "biomart_setup_gtf_exon_data.csv")),
-    ptg_init            = readr::read_csv(paste0(dataDirectory, "biomart_setup_gtf_exon_data.csv")),
-    transcript_data     = readr::read_csv(paste0(dataDirectory, "biomart_setup_gtf_exon_data.csv"))
+    ptg_init            = readr::read_csv(paste0(dataDirectory, "biomart_ptg_init.csv")),
+    transcript_data     = readr::read_csv(paste0(dataDirectory, "biomart_transcript_data.csv"))
   )
 
   gtf_list <- getAnnotation(biomart_data = biomart_data_sample)

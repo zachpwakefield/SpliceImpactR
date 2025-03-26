@@ -78,8 +78,8 @@ getTranscripts <- function(transcripts_location) {
 #' pdir <- system.file("extdata", package = "SpliceImpactR")
 #' dataDirectory <- paste0(pdir, "/")
 #' biomart_data_sample <- list(setup_gtf_exon_data = readr::read_csv(paste0(dataDirectory, "biomart_setup_gtf_exon_data.csv")),
-#'                             ptg_init =  = readr::read_csv(paste0(dataDirectory, "biomart_setup_gtf_exon_data.csv")),
-#'                             transcript_data =  = readr::read_csv(paste0(dataDirectory, "biomart_setup_gtf_exon_data.csv")))
+#'                             ptg_init = readr::read_csv(paste0(dataDirectory, "biomart_ptg_init.csv")),
+#'                             transcript_data = readr::read_csv(paste0(dataDirectory, "biomart_transcript_data.csv")))
 #'
 #' gtf <- getAnnotation(biomart_data = biomart_data_sample)
 #'
