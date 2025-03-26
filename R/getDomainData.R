@@ -16,14 +16,99 @@
 #' @importFrom ggplot2 scale_fill_manual theme_classic ggplot aes xlab ylab theme geom_bar geom_boxplot theme_classic coord_flip theme_bw ggtitle element_blank element_line facet_wrap
 #' @importFrom ggpubr ggarrange
 #' @importFrom data.table as.data.table
+#'
+#' @examples
+#'
+#' pdir <- system.file("extdata", package="SpliceImpactR")
+#' dataDirectory <- paste0(pdir, "/")
+#' test_group <- paste0(dataDirectory, "rawData/", c("test1","test2", "test3"))
+#' control_group <- paste0(dataDirectory, "rawData/", c("control1", "control2", "control3"))
+#' data_df <- data.frame(
+#'     sample_names = c(control_group, test_group),
+#'     phenotype_names = c(
+#'       rep("control", length(control_group)),
+#'       rep("test", length(test_group))
+#'      ),
+#'    stringsAsFactors = FALSE
+#'   )
+#' data_df$utc <- "control"
+#' data_df$utc[data_df$phenotype_names == unique(data_df$phenotype_names)[2]] <- "test"
+#'
+#' transcripts_sample <- list(transDF = readr::read_csv(paste0(dataDirectory, "transcripts_limited_transDF.csv")),
+#'                      c_trans = readr::read_lines(paste0(dataDirectory, "transcripts_limited_c_trans.csv")))
+#'
+#' gtf_sample <- list(gtf = readr::read_csv(paste0(dataDirectory, "gtf_limited.csv")),
+#'             transcript_gtf = readr::read_csv(paste0(dataDirectory, "transcript_gtf_limited.csv")))
+#' translations_sample <- readr::read_lines(paste0(dataDirectory, "translations_limited.csv"))
+#' biomart_data <- list(ip = readr::read_csv(paste0(dataDirectory, "biomart_ip.csv")),
+#'                      code_regions = readr::read_csv(paste0(dataDirectory, "biomart_code_regions.csv")),
+#'                      pfam_exon_level = readr::read_csv(paste0(dataDirectory, "biomart_pfam_exon_level.csv")),
+#'                      fsd_exon_data = readr::read_csv(paste0(dataDirectory, "biomart_data_sample.csv")))
+#'
+#'
+#' result <- differential_inclusion_HITindex(test_names = test_group,
+#'                                           control_names = control_group,
+#'                                           et = "AFE",
+#'                                           outlier_threshold = "Inf",
+#'                                           minReads = 10,
+#'                                           min_prop_samples = 0,
+#'                                           chosen_method = "qbGLM"
+#'                                           )
+#'
+#' fg <- getForeground(input = result,
+#'                             test_names = test_group,
+#'                             control_names = control_group,
+#'                             thresh = .1,
+#'                             fdr = .05,
+#'                             mOverlap = .1,
+#'                             exon_type = "AFE",
+#'                             output_location = NULL,
+#'                             cores = 1,
+#'                             gtf = gtf_sample,
+#'                             max_zero_prop = 1,
+#'                             min_prop_samples = 0,
+#'                             translations = translations_sample)
+#'
+#' bg <- getBackground(input=c(test_group, control_group),
+#'                     mOverlap = 0.1,
+#'                     cores = 1,
+#'                     exon_type = "AFE",
+#'                     output_location = NULL, gtf_sample, translations_sample)
+#' library(msa)
+#' pfg <- getPaired(foreground = fg$proBed,
+#'           et = "AFE",
+#'           nucleotides = transcripts_sample,
+#'           newGTF = gtf_sample,
+#'           cores = 1,
+#'           output_location = NULL,
+#'           saveAlignments = FALSE,
+#'           exon_data = biomart_data$fsd_exon_data)
+#'
+#' pfamData <- getPfam(background = bg,
+#'                     foreground = fg,
+#'                     pdir,
+#'                     output_location = NULL,
+#'                     cores = 1,
+#'                     biomart_data)
+#'
+#' domain_data <- getDomainData(fg,
+#'                              bg,
+#'                              pfg,
+#'                              pfamData,
+#'                              cores = 1,
+#'                              output_location = NULL,
+#'                              fdr_use = .25,
+#'                              min_sample_success = 1,
+#'                              engine = "Pfam",
+#'                              repeatingDomains = FALSE,
+#'                              topViz = 15)
 #' @export
 getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
-                    output_location, fdr_use = .05, min_sample_success = 3,
+                    output_location = NULL, fdr_use = .05, min_sample_success = 3,
                     engine = c("FunFam","Gene3D","CDD","PANTHER","SMART","ProSiteProfiles","Pfam","SUPERFAMILY","MobiDBLite","Coils","PRINTS","ProSitePatterns","PIRSF","NCBIfam","Hamap")[7],
                     repeatingDomains = FALSE, topViz = 15) {
 
   ## extract bed, fasta, and interproscan files from output_location
-  tf <- list.files(output_location)
   ipscan <- list(pfam$bg_out, pfam$fg_out) #fg_out, bg_out
   outFast<- list(bg$proFast, fg$proFast) #fg$proFast, fg$proFast
   outBed <- list(bg$proBed, pfg$paired_proBed) #bg$proBed, bg$proBed
@@ -160,8 +245,10 @@ getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
     data$rel_prop <- (data$sample_prop + .01) / (data$pop_prop + .01)
     data <- data[data$domain != "none" & data$domain != "" & data$domain != "-",] %>% dplyr::arrange(fdr)
 
+    if (!is.null(output_location)) {
+      write.csv(data, paste0(output_location, "DomainEnrichment/", ifelse(x == "up", "(+)", "(-)"), "domainEnrichment.csv"))
+    }
     # Write domain enrichment results to CSV files
-    write.csv(data, paste0(output_location, "DomainEnrichment/", ifelse(x == "up", "(+)", "(-)"), "domainEnrichment.csv"))
 
     list(data, lengthsDistributionDF, barPlotDF)
 
@@ -188,10 +275,6 @@ getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
     ggplot2::theme(legend.position = "none")
 
   comb_plot <- ggpubr::ggarrange(domainChanges, domainChangesNums, nrow = 1, widths = c(1, 2.5))
-
-  pdf(paste0(output_location, "DomainEnrichment/", "domainStats.pdf"), height = 8, width = 6)
-  print(comb_plot)
-  dev.off()
 
   if (nrow(dataList[[1]][[1]]) > 0 & nrow(dataList[[2]][[1]]) > 0) {
     dataList[[1]][[1]]$reg <- "Upregulated"
@@ -232,10 +315,14 @@ getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
                    panel.background = ggplot2::element_blank(),
                    axis.line = ggplot2::element_line(colour = "black")) + ggplot2::facet_wrap(~reg, ncol = 1, scales = 'free')
 
-  pdf(paste0(output_location, "DomainEnrichment/GlobalEnrichmentPlot.pdf"))
-  print(enrichmentPlot)
-  dev.off()
-  enrichmentPlot
+  if (!is.null(output_location)) {
+    pdf(paste0(output_location, "DomainEnrichment/", "domainStats.pdf"), height = 8, width = 6)
+    print(comb_plot)
+    dev.off()
+    pdf(paste0(output_location, "DomainEnrichment/GlobalEnrichmentPlot.pdf"))
+    print(enrichmentPlot)
+    dev.off()
+    }
   } else {
       enrichmentPlot <- NA
     }
