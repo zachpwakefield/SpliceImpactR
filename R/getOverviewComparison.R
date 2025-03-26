@@ -8,7 +8,9 @@
 #' @return 4 individual plots and 1 combined plot.
 #'
 #' @examples
-#' dataDirectory <- "testthat/testData/rawData/"
+#'
+#' pdir <- system.file(package="SpliceImpactR")
+#' dataDirectory <- paste0(pdir, "/testthat/testData/rawData/")
 #' test_group <- paste0(dataDirectory, c("test1","test2", "test3"))
 #' control_group <- paste0(dataDirectory, c("control1", "control2", "control3"))
 #' data_df <- data.frame(sample_names = c(control_group, test_group),

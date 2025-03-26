@@ -14,7 +14,9 @@
 #' @importFrom stats cooks.distance lm logLik pchisq setNames start
 #' @importFrom utils data read.csv read.delim read.table write.csv
 #' @examples
-#' dataDirectory <- "tests/testdata/rawData/"
+#'
+#' pdir <- system.file(package="SpliceImpactR")
+#' dataDirectory <- paste0(pdir, "/tests/testdata/rawData/")
 #' test_group <- paste0(dataDirectory, c("test1","test2", "test3"))
 #' control_group <- paste0(dataDirectory, c("control1", "control2", "control3"))
 #'

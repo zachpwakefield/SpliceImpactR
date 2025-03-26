@@ -36,7 +36,9 @@ proFast : fasta file of proteins identified in proBed
 getBackground set of transcripts in samples
 }
 \examples{
-dataDirectory <- "./tests/testdata/rawData/"
+
+pdir <- system.file(package="SpliceImpactR")
+dataDirectory <- paste0(pdir, "/tests/testdata/rawData/"
 test_group <- paste0(dataDirectory, "rawData/", c("test1","test2", "test3"))
 control_group <- paste0(dataDirectory, "rawData/", c("control1", "control2", "control3"))
 gtf_sample <- list(gtf = read_csv(paste0(dataDirectory, "gtf_limited.csv")),

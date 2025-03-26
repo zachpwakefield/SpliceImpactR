@@ -20,7 +20,9 @@ figures about HIT Index and csv for differentially used exons
 get paired as events / exons
 }
 \examples{
-dataDirectory <- "tests/testdata/rawData/"
+
+pdir <- system.file(package="SpliceImpactR")
+dataDirectory <- paste0(pdir, "/tests/testdata/rawData/")
 test_group <- paste0(dataDirectory, c("test1", "test2", "test3"))
 control_group <- paste0(dataDirectory, c("control1", "control2", "control3"))
 data_df <- data.frame(

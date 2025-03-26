@@ -39,7 +39,9 @@ a dataframe with differential inclusion information
 Extract differentially included AFE, ALE from HIT Index data
 }
 \examples{
-dataDirectory <- "tests/testdata/rawData/"
+
+pdir <- system.file(package="SpliceImpactR")
+dataDirectory <- paste0(pdir, "/tests/testdata/rawData/")
 test_group <- paste0(dataDirectory, c("test1","test2", "test3"))
 control_group <- paste0(dataDirectory, c("control1", "control2", "control3"))
 

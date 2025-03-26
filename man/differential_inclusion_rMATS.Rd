@@ -36,7 +36,9 @@ a dataframe with differential inclusion information
 Extract differentially included AS events from HIT Index data
 }
 \examples{
-dataDirectory <- "tests/testData/rawData/"
+
+pdir <- system.file(package="SpliceImpactR")
+dataDirectory <- paste0(pdir, "/tests/testData/rawData/"
 test_group <- paste0(dataDirectory, c("test1","test2", "test3"))
 control_group <- paste0(dataDirectory, c("control1", "control2", "control3"))
 

@@ -22,7 +22,9 @@ getOverviewComparison(data_df, exon_type, output_location, minReads = 10)
 Get comparison between phenotypes: count of AS event, count of AS event per gene, ECDF compare and save to Foreground subdir
 }
 \examples{
-dataDirectory <- "testthat/testData/rawData/"
+
+pdir <- system.file(package="SpliceImpactR")
+dataDirectory <- paste0(pdir, "/testthat/testData/rawData/")
 test_group <- paste0(dataDirectory, c("test1","test2", "test3"))
 control_group <- paste0(dataDirectory, c("control1", "control2", "control3"))
 data_df <- data.frame(sample_names = c(control_group, test_group),
