@@ -34,7 +34,7 @@ initiates tti network for entire genome, can be very time consumng
 }
 \examples{
 
-pdir <- system.file(package="SpliceImpactR")
+pdir <- system.file("extdata", package="SpliceImpactR")
 dataDirectory <- paste0(pdir, "/")
 biomart_data_sample <- list(ip = readr::read_csv(paste0(dataDirectory, "biomart_ip.csv")),
                      code_regions = readr::read_csv(paste0(dataDirectory, "biomart_code_regions.csv")),
@@ -42,7 +42,7 @@ biomart_data_sample <- list(ip = readr::read_csv(paste0(dataDirectory, "biomart_
                      fsd_exon_data = readr::read_csv(paste0(dataDirectory, "biomart_data_sample.csv")),
                      pfam_data = readr::read_csv(paste0(dataDirectory, "biomart_pfam_exon.csv")))
 
-initDDI <- init_ddi(pdir,
+initDDI <- init_ddi(pdir = dataDirectory,
                     output_location = NULL,
                     ppidm_class = c("Gold_Standard", "Gold", "Silver", "Bronze")[1],
                     removeDups = TRUE,

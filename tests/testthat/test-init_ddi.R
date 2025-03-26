@@ -1,5 +1,6 @@
 test_that("init_ddi works with sample data", {
-  pdir <- system.file(package = "SpliceImpactR")
+
+  pdir <- system.file("extdata", package="SpliceImpactR")
   dataDirectory <- paste0(pdir, "/")
 
   biomart_data_sample <- list(
@@ -11,7 +12,7 @@ test_that("init_ddi works with sample data", {
   )
 
   initDDI <- init_ddi(
-    pdir            = pdir,
+    pdir            = dataDirectory,
     output_location = NULL,
     ppidm_class     = c("Gold_Standard", "Gold", "Silver", "Bronze")[1],
     removeDups      = TRUE,
