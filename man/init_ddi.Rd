@@ -35,6 +35,7 @@ initiates tti network for entire genome, can be very time consumng
 \examples{
 
 pdir <- system.file(package="SpliceImpactR")
+dataDirectory <- paste0(pdir, "/")
 biomart_data_sample <- list(ip = readr::read_csv(paste0(dataDirectory, "biomart_ip.csv")),
                      code_regions = readr::read_csv(paste0(dataDirectory, "biomart_code_regions.csv")),
                      pfam_exon_level = readr::read_csv(paste0(dataDirectory, "biomart_pfam_exon_level.csv")),
