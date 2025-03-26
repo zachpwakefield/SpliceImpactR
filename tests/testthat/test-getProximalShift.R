@@ -56,14 +56,14 @@ test_that("getProximalShift works with sample data", {
   )
 
   proxShift <- getProximalShift(
-    eventType       = "AFE",
+    type       = "AFE",
     exon_pairs      = pfg$exon_pairs,
-    paired_proBed   = pfg$paired_proBed,
+    ep_supp   = pfg$paired_proBed,
     output_location = NULL
   )
 
   expect_type(proxShift, "list")
   expect_length(proxShift, 2)
   expect_s3_class(proxShift[[1]], "ggplot")
-  expect_s3_class(proxShift[[2]], "data.frame")
+  expect_s3_class(proxShift[[2]], "table")
 })
