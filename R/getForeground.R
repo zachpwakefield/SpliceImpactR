@@ -33,9 +33,9 @@
 #                                           min_prop_samples = 0,
 #                                           chosen_method = "qbGLM"
 #                                           )
-# gtf_sample <- list(gtf = read_csv(paste0(dataDirectory, "gtf_limited.csv")),
-#             transcript_gtf = read_csv(paste0(dataDirectory, "transcript_gtf_limited.csv")))
-# translations_sample <- read_lines(paste0(dataDirectory, "translations_limited.csv"))
+# gtf_sample <- list(gtf = readr::read_csv(paste0(dataDirectory, "gtf_limited.csv")),
+#             transcript_gtf = readr::read_csv(paste0(dataDirectory, "transcript_gtf_limited.csv")))
+# translations_sample <- readr::read_lines(paste0(dataDirectory, "translations_limited.csv"))
 #
 # fg <- getForeground(input = result,
 #                             test_names = test_group,

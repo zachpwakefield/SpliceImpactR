@@ -20,9 +20,9 @@
 #' dataDirectory <- paste0(pdir, "/")
 #' test_group <- paste0(dataDirectory, "rawData/", c("test1","test2", "test3"))
 #' control_group <- paste0(dataDirectory, "rawData/", c("control1", "control2", "control3"))
-#' gtf_sample <- list(gtf = read_csv(paste0(dataDirectory, "gtf_limited.csv")),
-#'             transcript_gtf = read_csv(paste0(dataDirectory, "transcript_gtf_limited.csv")))
-#' translations_sample <- read_lines(paste0(dataDirectory, "translations_limited.csv"))
+#' gtf_sample <- list(gtf = readr::read_csv(paste0(dataDirectory, "gtf_limited.csv")),
+#'             transcript_gtf = readr::read_csv(paste0(dataDirectory, "transcript_gtf_limited.csv")))
+#' translations_sample <- readr::read_lines(paste0(dataDirectory, "translations_limited.csv"))
 #'
 #' bg <- getBackground(input=c(test_group, control_group),
 #'                     mOverlap = 0.1,

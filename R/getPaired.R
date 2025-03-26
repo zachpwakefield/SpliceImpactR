@@ -22,10 +22,10 @@
 #' transcripts_sample <- list(transDF = readr::read_csv(paste0(dataDirectory, "transcripts_limited_transDF.csv")),
 #'                      c_trans = readr::read_lines(paste0(dataDirectory, "transcripts_limited_c_trans.csv")))
 #'
-#' gtf_sample <- list(gtf = read_csv(paste0(dataDirectory, "gtf_limited.csv")),
-#'             transcript_gtf = read_csv(paste0(dataDirectory, "transcript_gtf_limited.csv")))
-#' translations_sample <- read_lines(paste0(dataDirectory, "translations_limited.csv"))
-#' biomart_data_sample <- read_csv(paste0(dataDirectory, "biomart_data_sample.csv"))
+#' gtf_sample <- list(gtf = readr::read_csv(paste0(dataDirectory, "gtf_limited.csv")),
+#'             transcript_gtf = readr::read_csv(paste0(dataDirectory, "transcript_gtf_limited.csv")))
+#' translations_sample <- readr::read_lines(paste0(dataDirectory, "translations_limited.csv"))
+#' biomart_data_sample <- readr::read_csv(paste0(dataDirectory, "biomart_data_sample.csv"))
 #'
 #'
 #' result <- differential_inclusion_HITindex(test_names = test_group,
