@@ -30,6 +30,6 @@ test_that("getAnnotation produces the expected structure", {
   expect_s3_class(gtf_list$hybrid_first_extract,      "data.frame")
   expect_s3_class(gtf_list$tgp_biomart,               "data.frame")
 
-  expect_type(gtf_list$hybrid_first_extract_transcripts, "list")
-  expect_type(gtf_list$hybrid_last_extract_transcripts,  "list")
+  expect_type(gtf_list$hybrid_first_extract_transcripts, "character")
+  expect_type(gtf_list$hybrid_last_extract_transcripts,  "character")
 })
