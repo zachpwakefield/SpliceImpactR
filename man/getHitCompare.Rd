@@ -21,8 +21,8 @@ get paired as events / exons
 }
 \examples{
 
-pdir <- system.file(package="SpliceImpactR")
-dataDirectory <- paste0(pdir, "/tests/testdata/rawData/")
+pdir <- system.file("extdata", package="SpliceImpactR")
+dataDirectory <- paste0(pdir, "/rawData/")
 test_group <- paste0(dataDirectory, c("test1", "test2", "test3"))
 control_group <- paste0(dataDirectory, c("control1", "control2", "control3"))
 data_df <- data.frame(
