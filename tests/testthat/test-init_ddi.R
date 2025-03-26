@@ -1,6 +1,6 @@
 test_that("init_ddi works with sample data", {
   pdir <- system.file(package = "SpliceImpactR")
-  dataDirectory <- paste0(pdir, "/extdata/")  # adjust if needed
+  dataDirectory <- paste0(pdir, "/extdata/")
 
   biomart_data_sample <- list(
     ip               = readr::read_csv(paste0(dataDirectory, "biomart_ip.csv")),
@@ -10,7 +10,6 @@ test_that("init_ddi works with sample data", {
     pfam_data        = readr::read_csv(paste0(dataDirectory, "biomart_pfam_exon.csv"))
   )
 
-  # 2) Call init_ddi
   initDDI <- init_ddi(
     pdir            = pdir,
     output_location = NULL,
