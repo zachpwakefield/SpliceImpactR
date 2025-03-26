@@ -106,11 +106,9 @@ getfxnlASoutcome <- function(output_location,
 
   if (nrow(pfg$paired_proBed) > 1) {
     tti <- getTTI(paired_foreground = pfg$paired_proBed, background = bg$proBed,
-                  pdir = pdir,
                   steps=1,
                   max_vertices_for_viz = 2000,
                   fdr = .05,
-                  plot_bool = TRUE,
                   ppidm_class = "Gold_Standard",
                   write_igraphs = TRUE,
                   output_location = output_location,

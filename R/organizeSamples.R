@@ -10,7 +10,7 @@
 #' # hit-index
 #' @return none, outputs to directories
 
-#' @export
+#' @keywords internal
 
 organizeSamples <- function(samples, output_location, cores = 1) {
 

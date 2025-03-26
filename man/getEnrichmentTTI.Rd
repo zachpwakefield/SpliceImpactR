@@ -11,7 +11,6 @@ getEnrichmentTTI(
   transGeneProt,
   backgroundGenes,
   steps,
-  plot_bool,
   output_location
 )
 }

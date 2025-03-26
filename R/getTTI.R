@@ -2,11 +2,9 @@
 #'
 #' @param paired_foreground from getPaired
 #' @param background proBed from getBackground
-#' @param pdir the directory of the package
 #' @param steps the number of steps for viz
 #' @param max_vertices_for_viz max number of vertices to plot, saves time and space
 #' @param fdr fdr to cut off for geneset enrichment
-#' @param plot_bool bool to make output plots of not
 #' @param ppidm_class threshold of ppidm sets to use
 #' @param write_graphs save full graph interactions for each with signfiicant changes
 #' @param output_location location to make output
@@ -14,6 +12,7 @@
 #' @param minOverlap minimum overlap to classify as matched to annotation
 #' @param tgp tgp_biomart from setup_gtf output
 #' @param cores number of requested cores
+#' @param init_edgelist the edgelist out of initTTI if not using saved location
 #' @return differences between each tti pair and the overall results
 #' @importFrom igraph graph_from_edgelist V make_ego_graph write_graph simplify E layout.fruchterman.reingold
 #' @importFrom tidyr crossing
@@ -21,37 +20,147 @@
 #' @importFrom parallel mclapply
 #' @importFrom dplyr select relocate
 #' @importFrom hypeR msigdb_gsets hypeR hyp_dots
+#'
+#' @examples
+#'
+#' pdir <- system.file("extdata", package="SpliceImpactR")
+#' dataDirectory <- paste0(pdir, "/")
+#' test_group <- paste0(dataDirectory, "rawData/", c("test1","test2", "test3"))
+#' control_group <- paste0(dataDirectory, "rawData/", c("control1", "control2", "control3"))
+#' data_df <- data.frame(
+#'     sample_names = c(control_group, test_group),
+#'     phenotype_names = c(
+#'       rep("control", length(control_group)),
+#'       rep("test", length(test_group))
+#'      ),
+#'    stringsAsFactors = FALSE
+#'   )
+#' data_df$utc <- "control"
+#' data_df$utc[data_df$phenotype_names == unique(data_df$phenotype_names)[2]] <- "test"
+#'
+#' transcripts_sample <- list(transDF = readr::read_csv(paste0(dataDirectory, "transcripts_limited_transDF.csv")),
+#'                      c_trans = readr::read_lines(paste0(dataDirectory, "transcripts_limited_c_trans.csv")))
+#'
+#' gtf_sample <- list(gtf = readr::read_csv(paste0(dataDirectory, "gtf_limited.csv")),
+#'             transcript_gtf = readr::read_csv(paste0(dataDirectory, "transcript_gtf_limited.csv")),
+#'             tgp_biomart = readr::read_csv(paste0(dataDirectory, "tgp_biomart_limited"))
+#'             )
+#' translations_sample <- readr::read_lines(paste0(dataDirectory, "translations_limited.csv"))
+#' biomart_data <- list(ip = readr::read_csv(paste0(dataDirectory, "biomart_ip.csv")),
+#'                      code_regions = readr::read_csv(paste0(dataDirectory, "biomart_code_regions.csv")),
+#'                      pfam_exon_level = readr::read_csv(paste0(dataDirectory, "biomart_pfam_exon_level.csv")),
+#'                      fsd_exon_data = readr::read_csv(paste0(dataDirectory, "biomart_data_sample.csv")))
+#'
+#'
+#' result <- differential_inclusion_HITindex(test_names = test_group,
+#'                                           control_names = control_group,
+#'                                           et = "AFE",
+#'                                           outlier_threshold = "Inf",
+#'                                           minReads = 10,
+#'                                           min_prop_samples = 0,
+#'                                           chosen_method = "qbGLM"
+#'                                           )
+#'
+#' fg <- getForeground(input = result,
+#'                             test_names = test_group,
+#'                             control_names = control_group,
+#'                             thresh = .1,
+#'                             fdr = .05,
+#'                             mOverlap = .1,
+#'                             exon_type = "AFE",
+#'                             output_location = NULL,
+#'                             cores = 1,
+#'                             gtf = gtf_sample,
+#'                             max_zero_prop = 1,
+#'                             min_prop_samples = 0,
+#'                             translations = translations_sample)
+#'
+#' bg <- getBackground(input=c(test_group, control_group),
+#'                     mOverlap = 0.1,
+#'                     cores = 1,
+#'                     exon_type = "AFE",
+#'                     output_location = NULL, gtf_sample, translations_sample)
+#' library(msa)
+#' pfg <- getPaired(foreground = fg$proBed,
+#'           et = "AFE",
+#'           nucleotides = transcripts_sample,
+#'           newGTF = gtf_sample,
+#'           cores = 1,
+#'           output_location = NULL,
+#'           saveAlignments = FALSE,
+#'           exon_data = biomart_data$fsd_exon_data)
+#'
+#' pfamData <- getPfam(background = bg,
+#'                     foreground = fg,
+#'                     pdir,
+#'                     output_location = NULL,
+#'                     cores = 1,
+#'                     biomart_data)
+#'
+#' domain_data <- getDomainData(fg,
+#'                              bg,
+#'                              pfg,
+#'                              pfamData,
+#'                              cores = 1,
+#'                              output_location = NULL,
+#'                              fdr_use = .25,
+#'                              min_sample_success = 1,
+#'                              engine = "Pfam",
+#'                              repeatingDomains = FALSE,
+#'                              topViz = 15)
+#' pdir_init <- system.file(package="SpliceImpactR")
+#'  biomart_data_sample <- list(ip = readr::read_csv(paste0(dataDirectory, "biomart_ip.csv")),
+#'                      code_regions = readr::read_csv(paste0(dataDirectory, "biomart_code_regions.csv")),
+#'                      pfam_exon_level = readr::read_csv(paste0(dataDirectory, "biomart_pfam_exon_level.csv")),
+#'                      fsd_exon_data = readr::read_csv(paste0(dataDirectory, "biomart_data_sample.csv")),
+#'                      pfam_data = readr::read_csv(paste0(dataDirectory, "biomart_pfam_exon.csv")))
+#'
+#' initDDI <- init_ddi(pdir_init,
+#'                     output_location = NULL,
+#'                     ppidm_class = c("Gold_Standard", "Gold", "Silver", "Bronze")[1],
+#'                     removeDups = TRUE,
+#'                     cores = 1,
+#'                     pfam_data = biomart_data_sample$pfam_data)
+#' tti <- getTTI(paired_foreground = pfg$paired_proBed,
+#'               background = bg$proBed,
+#'               steps = 1,
+#'               max_vertices_for_viz = 300,
+#'               fdr = .05,
+#'               ppidm_class = c("Gold", "Silver", "Bronze")[1],
+#'               write_igraphs = FALSE,
+#'               output_location = NULL,
+#'               tti_location = NULL,
+#'               tgp = gtf_sample$tgp_biomart,
+#'               init_edgelist = initDDI$edgelist)
 #' @export
-getTTI <- function(paired_foreground, background, pdir, steps = 1, max_vertices_for_viz = 5000,
-                   fdr = .05, plot_bool = TRUE, ppidm_class = c("Gold", "Silver", "Bronze")[1],
+getTTI <- function(paired_foreground,
+                   background,
+                   steps = 1,
+                   max_vertices_for_viz = 5000,
+                   fdr = .05,
+                   ppidm_class = c("Gold", "Silver", "Bronze")[1],
                    write_igraphs = TRUE,
-                   output_location, tti_location, tgp) {
+                   output_location = NULL,
+                   tti_location = NULL,
+                   tgp,
+                   init_edgelist) {
   # Create a directory for storing plots if plot_bool is TRUE
-  if (plot_bool) {
+  if (!is.null(output_location)) {
     system(paste0("mkdir ", output_location, "tti"))
     if (write_igraphs) {
       system(paste0("mkdir ", output_location, "tti/transcript_igraph_edgelists"))
     }
   }
 
-  # Read the transcript-gene-protein mapping data for current genome
-  # tgp <- read.csv(paste0(pdir, '/gencodev42_transcriptGeneProtein.csv'))
-
-  # Read edgelist output from initTTI -- using the ppidm class used previously
-  edgeList <- read.table(paste0(tti_location,  "tti_igraph_edgelist_", paste(ppidm_class, collapse = ""), "_removeDups"),
-                         sep = " ", row.names = NULL)
-
-  # Convert the edgelist to a matrix format
-  edgeList_Matrix <- matrix(c(edgeList$V1, edgeList$V2), ncol = 2)
-
-  # # Extract genes present in the control and test groups
-  # genes_in_sample <- unlist(lapply(strsplit(unique(unlist(lapply(c(control_group, test_group), function(f) {
-  #   exon_df <- read.delim(paste0(f, '.exon'))
-  #   unique(exon_df$gene)
-  # }))), split = "[.]"), "[[", 1))
-
-  # # Filter for transcripts in the sample
-  # possible_transcripts <- tgp$transcript_id[tgp$gene_id %in% genes_in_sample]
+  if (!is.null(tti_location)) {
+    # Read edgelist output from initTTI -- using the ppidm class used previously
+    edgeList <- read.table(paste0(tti_location,  "tti_igraph_edgelist_", paste(ppidm_class, collapse = ""), "_removeDups"),
+                           sep = " ", row.names = NULL)
+    # Convert the edgelist to a matrix format
+    edgeList_Matrix <- matrix(c(edgeList$V1, edgeList$V2), ncol = 2)
+  } else {
+    edgeList_Matrix <- init_edgelist
+  }
 
   # Filter for transcripts in the sample
   genes_in_sample <- unique(background$gene)
@@ -73,7 +182,7 @@ getTTI <- function(paired_foreground, background, pdir, steps = 1, max_vertices_
       eg <- igraph::make_ego_graph(g, order = steps, nodes = paired_foreground$transcript[c(tr, tr+1)],
                                    mode = c("all", "out", "in")[1], mindist = 0)
       # Optionally write the ego graphs to files
-      if (write_igraphs) {
+      if (write_igraphs & !is.null(output_location)) {
 
         igraph::write_graph(eg[[1]], paste0(output_location, "tti/transcript_igraph_edgelists/",
                                             paired_foreground$gene[tr], "_",
@@ -103,7 +212,6 @@ getTTI <- function(paired_foreground, background, pdir, steps = 1, max_vertices_
                                        full_graph = g,
                                        steps = steps,
                                        max_vertices_for_viz = max_vertices_for_viz,
-                                       plot_bool = TRUE,
                                        output_location = output_location)
         # }
 
@@ -114,7 +222,7 @@ getTTI <- function(paired_foreground, background, pdir, steps = 1, max_vertices_
           } else {
             if (length(x[[2]]) > 0) {
               list(x[[2]], getEnrichmentTTI(current_transcript = x[[1]], t_impacts = x[[2]], fdr = fdr, transGeneProt = tgp,
-                                            backgroundGenes = genes_in_sample, steps = steps, plot_bool = plot_bool,
+                                            backgroundGenes = genes_in_sample, steps = steps,
                                             output_location = output_location))
             } else {
               list(x[[2]], NA)
@@ -151,7 +259,9 @@ getTTI <- function(paired_foreground, background, pdir, steps = 1, max_vertices_
                           unlist(lapply(yy, function(yy2) {length(yy2[[1]])}))}), "[[", 2))
                         )
   results <- results[results$transcript1_setdiff > 1 | results$transcript2_setdiff > 1,]
-  write_csv(results, paste0(output_location, "tti/tti_change_results.csv"))
+  if (!is.null(output_location)) {
+    write_csv(results, paste0(output_location, "tti/tti_change_results.csv"))
+  }
   # Return the list of differences
   return(list(differences = differences,
               results = results))
@@ -160,7 +270,7 @@ getTTI <- function(paired_foreground, background, pdir, steps = 1, max_vertices_
 #' graph helper function
 #' @return tti igraphs
 #' @keywords internal
-getTTIiGraphPlot <- function(paired_transcript, gene, steps, full_graph, max_vertices_for_viz, plot_bool, output_location) {
+getTTIiGraphPlot <- function(paired_transcript, gene, steps, full_graph, max_vertices_for_viz, output_location) {
   # Create ego graphs for each of the paired transcripts
   eg <- igraph::make_ego_graph(
     full_graph,  # The full graph from which ego graphs are derived
@@ -226,7 +336,7 @@ getTTIiGraphPlot <- function(paired_transcript, gene, steps, full_graph, max_ver
   igraph::V(e2g)$color[V(e2g)$name == paired_transcript[2]] <- "gold"
 
   # Plot the ego graphs if plot_bool is TRUE and the number of vertices is within the specified limit
-  if (plot_bool) {
+  if (!is.null(output_location)) {
     if (length(igraph::V(e1g)) <= max_vertices_for_viz) {
       pdf(paste0(output_location, "tti/", gene, "_", paired_transcript[1], "_", steps, 'steps_tti_graph.pdf'))
       print(igraph::plot.igraph(e1g,vertex.size=3,vertex.label=NA,main=paired_transcript[1],
@@ -250,7 +360,7 @@ getTTIiGraphPlot <- function(paired_transcript, gene, steps, full_graph, max_ver
 #' @return geneset enrichment from hypeR
 #' @keywords internal
 getEnrichmentTTI <- function(current_transcript, t_impacts, fdr, transGeneProt,
-                             backgroundGenes, steps, plot_bool, output_location) {
+                             backgroundGenes, steps, output_location) {
 
   # Extract gene names associated with the input transcript impacts
   enrichment_list <- transGeneProt$gene_name[transGeneProt$transcript_id %in% t_impacts]
@@ -287,7 +397,7 @@ getEnrichmentTTI <- function(current_transcript, t_impacts, fdr, transGeneProt,
                              top = 10, abrv = 150)
 
   # If plot_bool is TRUE, save the plots to a PDF file
-  if (plot_bool) {
+  if (!is.null(output_location)) {
     pdf(paste0(output_location, "tti/", current_transcript, '_unique_tti_', steps, '_steps_enrichment.pdf'))
     print(cc_dots)
     print(mf_dots)
@@ -320,21 +430,46 @@ getEnrichmentTTI <- function(current_transcript, t_impacts, fdr, transGeneProt,
 #' @param output_location location to make output
 #' @param cores number of requested cores
 #' @param removeDups takes a longer time to init, but faster down the line and saves a lot of memory to remove duplcate vertices
-#' @return overall tti network
-#' @importFrom igraph graph_from_edgelist V make_ego_graph write_graph simplify E layout.fruchterman.reingold
+#' @param pfam_data from biomart_data, pfam_data
+#' @return overall tti network in both graph and edgelist form
+#' @importFrom igraph graph_from_edgelist V make_ego_graph write_graph simplify E layout.fruchterman.reingold as_edgelist
 #' @importFrom tidyr crossing
 #' @importFrom readr read_csv
 #' @importFrom parallel mclapply
 #' @importFrom dplyr select relocate
 #' @importFrom hypeR msigdb_gsets hypeR hyp_dots
-#' @importFrom R.utils gunzip
 #' @importFrom biomaRt useEnsembl getBM
+#' @importFrom data.table fread
+#'
+#' @examples
+#'
+# pdir <- system.file(package="SpliceImpactR")
+# biomart_data_sample <- list(ip = readr::read_csv(paste0(dataDirectory, "biomart_ip.csv")),
+#                      code_regions = readr::read_csv(paste0(dataDirectory, "biomart_code_regions.csv")),
+#                      pfam_exon_level = readr::read_csv(paste0(dataDirectory, "biomart_pfam_exon_level.csv")),
+#                      fsd_exon_data = readr::read_csv(paste0(dataDirectory, "biomart_data_sample.csv")),
+#                      pfam_data = readr::read_csv(paste0(dataDirectory, "biomart_pfam_exon.csv")))
+#
+# initDDI <- init_ddi(pdir,
+#                     output_location = NULL,
+#                     ppidm_class = c("Gold_Standard", "Gold", "Silver", "Bronze")[1],
+#                     removeDups = TRUE,
+#                     cores = 1,
+#                     pfam_data = biomart_data_sample$pfam_data)
+#'
 #' @export
-init_ddi <- function(pdir, output_location, ppidm_class = c("Gold_Standard", "Gold", "Silver", "Bronze")[1], removeDups = TRUE, cores = 1, pfam_data) {
+init_ddi <- function(pdir,
+                     output_location = NULL,
+                     ppidm_class = c("Gold_Standard", "Gold", "Silver", "Bronze")[1],
+                     removeDups = TRUE,
+                     cores = 1,
+                     pfam_data) {
   pfam_data <- pfam_data[pfam_data$pfam != "",]
   pfam_in <- data.frame(transcriptID = pfam_data$ensembl_transcript_id,
                         geneID = pfam_data$ensembl_gene_id,
                         pfamID = pfam_data$pfam)
+
+  pfam_in <- pfam_in[!is.na(pfam_in$transcriptID),]
 
   # Select and deduplicate transcriptID and geneID pairs
   gt_df <- pfam_in %>% dplyr::select(transcriptID, geneID)
@@ -351,14 +486,7 @@ init_ddi <- function(pdir, output_location, ppidm_class = c("Gold_Standard", "Go
   # Remove duplicate list elements
   d_transcripts <- d_transcripts[!duplicated(d_transcripts)]
 
-
-  # Read in the protein-protein interaction domain mapping (PPIDM) dataset
-  if (!(file.exists(paste0(pdir, "/PPIDM_GoldDDIs.csv")))) {
-    R.utils::gunzip(paste0(pdir, "/PPIDM_GoldDDIs.csv.gz"), remove=FALSE, overwrite=TRUE)
-  }
-
-  pdm1 <- readr::read_delim(paste(pdir, "/PPIDM_GoldDDIs.csv",
-                                sep = ""), delim = ";")
+  pdm1 <- data.frame(data.table::fread(paste0(pdir, "/PPIDM_GoldDDIs.csv.gz")))
 
   # Filter interactions based on the specified PPIDM class (e.g., Gold, Silver, Bronze)
   if ("Gold_Standard" == ppidm_class) {
@@ -370,13 +498,11 @@ init_ddi <- function(pdir, output_location, ppidm_class = c("Gold_Standard", "Go
     d6 <- pdm1[pdm1$CLASS %in% ppidm_class, c(1, 2)]
   }
 
-
-
   # Rename columns for clarity
   colnames(d6) <- c("n1", "n2")
 
   # Generate a dataframe of transcript pairs from the filtered PPIDM interactions
-  tti <- do.call(rbind, parallel::mclapply(seq_alone(d6$n1), function(x) {
+  tti <- do.call(rbind, parallel::mclapply(seq_along(d6$n1), function(x) {
     # Check if both interacting proteins are in the domain-transcript list
     if (sum(names(d_transcripts) == d6$n1[x]) > 0 & sum(names(d_transcripts) ==
                                                         d6$n2[x]) > 0) {
@@ -397,13 +523,16 @@ init_ddi <- function(pdir, output_location, ppidm_class = c("Gold_Standard", "Go
   }
   # Create an undirected graph from the deduplicated transcript pairs
   g <- igraph::graph_from_edgelist(as.matrix(tti), directed = FALSE)
+  edgelist <- igraph::as_edgelist(g)
 
-  # Write the graph edgelist to a file
-  write_graph(
-    g,
-    paste0(output_location, 'tti_igraph_edgelist_', paste(ppidm_class, collapse = ""), '_removeDups'),
-    format = "ncol"
-  )
+  if (!is.null(output_location)) {
+    write_graph(
+      g,
+      paste0(output_location, 'tti_igraph_edgelist_', paste(ppidm_class, collapse = ""), '_removeDups'),
+      format = "ncol"
+    )
+  }
 
-  return(g)
+  return(list(graph = g,
+              edgelist = edgelist))
 }

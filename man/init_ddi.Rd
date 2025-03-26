@@ -6,7 +6,7 @@
 \usage{
 init_ddi(
   pdir,
-  output_location,
+  output_location = NULL,
   ppidm_class = c("Gold_Standard", "Gold", "Silver", "Bronze")[1],
   removeDups = TRUE,
   cores = 1,
@@ -23,10 +23,16 @@ init_ddi(
 \item{removeDups}{takes a longer time to init, but faster down the line and saves a lot of memory to remove duplcate vertices}
 
 \item{cores}{number of requested cores}
+
+\item{pfam_data}{from biomart_data, pfam_data}
 }
 \value{
-overall tti network
+overall tti network in both graph and edgelist form
 }
 \description{
 initiates tti network for entire genome, can be very time consumng
+}
+\examples{
+
+
 }

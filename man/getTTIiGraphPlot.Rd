@@ -10,7 +10,6 @@ getTTIiGraphPlot(
   steps,
   full_graph,
   max_vertices_for_viz,
-  plot_bool,
   output_location
 )
 }
