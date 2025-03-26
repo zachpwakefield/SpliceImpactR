@@ -2,9 +2,11 @@ Package: SpliceImpactR
 Type: Package
 Title: An R pacakge to identify functional impacts due to alternative splicing events 
 Version: 0.99.0
-Authors@R: person("Zachary", "Wakefield",
+Authors@R: person(given="Zachary", family="Wakefield",
     email = "zachpw@bu.edu",
     role = c("cre", "aut"))
+Author: Zachary Wakefield [aut, cre]
+Maintainer: Zachary Wakefield <zachpw.bu.edu>
 Description: SpliceImpactR begins by importing all alternative RNA processing events that vary across conditions (1). 
     It uses rMATS to identify retained introns (RI), skipped exons (SE), alternative 5’ (A5SS) and 3’ splice sites (A3SS), and mutually 
     exclusive exons (MXE). he HIT Index detects alternative first exons (AFEs), hybrid first (HFE) and last exons (HLE), and alternative 
