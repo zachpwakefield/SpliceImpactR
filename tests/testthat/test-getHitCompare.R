@@ -1,7 +1,7 @@
 test_that("getHitCompare returns two ggplot objects and one data frame", {
 
-  pdir <- system.file(package="SpliceImpactR")
-  dataDirectory <- paste0(pdir, "/tests/testdata/rawData/")
+  pdir <- system.file("extdata", package="SpliceImpactR")
+  dataDirectory <- paste0(pdir, "/rawData/")
   skip_if_not(dir.exists(dataDirectory), "Data directory not found.")
 
   test_group <- paste0(dataDirectory, c("test1", "test2", "test3"))

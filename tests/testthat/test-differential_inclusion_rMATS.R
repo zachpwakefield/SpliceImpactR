@@ -1,7 +1,7 @@
 test_that("differential_inclusion_rMATS works", {
 
-  pdir <- system.file(package="SpliceImpactR")
-  dataDirectory <- paste0(pdir, "/tests/testdata/rawData/")
+  pdir <- system.file("extdata", package="SpliceImpactR")
+  dataDirectory <- paste0(pdir, "/rawData/")
 
   skip_if_not(dir.exists(dataDirectory), "Data directory not found.")
 

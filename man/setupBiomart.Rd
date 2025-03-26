@@ -4,7 +4,10 @@
 \alias{setupBiomart}
 \title{import / load + save biomaRt data}
 \usage{
-setupBiomart(save_location, m = "")
+setupBiomart(save_location)
+}
+\arguments{
+\item{save_location}{path to save output}
 }
 \value{
 various biomaRt results for use downstream in pipeline

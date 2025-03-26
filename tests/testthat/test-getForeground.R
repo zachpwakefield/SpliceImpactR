@@ -1,7 +1,7 @@
 test_that("getForeground returns the expected list structure", {
 
-  pdir <- system.file(package="SpliceImpactR")
-  dataDirectory <- paste0(pdir, "/tests/testdata/")
+  pdir <- system.file("extdata", package="SpliceImpactR")
+  dataDirectory <- paste0(pdir, "/")
   skip_if_not(dir.exists(dataDirectory), "Data directory not found.")
 
   test_group <- paste0(dataDirectory, "rawData/", c("test1","test2","test3"))

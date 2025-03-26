@@ -1,7 +1,7 @@
 test_that("getPaired returns expected output structure", {
 
-  pdir <- system.file(package="SpliceImpactR")
-  dataDirectory <- paste0(pdir, "/tests/testdata/")
+  pdir <- system.file("extdata", package="SpliceImpactR")
+  dataDirectory <- paste0(pdir, "/")
   skip_if_not(dir.exists(dataDirectory), "Data directory not found.")
 
 

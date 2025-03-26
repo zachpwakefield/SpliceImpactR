@@ -120,14 +120,16 @@ setupAnnotation <- function(biomart_data) {
 
 
 #' import / load + save biomaRt data
+#' @param save_location path to save output
 #' @importFrom biomaRt useEnsembl getBM
 #' @return various biomaRt results for use downstream in pipeline
 #' @export
 
-setupBiomart <- function(save_location, m = '') {
+setupBiomart <- function(save_location) {
   ##setup_gtf
   if (!(file.exists(paste0(save_location, 'setup_gtf_exon_data.csv')))) {
-    attributes <- c("chromosome_name", "exon_chrom_start", "exon_chrom_end", "strand", "ensembl_gene_id", "ensembl_transcript_id", "gene_biotype",
+    attributes <- c("chromosome_name", "exon_chrom_start", "exon_chrom_end", "strand",
+                    "ensembl_gene_id", "ensembl_transcript_id", "gene_biotype",
                     "transcript_biotype", "external_gene_name", "rank", "ensembl_exon_id")
     setup_gtf_exon_data <- biomaRt::getBM(attributes = attributes, mart = ensembl)
     write_csv(setup_gtf_exon_data, paste0(save_location, 'setup_gtf_exon_data.csv'))
@@ -136,7 +138,8 @@ setupBiomart <- function(save_location, m = '') {
   }
 
   if (!(file.exists(paste0(save_location, 'ptg_init.csv')))) {
-    attributes <- c("ensembl_gene_id", "ensembl_transcript_id", "external_gene_name", "external_transcript_name", "ensembl_peptide_id", "chromosome_name")
+    attributes <- c("ensembl_gene_id", "ensembl_transcript_id", "external_gene_name",
+                    "external_transcript_name", "ensembl_peptide_id", "chromosome_name")
     ptg_init <- biomaRt::getBM(attributes = attributes, mart = ensembl)
     write_csv(ptg_init, paste0(save_location, 'ptg_init.csv'))
   } else {
@@ -144,8 +147,10 @@ setupBiomart <- function(save_location, m = '') {
   }
 
   if (!(file.exists(paste0(save_location, 'transcript_data.csv')))) {
-    attributes <- c("ensembl_transcript_id", "chromosome_name", "strand", "transcript_start", "transcript_end")
-    transcript_data <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = c(seq_len(23), "X", "Y"), filters = 'chromosome_name')
+    attributes <- c("ensembl_transcript_id", "chromosome_name",
+                    "strand", "transcript_start", "transcript_end")
+    transcript_data <- biomaRt::getBM(attributes = attributes, mart = ensembl,
+                                      values = c(seq_len(23), "X", "Y"), filters = 'chromosome_name')
     write_csv(transcript_data, paste0(save_location, 'transcript_data.csv'))
   } else {
     transcript_data <- read_csv(paste0(save_location, 'transcript_data.csv'))
@@ -155,7 +160,8 @@ setupBiomart <- function(save_location, m = '') {
   if (!(file.exists(paste0(save_location, 'pfam_data.csv')))) {
     attributes <- c("ensembl_gene_id", "ensembl_transcript_id", "pfam",
                     "transcript_biotype")
-    pfam_data <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list(c(seq_len(23), "X", "Y"), "protein_coding"), filters = c('chromosome_name', "transcript_biotype"))
+    pfam_data <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list(c(seq_len(23), "X", "Y"), "protein_coding"),
+                                filters = c('chromosome_name', "transcript_biotype"))
     write_csv(pfam_data, paste0(save_location, 'pfam_data.csv'))
   } else {
     pfam_data <- read_csv(paste0(save_location, 'pfam_data.csv'))
@@ -165,7 +171,8 @@ setupBiomart <- function(save_location, m = '') {
   if (!(file.exists(paste0(save_location, 'ip.csv')))) {
     attributes <- c("ensembl_transcript_id", "chromosome_name",
                     "transcript_biotype","interpro_description", "interpro")
-    ip <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list(c(seq_len(23), "X", "Y"), "protein_coding"), filters = c('chromosome_name', "transcript_biotype"))
+    ip <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list(c(seq_len(23), "X", "Y"), "protein_coding"),
+                         filters = c('chromosome_name', "transcript_biotype"))
     write_csv(ip, paste0(save_location, 'ip.csv'))
   } else {
     ip <- read_csv(paste0(save_location, 'ip.csv'))
@@ -173,15 +180,24 @@ setupBiomart <- function(save_location, m = '') {
 
   if (!(file.exists(paste0(save_location, 'pfam_exon_level.csv')))) {
     attributes <- c("ensembl_transcript_id", "ensembl_exon_id", "pfam", 'chromosome_name', 'transcript_biotype', 'pfam_start', 'pfam_end')
-    b1 <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list(c(1, 2), "protein_coding"), filters = c('chromosome_name', "transcript_biotype"))
-    b2 <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list(c(3, 4), "protein_coding"), filters = c('chromosome_name', "transcript_biotype"))
-    b3 <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list(c(5, 6, 7), "protein_coding"), filters = c('chromosome_name', "transcript_biotype"))
-    b4 <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list(c(8, 9, 10), "protein_coding"), filters = c('chromosome_name', "transcript_biotype"))
-    b5 <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list(c(11, 12, 13), "protein_coding"), filters = c('chromosome_name', "transcript_biotype"))
-    b6 <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list(c(14, 15, 16), "protein_coding"), filters = c('chromosome_name', "transcript_biotype"))
-    b7 <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list(c(17, 18, 19, 20), "protein_coding"), filters = c('chromosome_name', "transcript_biotype"))
-    b8 <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list(c(21, 22, 23), "protein_coding"), filters = c('chromosome_name', "transcript_biotype"))
-    b9 <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list(c("X", "Y"), "protein_coding"), filters = c('chromosome_name', "transcript_biotype"))
+    b1 <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list(c(1, 2), "protein_coding"),
+                         filters = c('chromosome_name', "transcript_biotype"))
+    b2 <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list(c(3, 4), "protein_coding"),
+                         filters = c('chromosome_name', "transcript_biotype"))
+    b3 <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list(c(5, 6, 7), "protein_coding"),
+                         filters = c('chromosome_name', "transcript_biotype"))
+    b4 <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list(c(8, 9, 10), "protein_coding"),
+                         filters = c('chromosome_name', "transcript_biotype"))
+    b5 <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list(c(11, 12, 13), "protein_coding"),
+                         filters = c('chromosome_name', "transcript_biotype"))
+    b6 <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list(c(14, 15, 16), "protein_coding"),
+                         filters = c('chromosome_name', "transcript_biotype"))
+    b7 <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list(c(17, 18, 19, 20), "protein_coding"),
+                         filters = c('chromosome_name', "transcript_biotype"))
+    b8 <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list(c(21, 22, 23), "protein_coding"),
+                         filters = c('chromosome_name', "transcript_biotype"))
+    b9 <- biomaRt::getBM(attributes = attributes, mart = ensembl, values = list(c("X", "Y"), "protein_coding"),
+                         filters = c('chromosome_name', "transcript_biotype"))
     pfam_exon_level <- do.call(rbind, list(b1, b2, b3, b4, b5, b6, b7, b8, b9))
     write_csv(pfam_exon_level, paste0(save_location, 'pfam_exon_level.csv'))
   } else {
