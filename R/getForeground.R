@@ -21,7 +21,7 @@
 #' @examples
 #'
 #' pdir <- system.file(package="SpliceImpactR")
-#' dataDirectory <- paste0(pdir, "tests/testdata/")
+#' dataDirectory <- paste0(pdir, "/tests/testdata/")
 #' test_group <- paste0(dataDirectory, "rawData/", c("test1","test2", "test3"))
 #' control_group <- paste0(dataDirectory, "rawData/", c("control1", "control2", "control3"))
 #'

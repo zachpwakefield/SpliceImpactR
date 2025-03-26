@@ -25,7 +25,7 @@ matchAlignType <- function(proBed, protCode, nucleotides, output_location = NULL
   alignmentScore <- alignmentScores$alignScore
   alignmentScore[alignmentScore == -1] <- rep(median(alignmentScore[alignmentScore != 0]), sum(alignmentScore == -1))
 
-  alignmentTypesIntermediary <- SpliceImpactR:::getFrameShift(df, et = exon_type, newgtf, exon_data)
+  alignmentTypesIntermediary <- getFrameShift(df, et = exon_type, newgtf, exon_data)
   alignmentTypes <- alignmentTypesIntermediary[seq(1, length(alignmentTypesIntermediary), by = 2)]
   alignmentTypes[alignmentScore == 1] <- "Match"
   if (saveAlignments & !is.null(output_location)) {
