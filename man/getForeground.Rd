@@ -51,6 +51,36 @@ get Foreground differentially included transcripts in samples
 }
 \examples{
 
+pdir <- system.file("extdata", package="SpliceImpactR")
+dataDirectory <- paste0(pdir, "/")
+test_group <- paste0(dataDirectory, "rawData/", c("test1","test2", "test3"))
+control_group <- paste0(dataDirectory, "rawData/", c("control1", "control2", "control3"))
+
+result <- differential_inclusion_HITindex(test_names = test_group,
+                                          control_names = control_group,
+                                          et = "AFE",
+                                          outlier_threshold = "Inf",
+                                          minReads = 10,
+                                          min_prop_samples = 0,
+                                          chosen_method = "qbGLM"
+                                          )
+gtf_sample <- list(gtf = readr::read_csv(paste0(dataDirectory, "gtf_limited.csv")),
+            transcript_gtf = readr::read_csv(paste0(dataDirectory, "transcript_gtf_limited.csv")))
+translations_sample <- readr::read_lines(paste0(dataDirectory, "translations_limited.csv"))
+
+fg <- getForeground(input = result,
+                            test_names = test_group,
+                            control_names = control_group,
+                            thresh = .1,
+                            fdr = .05,
+                            mOverlap = .1,
+                            exon_type = "AFE",
+                            output_location = NULL,
+                            cores = 1,
+                            gtf = gtf_sample,
+                            max_zero_prop = 1,
+                            min_prop_samples = 0,
+                            translations = translations_sample)
 
 
 }

@@ -23,5 +23,15 @@ Get comparison between phenotypes: count of AS event, count of AS event per gene
 }
 \examples{
 
+ pdir <- system.file("extdata", package="SpliceImpactR")
+ dataDirectory <- paste0(pdir, "/rawData/")
+ test_group <- paste0(dataDirectory, c("test1","test2", "test3"))
+ control_group <- paste0(dataDirectory, c("control1", "control2", "control3"))
+ data_df <- data.frame(sample_names = c(control_group, test_group),
+                       phenotype_names = c(rep("control", length(control_group)), rep("test", length(test_group))))
+
+ data_df$utc <- "control"
+ data_df$utc[data_df$phenotype_names == unique(data_df$phenotype_names)[2]] <- "test"
+ overview <- getOverviewComparison(data_df, "AFE", output_location = NULL, minReads = 10)
 
 }
