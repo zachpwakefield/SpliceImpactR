@@ -16,14 +16,15 @@ various biomaRt results for use downstream in pipeline
 import / load + save biomaRt data
 }
 \examples{
-
+\dontrun{
 library(biomaRt)
 new_config <- httr::config(ssl_verifypeer = FALSE)
 httr::set_config(new_config, override = FALSE)
 ensembl <- biomaRt::useEnsembl(biomart = "ensembl",
-                               dataset = "hsapiens_gene_ensembl")
+                               dataset = "hsapiens_gene_ensembl",
+                               mirror = 'useast')
 pdir <- system.file("extdata", package = "SpliceImpactR")
 dataDirectory <- paste0(pdir, "/")
 biomart_data <- setupBiomart(dataDirectory)
-
+}
 }
