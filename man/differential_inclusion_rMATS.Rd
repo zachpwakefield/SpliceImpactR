@@ -44,7 +44,7 @@ control_group <- paste0(dataDirectory, c("control1", "control2", "control3"))
 
 result <- differential_inclusion_rMATS(test_names = test_group,
                                           control_names = control_group,
-                                          et = "AFE",
+                                          et = "SE",
                                           outlier_threshold = "Inf",
                                           minReads = 10,
                                           min_prop_samples = 0,
