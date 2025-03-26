@@ -1,6 +1,7 @@
 test_that("getOverviewComparison works with example data", {
 
-  dataDirectory <- "tests/testdata/rawData/"
+  pdir <- system.file(package="SpliceImpactR")
+  dataDirectory <- paste0(pdir, "/tests/testdata/rawData/")
 
   skip_if_not(dir.exists(dataDirectory), "Data directory not found.")
 
