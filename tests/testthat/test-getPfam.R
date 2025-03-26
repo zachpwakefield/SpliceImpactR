@@ -78,7 +78,7 @@ test_that("getPfam works with sample data", {
     cores           = 1,
     output_location = NULL,
     saveAlignments  = FALSE,
-    exon_data       = biomart_data_sample
+    exon_data       = biomart_data$fsd_exon_data
   )
 
   pfamData <- getPfam(
