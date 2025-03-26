@@ -125,14 +125,14 @@ setupAnnotation <- function(biomart_data) {
 #' @return various biomaRt results for use downstream in pipeline
 #'
 #' @examples
-#' \donttest {
+#'
 #' library(biomaRt)
 #' ensembl <- biomaRt::useEnsembl(biomart = "ensembl",
 #'                                dataset = "hsapiens_gene_ensembl")
 #' pdir <- system.file("extdata", package = "SpliceImpactR")
 #' dataDirectory <- paste0(pdir, "/")
 #' biomart_data <- setupBiomart(dataDirectory)
-#' }
+#'
 #' @export
 
 setupBiomart <- function(save_location) {
