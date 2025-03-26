@@ -45,7 +45,6 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
                         mOverlap,
                         cores,
                         exon_type = as_types[1],
-                        pdir,
                         output_location = output_directory, s_gtf, translations)
   } else {
     bg <- bg_pre

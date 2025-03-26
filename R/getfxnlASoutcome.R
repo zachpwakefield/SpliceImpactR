@@ -66,7 +66,6 @@ getfxnlASoutcome <- function(output_location,
                      mOverlap=mOverlap,
                      cores=cores,
                      exon_type=exon_type,
-                     pdir=pdir,
                      output_location=output_location, gtf=gtf,
                      max_zero_prop, min_prop_samples, translations)
 
@@ -93,7 +92,6 @@ getfxnlASoutcome <- function(output_location,
                         mOverlap = mOverlap,
                         cores = cores,
                         exon_type = exon_type,
-                        pdir = pdir,
                         output_location = output_location, gtf=gtf, translations)
   }
 

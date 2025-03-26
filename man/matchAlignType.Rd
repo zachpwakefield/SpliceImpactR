@@ -8,8 +8,8 @@ matchAlignType(
   proBed,
   protCode,
   nucleotides,
-  output_location,
-  saveAlignments = TRUE,
+  output_location = NULL,
+  saveAlignments = FALSE,
   exon_type,
   newgtf,
   exon_data

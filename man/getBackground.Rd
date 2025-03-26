@@ -9,20 +9,17 @@ getBackground(
   mOverlap,
   cores,
   exon_type,
-  pdir,
-  output_location,
+  output_location = NULL,
   gtf,
   translations
 )
 }
 \arguments{
-\item{input}{the path containing the .exon file}
+\item{input}{the paths containing the .exon files (/a/b/c if the file is /a/b/c.exon)}
 
 \item{mOverlap}{overlap to identify a match to annotation}
 
 \item{exon_type}{placeholder for other functions}
-
-\item{pdir}{location of the package}
 
 \item{output_location}{location to make background directory}
 
@@ -37,4 +34,19 @@ proFast : fasta file of proteins identified in proBed
 }
 \description{
 getBackground set of transcripts in samples
+}
+\examples{
+dataDirectory <- "./tests/testdata/rawData/"
+test_group <- paste0(dataDirectory, "rawData/", c("test1","test2", "test3"))
+control_group <- paste0(dataDirectory, "rawData/", c("control1", "control2", "control3"))
+gtf_sample <- list(gtf = read_csv(paste0(dataDirectory, "gtf_limited.csv")),
+            transcript_gtf = read_csv(paste0(dataDirectory, "transcript_gtf_limited.csv")))
+translations_sample <- read_lines(paste0(dataDirectory, "translations_limited.csv"))
+
+bg <- getBackground(input=c(test_group, control_group),
+                    mOverlap = 0.1,
+                    cores = 1,
+                    exon_type = "AFE",
+                    output_location = NULL, gtf_sample, translations_sample)
+
 }

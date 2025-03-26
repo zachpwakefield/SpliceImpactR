@@ -12,8 +12,7 @@ getForeground(
   fdr = 0.05,
   mOverlap,
   exon_type,
-  pdir,
-  output_location,
+  output_location = NULL,
   cores = 1,
   gtf,
   max_zero_prop = 0.5,
@@ -32,8 +31,6 @@ getForeground(
 
 \item{exon_type}{placeholder for other functions}
 
-\item{pdir}{location of the package}
-
 \item{output_location}{location to make background directory}
 
 \item{gtf}{full output from setup_gtf}
@@ -51,4 +48,37 @@ proFast : fasta file of proteins identified in proBed
 }
 \description{
 get Foreground differentially included transcripts in samples
+}
+\examples{
+dataDirectory <- "tests/testdata/"
+test_group <- paste0(dataDirectory, "rawData/", c("test1","test2", "test3"))
+control_group <- paste0(dataDirectory, "rawData/", c("control1", "control2", "control3"))
+
+result <- differential_inclusion_HITindex(test_names = test_group,
+                                          control_names = control_group,
+                                          et = "AFE",
+                                          outlier_threshold = "Inf",
+                                          minReads = 10,
+                                          min_prop_samples = 0,
+                                          chosen_method = "qbGLM"
+                                          )
+gtf_sample <- list(gtf = read_csv(paste0(dataDirectory, "gtf_limited.csv")),
+            transcript_gtf = read_csv(paste0(dataDirectory, "transcript_gtf_limited.csv")))
+translations_sample <- read_lines(paste0(dataDirectory, "translations_limited.csv"))
+
+fg <- getForeground(input = result,
+                            test_names = test_group,
+                            control_names = control_group,
+                            thresh = .1,
+                            fdr = .05,
+                            mOverlap = .1,
+                            exon_type = "AFE",
+                            output_location = NULL,
+                            cores = 1,
+                            gtf = gtf_sample,
+                            max_zero_prop = 1,
+                            min_prop_samples = 0,
+                            translations = translations_sample)
+
+
 }

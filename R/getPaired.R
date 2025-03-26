@@ -12,8 +12,55 @@
 #' @importFrom dplyr %>% mutate filter rename left_join
 #' @importFrom ggplot2 ggplot aes geom_histogram after_stat geom_density scale_fill_manual theme_classic xlab ylab
 #' @importFrom ggpubr ggarrange
+#'
+#' @examples
+#'
+#' dataDirectory <- "./tests/testdata/"
+#' test_group <- paste0(dataDirectory, "rawData/", c("test1","test2", "test3"))
+#' control_group <- paste0(dataDirectory, "rawData/", c("control1", "control2", "control3"))
+#' transcripts_sample <- list(transDF = readr::read_csv(paste0(dataDirectory, "transcripts_limited_transDF.csv")),
+#'                      c_trans = readr::read_lines(paste0(dataDirectory, "transcripts_limited_c_trans.csv")))
+#'
+#' gtf_sample <- list(gtf = read_csv(paste0(dataDirectory, "gtf_limited.csv")),
+#'             transcript_gtf = read_csv(paste0(dataDirectory, "transcript_gtf_limited.csv")))
+#' translations_sample <- read_lines(paste0(dataDirectory, "translations_limited.csv"))
+#' biomart_data_sample <- read_csv(paste0(dataDirectory, "biomart_data_sample.csv"))
+#'
+#'
+#' result <- differential_inclusion_HITindex(test_names = test_group,
+#'                                           control_names = control_group,
+#'                                           et = "AFE",
+#'                                           outlier_threshold = "Inf",
+#'                                           minReads = 10,
+#'                                           min_prop_samples = 0,
+#'                                           chosen_method = "qbGLM"
+#'                                           )
+#'
+#' fg <- getForeground(input = result,
+#'                             test_names = test_group,
+#'                             control_names = control_group,
+#'                             thresh = .1,
+#'                             fdr = .05,
+#'                             mOverlap = .1,
+#'                             exon_type = "AFE",
+#'                             output_location = NULL,
+#'                             cores = 1,
+#'                             gtf = gtf_sample,
+#'                             max_zero_prop = 1,
+#'                             min_prop_samples = 0,
+#'                             translations = translations_sample)
+#' library(msa)
+#' pfg <- getPaired(foreground = fg$proBed,
+#'           et = "AFE",
+#'           nucleotides = transcripts_sample,
+#'           newGTF = gtf_sample,
+#'           cores = 1,
+#'           output_location = NULL,
+#'           saveAlignments = FALSE,
+#'           exon_data = biomart_data_sample)
+#'
 #' @export
-getPaired <- function(foreground, et, nucleotides, newGTF, cores = 1, output_location, saveAlignments = TRUE, exon_data) {
+getPaired <- function(foreground, et, nucleotides, newGTF, cores = 1, output_location = NULL, saveAlignments = TRUE, exon_data) {
   # Create a unique identifier for each exon
   foreground <- foreground %>%
     dplyr::mutate(exon_id = paste0(chr, ":", start, "-", stop))
@@ -145,6 +192,7 @@ getPaired <- function(foreground, et, nucleotides, newGTF, cores = 1, output_loc
     exon_pairs_df$gene <- unlist(lapply(strsplit(exon_pairs_df$gene, split = "#"), "[[", 1))
     combined_rows_df_expanded$gene <- unlist(lapply(strsplit(combined_rows_df_expanded$gene, split = "#"), "[[", 1))
 
+    if (!is.null(output_location)) {
     system(paste0("mkdir ", output_location, "pairedOutput/"))
     write_csv(exon_pairs_df, paste0(output_location, "pairedOutput/", "exon_pairs.csv"))
     write_csv(combined_rows_df_expanded, paste0(output_location, "pairedOutput/", "paired_combined_rows.csv"))
@@ -152,6 +200,7 @@ getPaired <- function(foreground, et, nucleotides, newGTF, cores = 1, output_loc
     pdf(paste0(output_location, "pairedOutput/", "primarySequencePlot.pdf"))
     print(gdf_comp)
     dev.off()
+    }
 
     return(list(exon_pairs = exon_pairs_df,
                 paired_proBed = combined_rows_df_expanded,

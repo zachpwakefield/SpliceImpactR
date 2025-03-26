@@ -9,14 +9,16 @@
 #' @return altered probed and alignment info
 #' @importFrom Biostrings AAStringSet
 #' @importFrom dplyr left_join
-#' @importFrom msa msaPrettyPrint msa
+#' @importFrom msa msaPrettyPrint msa msaClustalW
 #' @keywords internal
-matchAlignType <- function(proBed, protCode, nucleotides, output_location, saveAlignments = TRUE, exon_type, newgtf, exon_data) {
+matchAlignType <- function(proBed, protCode, nucleotides, output_location = NULL, saveAlignments = FALSE, exon_type, newgtf, exon_data) {
 
   df <- dplyr::left_join(proBed, nucleotides$transDF, by = c("transcript" = "transcriptID")) # transcripts
 
+  if (!is.null(output_location)) {
   system(paste0("mkdir ", output_location, "pairedAlignments"))
   setwd(paste0(output_location, "pairedAlignments/"))
+  }
   # Iterate through protein codes in pairs
 
   alignmentScores <- alignmentScorer(exon_type, df)
@@ -26,10 +28,10 @@ matchAlignType <- function(proBed, protCode, nucleotides, output_location, saveA
   alignmentTypesIntermediary <- SpliceImpactR:::getFrameShift(df, et = exon_type, newgtf, exon_data)
   alignmentTypes <- alignmentTypesIntermediary[seq(1, length(alignmentTypesIntermediary), by = 2)]
   alignmentTypes[alignmentScore == 1] <- "Match"
-  if (saveAlignments) {
+  if (saveAlignments & !is.null(output_location)) {
     lapply(seq(1, length(alignmentTypes), by = 2), function(i) {
       if (alignmentTypes[i] %in% c("Match", "PartialMatch", "FrameShift")) {
-        try(msa::msaPrettyPrint(msa::msa(Biostrings::AAStringSet(c(df$prot[i], df$prot[i+1])), verbose = FALSE), askForOverwrite=FALSE,
+        try(msa::msaPrettyPrint(msa::msa(Biostrings::AAStringSet(c(df$prot[i], df$prot[i+1])), verbose = FALSE, method = "ClustalW"), askForOverwrite=FALSE,
                                 file = paste(output_location, "pairedAlignments/", proBed$transcript[i], "_", proBed$transcript[i+1],
                                              "_", alignmentTypes[i], "_Alignment.pdf", sep = ""), output = "pdf"))
       }

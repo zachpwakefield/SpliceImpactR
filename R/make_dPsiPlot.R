@@ -1,8 +1,8 @@
 #' gets the tti interactions with various helper functions to do so
 #'
 #' @param dpsi_df pre filtering differential inclusion analysis df
+#' @param gtf gtf from setupGTF
 #' @param thresh threshold for differential inclusion
-#' @param pdir the directory of the package
 #'
 #' @return differences between each tti pair and the overall results
 #' @importFrom igraph graph_from_edgelist V make_ego_graph write_graph simplify E layout.fruchterman.reingold
@@ -11,7 +11,7 @@
 #' @importFrom ggpubr ggarrange
 #' @importFrom dplyr select relocate
 #' @keywords internal
-make_dPsiPlot <- function(dpsi_df, thresh = .1, pdir) {
+make_dPsiPlot <- function(dpsi_df, gtf, thresh = .1) {
 
   # Map Ensembl IDs in the lfc_df to HGNC symbols using the conversion table
   gene_id_to_name <- setNames(gtf$geneName, gtf$geneID)

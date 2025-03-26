@@ -6,7 +6,6 @@
 #' @param thresh delta psi threshold to filter
 #' @param fdr adj p to filter for
 #' @param gtf full output from setup_gtf
-#' @param pdir location of the package
 #' @param max_zero_prop max number of zeros in to count an exon
 #' @param min_prop_samples min proportion of samples needed to not be counted as outliers
 #' @param output_location location to make background directory
@@ -17,12 +16,49 @@
 #' @importFrom dplyr arrange first left_join group_by summarise
 #' @importFrom tidyr separate
 #' @importFrom readr read_csv read_lines
+#'
+#'
+#' @examples
+#' dataDirectory <- "tests/testdata/"
+#' test_group <- paste0(dataDirectory, "rawData/", c("test1","test2", "test3"))
+#' control_group <- paste0(dataDirectory, "rawData/", c("control1", "control2", "control3"))
+#'
+#' result <- differential_inclusion_HITindex(test_names = test_group,
+#'                                           control_names = control_group,
+#'                                           et = "AFE",
+#'                                           outlier_threshold = "Inf",
+#'                                           minReads = 10,
+#'                                           min_prop_samples = 0,
+#'                                           chosen_method = "qbGLM"
+#'                                           )
+#' gtf_sample <- list(gtf = read_csv(paste0(dataDirectory, "gtf_limited.csv")),
+#'             transcript_gtf = read_csv(paste0(dataDirectory, "transcript_gtf_limited.csv")))
+#' translations_sample <- read_lines(paste0(dataDirectory, "translations_limited.csv"))
+#'
+#' fg <- getForeground(input = result,
+#'                             test_names = test_group,
+#'                             control_names = control_group,
+#'                             thresh = .1,
+#'                             fdr = .05,
+#'                             mOverlap = .1,
+#'                             exon_type = "AFE",
+#'                             output_location = NULL,
+#'                             cores = 1,
+#'                             gtf = gtf_sample,
+#'                             max_zero_prop = 1,
+#'                             min_prop_samples = 0,
+#'                             translations = translations_sample)
+#'
+#'
 #' @export
 getForeground <- function(input, test_names, control_names, thresh = .1, fdr = .05,
-                          mOverlap,exon_type, pdir,
-                          output_location, cores = 1, gtf,
+                          mOverlap,exon_type,
+                          output_location = NULL,
+                          cores = 1,
+                          gtf,
                           max_zero_prop = .5,
-                          min_prop_samples = .5, translations) {
+                          min_prop_samples = .5,
+                          translations) {
 
   ## If using foreground set, read in diExon file and extract differentially included exons using diff_info()
   df <- input
@@ -34,7 +70,7 @@ getForeground <- function(input, test_names, control_names, thresh = .1, fdr = .
   bdf.l <- significanceFilter(qdf.l, fdr = fdr, d.psi = thresh)
 
   ## Make volcano plot with make_lfcPlot()
-  lfcPlot <- make_dPsiPlot(qdf.l, thresh = thresh, pdir = pdir)
+  lfcPlot <- make_dPsiPlot(qdf.l, gtf$gtf, thresh = thresh)
 
   ## Make data.frame with gene, location of each exon on total foreground
   redExon <- data.frame(geneR = unlist(lapply(strsplit(bdf.l$gene, split = "[.]"), "[[", 1)),
@@ -96,16 +132,18 @@ getForeground <- function(input, test_names, control_names, thresh = .1, fdr = .
   # Interleave headers and sequences
   proFast <- paste(rbind(fasta_headers, fasta_sequences))
 
-  system(paste0("mkdir ", output_location, "Foreground/"))
-  readr::write_csv(proBed, paste0(output_location, "Foreground/", "fgoutBed.csv"))
-  readr::write_lines(proFast, paste0(output_location, "Foreground/", "fgoutFast.fa"))
-  readr::write_csv(matched,  paste0(output_location, "Foreground/", "fgmatched.csv"))
-  readr::write_csv(df.l,  paste0(output_location, "Foreground/", "fglfc.csv"))
-  readr::write_csv(bed,  paste0(output_location, "Foreground/", "fgexonBed.csv"))
+  if (!is.null(output_location)) {
+    system(paste0("mkdir ", output_location, "Foreground/"))
+    readr::write_csv(proBed, paste0(output_location, "Foreground/", "fgoutBed.csv"))
+    readr::write_lines(proFast, paste0(output_location, "Foreground/", "fgoutFast.fa"))
+    readr::write_csv(matched,  paste0(output_location, "Foreground/", "fgmatched.csv"))
+    readr::write_csv(df.l,  paste0(output_location, "Foreground/", "fglfc.csv"))
+    readr::write_csv(bed,  paste0(output_location, "Foreground/", "fgexonBed.csv"))
 
-  pdf(paste0(output_location, "Foreground/", "delta_psi_plot.pdf"))
-  print(lfcPlot)
-  dev.off()
+    pdf(paste0(output_location, "Foreground/", "delta_psi_plot.pdf"))
+    print(lfcPlot)
+    dev.off()
+  }
 
   return(list(proBed = proBed,
               proFast = proFast,

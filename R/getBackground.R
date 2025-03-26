@@ -1,9 +1,8 @@
 #' getBackground set of transcripts in samples
 #'
-#' @param input the path containing the .exon file
+#' @param input the paths containing the .exon files (/a/b/c if the file is /a/b/c.exon)
 #' @param mOverlap overlap to identify a match to annotation
 #' @param exon_type placeholder for other functions
-#' @param pdir location of the package
 #' @param gtf full output from setup_gtf
 #' @param output_location location to make background directory
 #' @param translations from getTranslations
@@ -13,13 +12,28 @@
 #' @importFrom dplyr arrange first left_join group_by summarise
 #' @importFrom tidyr separate
 #' @importFrom stringr str_extract
+#'
+#' @examples
+#' dataDirectory <- "./tests/testdata/rawData/"
+#' test_group <- paste0(dataDirectory, "rawData/", c("test1","test2", "test3"))
+#' control_group <- paste0(dataDirectory, "rawData/", c("control1", "control2", "control3"))
+#' gtf_sample <- list(gtf = read_csv(paste0(dataDirectory, "gtf_limited.csv")),
+#'             transcript_gtf = read_csv(paste0(dataDirectory, "transcript_gtf_limited.csv")))
+#' translations_sample <- read_lines(paste0(dataDirectory, "translations_limited.csv"))
+#'
+#' bg <- getBackground(input=c(test_group, control_group),
+#'                     mOverlap = 0.1,
+#'                     cores = 1,
+#'                     exon_type = "AFE",
+#'                     output_location = NULL, gtf_sample, translations_sample)
+#'
 #' @export
-getBackground <- function(input, mOverlap, cores, exon_type, pdir, output_location, gtf, translations) {
+getBackground <- function(input, mOverlap, cores, exon_type, output_location = NULL, gtf, translations) {
     ## extract all first exons and create combined data.frame with gene, location
-    files <- paste(input, unlist(lapply(input, function(x) list.files(x)[grep('[.]exon', list.files(x))])), sep = "")
+    files <- paste0(input, '.exon')
 
     first_exons <- unique(unlist(lapply(files, function(x) {
-        in_file <- read.delim(x)
+        in_file <- data.frame(fread(x))
         paste(in_file$gene, ';', in_file$exon, ';',  in_file$strand, sep = "")})))
     first_exons <- first_exons[grepl('[-]', first_exons) & grepl(';', first_exons)]
     redExon <- data.frame(geneR = unlist(lapply(strsplit(unlist(lapply(strsplit(first_exons, split = ";"), "[[", 1)), split = '[.]'), "[[", 1)),
@@ -71,11 +85,14 @@ getBackground <- function(input, mOverlap, cores, exon_type, pdir, output_locati
     ## Interleave headers and sequences
     proFast <- paste(rbind(fasta_headers, fasta_sequences))
 
+    if (!is.null(output_location)) {
     system(paste0("mkdir ", output_location, "Background/"))
     write_csv(proBed, paste0(output_location, "Background/", "bgoutBed.csv"))
     write_lines(proFast, paste0(output_location, "Background/", "bgoutFast.fa"))
     write_csv(matched,  paste0(output_location, "Background/", "bgmatched.csv"))
     write_csv(bed,  paste0(output_location, "Background/", "bgbed.csv"))
+      }
+
 
     message("Background complete...")
     return(list(matched = matched,

@@ -4,14 +4,14 @@
 \alias{make_dPsiPlot}
 \title{gets the tti interactions with various helper functions to do so}
 \usage{
-make_dPsiPlot(dpsi_df, thresh = 0.1, pdir)
+make_dPsiPlot(dpsi_df, gtf, thresh = 0.1)
 }
 \arguments{
 \item{dpsi_df}{pre filtering differential inclusion analysis df}
 
-\item{thresh}{threshold for differential inclusion}
+\item{gtf}{gtf from setupGTF}
 
-\item{pdir}{the directory of the package}
+\item{thresh}{threshold for differential inclusion}
 }
 \value{
 differences between each tti pair and the overall results

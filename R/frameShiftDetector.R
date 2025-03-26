@@ -3,7 +3,7 @@
 #' @param exon_data exon_data from earlier
 #' @return multiple dfs with different info and organization related to coding exons
 #'
-#' @importFrom dplyr group_by mutate arrange select ungroup
+#' @importFrom dplyr group_by mutate arrange select ungroup if_else
 #' @keywords internal
 getFrameShiftInit <- function(newgtf, exon_data) {
   exon_data <- exon_data[exon_data$ensembl_exon_id %in% newgtf$exonID,]
@@ -13,7 +13,7 @@ getFrameShiftInit <- function(newgtf, exon_data) {
   exon_data <- exon_data %>%
     dplyr::group_by(ensembl_transcript_id) %>%
     dplyr::mutate(
-      adjusted_start = if_else(strand == 1, exon_chrom_start, -exon_chrom_start)
+      adjusted_start = dplyr::if_else(strand == 1, exon_chrom_start, -exon_chrom_start)
     ) %>%
     dplyr::arrange(ensembl_transcript_id, adjusted_start) %>%
     dplyr::select(-adjusted_start) %>%
@@ -642,7 +642,7 @@ seRead <- function(addInf, coding_exons, exon_data, exon_length_df, newgtf) {
 #' @param type event type
 #' @param proBed proBed paired output
 #' @return align scores and lengths
-#' @importFrom msa msaPrettyPrint msa
+#' @importFrom msa msaPrettyPrint msa msaClustalW
 #' @keywords internal
 alignmentScorer <- function(type, proBed) {
   values <- c(
@@ -686,9 +686,10 @@ alignmentScorer <- function(type, proBed) {
     if (as.numeric(nchar(pB_nuc2$prot[rowCount]))*as.numeric(nchar(pB_nuc2$prot[rowCount+1])) >= 2000000000) {
       list(c(-1, -1), c(-1, -1))
     } else {
+
       msaA1 <- msa::msaConsensusSequence(msa::msa(Biostrings::AAStringSet(c(as.character(pB_nuc2$prot[rowCount]),
                                                                             as.character(pB_nuc2$prot[rowCount+1]))),
-                                                  substitutionMatrix = BLOSUM62))
+                                                  substitutionMatrix = BLOSUM62, method = "ClustalW"))
 
       alignScore <- sum(strsplit(msaA1, "")[[1]] != "?")/nchar(msaA1)
       list(c(alignScore, alignScore), c(nchar(msaA1), nchar(msaA1)))
