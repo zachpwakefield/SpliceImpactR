@@ -123,6 +123,16 @@ setupAnnotation <- function(biomart_data) {
 #' @param save_location path to save output
 #' @importFrom biomaRt useEnsembl getBM
 #' @return various biomaRt results for use downstream in pipeline
+#'
+#' @examples
+#'
+#' library(biomaRt)
+#' ensembl <- biomaRt::useEnsembl(biomart = "ensembl",
+#'                                dataset = "hsapiens_gene_ensembl")
+#' pdir <- system.file("extdata", package = "SpliceImpactR")
+#' dataDirectory <- paste0(pdir, "/")
+#' biomart_data <- setupBiomart(dataDirectory)
+#'
 #' @export
 
 setupBiomart <- function(save_location) {

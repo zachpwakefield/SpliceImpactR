@@ -15,3 +15,13 @@ various biomaRt results for use downstream in pipeline
 \description{
 import / load + save biomaRt data
 }
+\examples{
+
+library(biomaRt)
+ensembl <- biomaRt::useEnsembl(biomart = "ensembl",
+                               dataset = "hsapiens_gene_ensembl")
+pdir <- system.file("extdata", package = "SpliceImpactR")
+dataDirectory <- paste0(pdir, "/")
+biomart_data <- setupBiomart(dataDirectory)
+
+}

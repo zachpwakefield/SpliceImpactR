@@ -15,3 +15,14 @@ annotated gtf and others from setup_gtf
 \description{
 wrapper for setup_gtf
 }
+\examples{
+
+pdir <- system.file("extdata", package = "SpliceImpactR")
+dataDirectory <- paste0(pdir, "/")
+biomart_data_sample <- list(setup_gtf_exon_data = readr::read_csv(paste0(dataDirectory, "biomart_setup_gtf_exon_data.csv")),
+                            ptg_init =  = readr::read_csv(paste0(dataDirectory, "biomart_setup_gtf_exon_data.csv")),
+                            transcript_data =  = readr::read_csv(paste0(dataDirectory, "biomart_setup_gtf_exon_data.csv")))
+
+gtf <- getAnnotation(biomart_data = biomart_data_sample)
+
+}
