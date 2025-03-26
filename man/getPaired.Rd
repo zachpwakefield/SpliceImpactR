@@ -40,7 +40,7 @@ get paired as events / exons
 }
 \examples{
 
-pdir <- system.file(package="SpliceImpactR")
+pdir <- system.file("extdata", package="SpliceImpactR")
 dataDirectory <- paste0(pdir, "/")
 test_group <- paste0(dataDirectory, "rawData/", c("test1","test2", "test3"))
 control_group <- paste0(dataDirectory, "rawData/", c("control1", "control2", "control3"))
