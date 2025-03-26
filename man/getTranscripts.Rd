@@ -15,3 +15,10 @@ modified nucleotide code fasta
 \description{
 setting up transcriptions
 }
+\examples{
+
+pdir <- system.file("extdata", package = "SpliceImpactR")
+dataDirectory <- paste0(pdir, "/")
+transcripts <- getTranscripts(transcripts_location = dataDirectory)
+
+}

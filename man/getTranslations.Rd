@@ -15,3 +15,10 @@ modified protein code fasta
 \description{
 setting up translations
 }
+\examples{
+
+pdir <- system.file("extdata", package = "SpliceImpactR")
+dataDirectory <- paste0(pdir, "/")
+translations <- getTranslations(translations_location = dataDirectory)
+
+}

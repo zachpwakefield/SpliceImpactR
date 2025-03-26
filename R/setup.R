@@ -5,6 +5,13 @@
 #' @importFrom utils download.file
 #' @importFrom R.utils gunzip
 #' @return modified protein code fasta
+#'
+#' @examples
+#'
+#' pdir <- system.file("extdata", package = "SpliceImpactR")
+#' dataDirectory <- paste0(pdir, "/")
+#' translations <- getTranslations(translations_location = dataDirectory)
+#'
 #' @export
 getTranslations <- function(translations_location) {
   if (!(file.exists(paste0(translations_location, "gencode.v45.pc_translations.fa")))) {
@@ -28,6 +35,13 @@ getTranslations <- function(translations_location) {
 #' @importFrom utils download.file
 #' @importFrom R.utils gunzip
 #' @return modified nucleotide code fasta
+#'
+#' @examples
+#'
+#' pdir <- system.file("extdata", package = "SpliceImpactR")
+#' dataDirectory <- paste0(pdir, "/")
+#' transcripts <- getTranscripts(transcripts_location = dataDirectory)
+#'
 #' @export
 getTranscripts <- function(transcripts_location) {
   if (!(file.exists(paste0(transcripts_location, "gencode.v45.pc_transcripts.fa")))) {
