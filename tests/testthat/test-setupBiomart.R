@@ -1,6 +1,9 @@
 test_that("setupBiomart returns a list of eight data frames", {
   library(biomaRt)
 
+  new_config <- httr::config(ssl_verifypeer = FALSE)
+  httr::set_config(new_config, override = FALSE)
+
   ensembl <- biomaRt::useEnsembl(
     biomart = "ensembl",
     dataset = "hsapiens_gene_ensembl"

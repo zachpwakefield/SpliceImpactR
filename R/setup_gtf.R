@@ -127,6 +127,8 @@ setupAnnotation <- function(biomart_data) {
 #' @examples
 #'
 #' library(biomaRt)
+#' new_config <- httr::config(ssl_verifypeer = FALSE)
+#' httr::set_config(new_config, override = FALSE)
 #' ensembl <- biomaRt::useEnsembl(biomart = "ensembl",
 #'                                dataset = "hsapiens_gene_ensembl")
 #' pdir <- system.file("extdata", package = "SpliceImpactR")
