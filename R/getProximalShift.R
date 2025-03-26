@@ -9,9 +9,58 @@
 #' @importFrom ggplot2 ggplot aes geom_segment geom_text scale_color_manual coord_cartesian element_blank theme labs theme_minimal element_text
 #' @importFrom grid arrow
 #' @importFrom tidyr separate
+#' @importFrom grid unit
+#'
+#' @examples
+#' pdir <- system.file("extdata", package="SpliceImpactR")
+#' dataDirectory <- paste0(pdir, "/")
+#' test_group <- paste0(dataDirectory, "rawData/", c("test1","test2", "test3"))
+#' control_group <- paste0(dataDirectory, "rawData/", c("control1", "control2", "control3"))
+#' transcripts_sample <- list(transDF = readr::read_csv(paste0(dataDirectory, "transcripts_limited_transDF.csv")),
+#'                      c_trans = readr::read_lines(paste0(dataDirectory, "transcripts_limited_c_trans.csv")))
+#'
+#' gtf_sample <- list(gtf = readr::read_csv(paste0(dataDirectory, "gtf_limited.csv")),
+#'             transcript_gtf = readr::read_csv(paste0(dataDirectory, "transcript_gtf_limited.csv")))
+#' translations_sample <- readr::read_lines(paste0(dataDirectory, "translations_limited.csv"))
+#' biomart_data_sample <- readr::read_csv(paste0(dataDirectory, "biomart_data_sample.csv"))
+#'
+#'
+#' result <- differential_inclusion_HITindex(test_names = test_group,
+#'                                           control_names = control_group,
+#'                                           et = "AFE",
+#'                                           outlier_threshold = "Inf",
+#'                                           minReads = 10,
+#'                                           min_prop_samples = 0,
+#'                                           chosen_method = "qbGLM"
+#'                                           )
+#'
+#' fg <- getForeground(input = result,
+#'                             test_names = test_group,
+#'                             control_names = control_group,
+#'                             thresh = .1,
+#'                             fdr = .05,
+#'                             mOverlap = .1,
+#'                             exon_type = "AFE",
+#'                             output_location = NULL,
+#'                             cores = 1,
+#'                             gtf = gtf_sample,
+#'                             max_zero_prop = 1,
+#'                             min_prop_samples = 0,
+#'                             translations = translations_sample)
+#' library(msa)
+#' pfg <- getPaired(foreground = fg$proBed,
+#'           et = "AFE",
+#'           nucleotides = transcripts_sample,
+#'           newGTF = gtf_sample,
+#'           cores = 1,
+#'           output_location = NULL,
+#'           saveAlignments = FALSE,
+#'           exon_data = biomart_data_sample)
+#'
+#' proxShift <- getProximalShift("AFE", pfg$exon_pairs, pfg$paired_proBed, output_location = NULL)
 #' @export
 #'
-getProximalShift <- function(type, exon_pairs, ep_supp, output_location) {
+getProximalShift <- function(type, exon_pairs, ep_supp, output_location = NULL) {
   ep_supp <- ep_supp %>% dplyr::select(gene, strand) %>% dplyr::distinct()
   exon_pairs <- dplyr::left_join(exon_pairs, ep_supp) %>%
     tidyr::separate(pos_exon_id, into = c('pos_chr', 'pos_start', 'pos_stop'), sep = "[:\\-]") %>%
@@ -35,17 +84,23 @@ getProximalShift <- function(type, exon_pairs, ep_supp, output_location) {
   colnames(data) <- c('group', 'size')
   data$type <- type
 
+  if (max(data$size) > 30) {
+    data$size_adjusted <- c(data$size)*(30/max(data$size))
+  } else {
+    data$size_adjusted <- data$size
+  }
+
   shift <- 10
   # Create start and end points for arrows
   data2 <- data %>%
     dplyr::mutate(
       # Reverse arrow direction for ALE
       x_start = ifelse(type == "ALE",
-                       ifelse(group == "proximal", -size / 2 + shift, size / 2 + shift),
-                       ifelse(group == "proximal", size / 2 + shift, -size / 2 + shift)),
+                       ifelse(group == "proximal", -size_adjusted / 2 + shift, size_adjusted / 2 + shift),
+                       ifelse(group == "proximal", size_adjusted / 2 + shift, -size_adjusted / 2 + shift)),
       x_end = ifelse(type == "ALE",
-                     ifelse(group == "proximal", size / 2 + shift, -size / 2 + shift),
-                     ifelse(group == "proximal", -size / 2 + shift, size / 2 + shift)),
+                     ifelse(group == "proximal", size_adjusted / 2 + shift, -size_adjusted / 2 + shift),
+                     ifelse(group == "proximal", -size_adjusted / 2 + shift, size_adjusted / 2 + shift)),
       y = ifelse(group == "proximal", 1, 1.1)  # Adjust y positions
     )
   x_limits <- c(min(data2$x_end) - 15, max(data2$x_start) + 15)  # Add padding to fit the full arrow
@@ -79,14 +134,17 @@ getProximalShift <- function(type, exon_pairs, ep_supp, output_location) {
       axis.text = ggplot2::element_blank(),
       axis.ticks = ggplot2::element_blank(),
       panel.grid = ggplot2::element_blank(),
-      plot.margin=unit(c(0,0,0,0), "pt"),
+      plot.margin=grid::unit(c(10,10,10,10), "pt"),
       plot.title = ggplot2::element_text(hjust = 0.5, vjust = -4),
       legend.position = "none"  # Remove legend
     )
 
-  pdf(paste0(output_location, "pairedOutput/", "proximalShiftPlot.pdf"), height = 2)
-  print(proxPlot)
-  dev.off()
+  if (!is.null(output_location)) {
+    pdf(paste0(output_location, "pairedOutput/", "proximalShiftPlot.pdf"), height = 2)
+    print(proxPlot)
+    dev.off()
+  }
+
 
   return(list(proxPlot = proxPlot,
               proximalShift = table(exon_pairs$label)))
