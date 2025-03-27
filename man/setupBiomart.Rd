@@ -18,6 +18,7 @@ import / load + save biomaRt data
 \examples{
 \donttest{
 library(biomaRt)
+library(biomaRt)
 new_config <- httr::config(ssl_verifypeer = FALSE)
 httr::set_config(new_config, override = FALSE)
 ensembl <- biomaRt::useEnsembl(biomart = "ensembl",
