@@ -16,9 +16,69 @@
 #' @param transcripts from getTranscripts
 #' @param max_zero_prop max prop of samples that can be 0
 #' @param min_prop_samples min prop of samples from each phenotype required to show a specific event
+#' @param initTTI takes in output from the respective function for passing to getTTI
 #' @return nothing or all output from pipeline
+#'
+#' @examples
+#' pdir <- system.file("extdata", package="SpliceImpactR")
+#' dataDirectory <- paste0(pdir, "/")
+#' test_group <- paste0(dataDirectory, "rawData/", c("test1","test2", "test3"))
+#' control_group <- paste0(dataDirectory, "rawData/", c("control1", "control2", "control3"))
+#' data_df <- data.frame(
+#'     sample_names = c(control_group, test_group),
+#'     phenotype_names = c(
+#'       rep("control", length(control_group)),
+#'       rep("test", length(test_group))
+#'      ),
+#'    stringsAsFactors = FALSE
+#'   )
+#' data_df$utc <- "control"
+#' data_df$utc[data_df$phenotype_names == unique(data_df$phenotype_names)[2]] <- "test"
+#'
+#' transcripts_sample <- list(transDF = readr::read_csv(paste0(dataDirectory, "transcripts_limited_transDF.csv")),
+#'                      c_trans = readr::read_lines(paste0(dataDirectory, "transcripts_limited_c_trans.csv")))
+#'
+#' gtf_sample <- list(gtf = readr::read_csv(paste0(dataDirectory, "gtf_limited.csv")),
+#'             transcript_gtf = readr::read_csv(paste0(dataDirectory, "transcript_gtf_limited.csv")),
+#'             tgp_biomart = readr::read_csv(paste0(dataDirectory, "tgp_biomart_limited"))
+#'             )
+#' translations_sample <- readr::read_lines(paste0(dataDirectory, "translations_limited.csv"))
+#' biomart_data_sample <- list(ip = readr::read_csv(paste0(dataDirectory, "biomart_ip.csv")),
+#'                             code_regions = readr::read_csv(paste0(dataDirectory, "biomart_code_regions.csv")),
+#'                             pfam_exon_level = readr::read_csv(paste0(dataDirectory, "biomart_pfam_exon_level.csv")),
+#'                             fsd_exon_data = readr::read_csv(paste0(dataDirectory, "biomart_data_sample.csv")),
+#'                             pfam_data = readr::read_csv(paste0(dataDirectory, "biomart_pfam_exon.csv")))
+#'
+#'
+#' initDDI <- init_ddi(pdir = dataDirectory,
+#'                     output_location = NULL,
+#'                     ppidm_class = c("Gold_Standard", "Gold", "Silver", "Bronze")[1],
+#'                     removeDups = TRUE,
+#'                     cores = 1,
+#'                     pfam_data = biomart_data_sample$pfam_data)
+#' oneASrun <- getfxnlASoutcome(output_location = NULL,
+#'                              test_group,
+#'                              control_group,
+#'                              data_df,
+#'                              exon_type = "AFE",
+#'                              cutoff = .1,
+#'                              outlier_handle = "Inf",
+#'                              cores = 1,
+#'                              tti_location = NULL,
+#'                              full_pipe = FALSE,
+#'                              bg = NA,
+#'                              mOverlap = .05,
+#'                              gtf_sample,
+#'                              plotAlignments = FALSE,
+#'                              transcripts = transcripts_sample,
+#'                              translations = translations_sample,
+#'                              biomart_data = biomart_data_sample,
+#'                              max_zero_prop = 1,
+#'                              min_prop_samples = 0,
+#'                              chosen_method = 'qbGLM',
+#'                              initTTI = initDDI$edgelist)
 #' @export
-getfxnlASoutcome <- function(output_location,
+getfxnlASoutcome <- function(output_location = NULL,
                              test_group,control_group,data_df,
                              exon_type, cutoff = .1, outlier_handle = "Inf",
                              cores = 1,
@@ -29,8 +89,11 @@ getfxnlASoutcome <- function(output_location,
                              biomart_data,
                              max_zero_prop = .5,
                              min_prop_samples = .5,
-                             chosen_method) {
-  system(paste0("mkdir ",  output_location))
+                             chosen_method,
+                             initTTI = NULL) {
+  if (!is.null(output_location)) {
+    system(paste0("mkdir ",  output_location))
+  }
   pdir <- system.file(package="SpliceImpactR")
 
   if (exon_type %in% c("AFE", "HFE")) {
@@ -87,8 +150,7 @@ getfxnlASoutcome <- function(output_location,
 
   bg_param <- suppressWarnings(is.na(bg))
   if (bg_param) {
-    bg_input <- gsub("[^/]*$", "", c(control_group, test_group))
-    bg <- getBackground(input=bg_input,
+    bg <- getBackground(input=c(control_group, test_group),
                         mOverlap = mOverlap,
                         cores = cores,
                         exon_type = exon_type,
@@ -105,14 +167,17 @@ getfxnlASoutcome <- function(output_location,
                 fdr_use = .05, min_sample_success = 2, engine = "Pfam", topViz = 15)
 
   if (nrow(pfg$paired_proBed) > 1) {
-    tti <- getTTI(paired_foreground = pfg$paired_proBed, background = bg$proBed,
+    tti <- getTTI(paired_foreground = pfg$paired_proBed,
+                  background = bg$proBed,
                   steps=1,
                   max_vertices_for_viz = 2000,
                   fdr = .05,
                   ppidm_class = "Gold_Standard",
-                  write_igraphs = TRUE,
+                  write_igraphs = FALSE,
                   output_location = output_location,
-                  tti_location = tti_location, tgp = gtf$tgp_biomart)
+                  tti_location = tti_location,
+                  tgp = gtf$tgp_biomart,
+                  init_edgelist = initTTI)
   } else {
     tti <- NA
   }
@@ -126,7 +191,10 @@ getfxnlASoutcome <- function(output_location,
                 bg = bg,
                 pfam = pfam,
                 gD = gD,
-                tti = tti))
+                tti = tti,
+                proxPlot = proxPlot,
+                length_comparison = length_comparison,
+                initial_comparison = initial_comparison))
   }
 
 }

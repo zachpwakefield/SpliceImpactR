@@ -25,3 +25,4 @@ either noRescues or the transcript and exons that contain rescue
 \description{
 check for rescue of the frame shifts
 }
+\keyword{internal}

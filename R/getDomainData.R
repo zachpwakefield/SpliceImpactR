@@ -118,7 +118,9 @@ getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
     dplyr::group_by(transcript) %>%
     dplyr::filter(X1 == dplyr::first(X1))
 
-  system(paste0("mkdir ", output_location, "DomainEnrichment/"))
+  if (!is.null(output_location)) {
+    system(paste0("mkdir ", output_location, "DomainEnrichment/"))
+  }
   ## Process interproscan results for background and foreground datasets
   interproscan_results <- lapply(c(1, 2), function(o) {
     # Read domain scan results and sequence information

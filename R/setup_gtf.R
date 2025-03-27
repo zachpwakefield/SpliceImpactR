@@ -125,7 +125,7 @@ setupAnnotation <- function(biomart_data) {
 #' @return various biomaRt results for use downstream in pipeline
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' library(biomaRt)
 #' new_config <- httr::config(ssl_verifypeer = FALSE)
 #' httr::set_config(new_config, override = FALSE)

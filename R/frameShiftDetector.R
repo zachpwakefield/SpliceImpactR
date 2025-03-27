@@ -737,7 +737,7 @@ getNextOverlap <- function(df1, df2, e1, e2, eld) {
 #' @param filterDownstream param to choose whether or not to filter to downstream of exons
 #' @return either noRescues or the transcript and exons that contain rescue
 #' @importFrom dplyr mutate relocate
-#' @export
+#' @keywords internal
 getRescue <- function(transcript1, transcript2, e1, e2, eld, filterDownstream = FALSE) {
 
   df1 <- eld[eld$ensembl_transcript_id %in% transcript1 &

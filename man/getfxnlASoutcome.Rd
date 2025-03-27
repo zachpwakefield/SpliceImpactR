@@ -5,7 +5,7 @@
 \title{Full run of the pipeline for a single alternative splicing event type}
 \usage{
 getfxnlASoutcome(
-  output_location,
+  output_location = NULL,
   test_group,
   control_group,
   data_df,
@@ -24,7 +24,8 @@ getfxnlASoutcome(
   biomart_data,
   max_zero_prop = 0.5,
   min_prop_samples = 0.5,
-  chosen_method
+  chosen_method,
+  initTTI = NULL
 )
 }
 \arguments{
@@ -59,10 +60,71 @@ getfxnlASoutcome(
 \item{max_zero_prop}{max prop of samples that can be 0}
 
 \item{min_prop_samples}{min prop of samples from each phenotype required to show a specific event}
+
+\item{initTTI}{takes in output from the respective function for passing to getTTI}
 }
 \value{
 nothing or all output from pipeline
 }
 \description{
 Full run of the pipeline for a single alternative splicing event type
+}
+\examples{
+pdir <- system.file("extdata", package="SpliceImpactR")
+dataDirectory <- paste0(pdir, "/")
+test_group <- paste0(dataDirectory, "rawData/", c("test1","test2", "test3"))
+control_group <- paste0(dataDirectory, "rawData/", c("control1", "control2", "control3"))
+data_df <- data.frame(
+    sample_names = c(control_group, test_group),
+    phenotype_names = c(
+      rep("control", length(control_group)),
+      rep("test", length(test_group))
+     ),
+   stringsAsFactors = FALSE
+  )
+data_df$utc <- "control"
+data_df$utc[data_df$phenotype_names == unique(data_df$phenotype_names)[2]] <- "test"
+
+transcripts_sample <- list(transDF = readr::read_csv(paste0(dataDirectory, "transcripts_limited_transDF.csv")),
+                     c_trans = readr::read_lines(paste0(dataDirectory, "transcripts_limited_c_trans.csv")))
+
+gtf_sample <- list(gtf = readr::read_csv(paste0(dataDirectory, "gtf_limited.csv")),
+            transcript_gtf = readr::read_csv(paste0(dataDirectory, "transcript_gtf_limited.csv")),
+            tgp_biomart = readr::read_csv(paste0(dataDirectory, "tgp_biomart_limited"))
+            )
+translations_sample <- readr::read_lines(paste0(dataDirectory, "translations_limited.csv"))
+biomart_data_sample <- list(ip = readr::read_csv(paste0(dataDirectory, "biomart_ip.csv")),
+                            code_regions = readr::read_csv(paste0(dataDirectory, "biomart_code_regions.csv")),
+                            pfam_exon_level = readr::read_csv(paste0(dataDirectory, "biomart_pfam_exon_level.csv")),
+                            fsd_exon_data = readr::read_csv(paste0(dataDirectory, "biomart_data_sample.csv")),
+                            pfam_data = readr::read_csv(paste0(dataDirectory, "biomart_pfam_exon.csv")))
+
+
+initDDI <- init_ddi(pdir = dataDirectory,
+                    output_location = NULL,
+                    ppidm_class = c("Gold_Standard", "Gold", "Silver", "Bronze")[1],
+                    removeDups = TRUE,
+                    cores = 1,
+                    pfam_data = biomart_data_sample$pfam_data)
+oneASrun <- getfxnlASoutcome(output_location = NULL,
+                             test_group,
+                             control_group,
+                             data_df,
+                             exon_type = "AFE",
+                             cutoff = .1,
+                             outlier_handle = "Inf",
+                             cores = 1,
+                             tti_location = NULL,
+                             full_pipe = FALSE,
+                             bg = NA,
+                             mOverlap = .05,
+                             gtf_sample,
+                             plotAlignments = FALSE,
+                             transcripts = transcripts_sample,
+                             translations = translations_sample,
+                             biomart_data = biomart_data_sample,
+                             max_zero_prop = 1,
+                             min_prop_samples = 0,
+                             chosen_method = 'qbGLM',
+                             initTTI = initDDI$edgelist)
 }

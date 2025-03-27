@@ -16,7 +16,7 @@ various biomaRt results for use downstream in pipeline
 import / load + save biomaRt data
 }
 \examples{
-\dontrun{
+\donttest{
 library(biomaRt)
 new_config <- httr::config(ssl_verifypeer = FALSE)
 httr::set_config(new_config, override = FALSE)

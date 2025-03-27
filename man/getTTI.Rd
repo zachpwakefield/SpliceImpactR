@@ -11,7 +11,7 @@ getTTI(
   max_vertices_for_viz = 5000,
   fdr = 0.05,
   ppidm_class = c("Gold", "Silver", "Bronze")[1],
-  write_igraphs = TRUE,
+  write_igraphs = FALSE,
   output_location = NULL,
   tti_location = NULL,
   tgp,
