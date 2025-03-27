@@ -29,6 +29,8 @@ differential_inclusion_HITindex(
 \item{min_prop_samples}{minimum proportion of samples in either phenotype an exon has to be present in to be kept}
 
 \item{chosen_method}{stats model}
+
+\item{geneIndependent}{bool to (TRUE) remove non expressed genes}
 }
 \value{
 a dataframe with differential inclusion information

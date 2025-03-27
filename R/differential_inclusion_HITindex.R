@@ -7,7 +7,7 @@
 #' @param minReads threshold to count an exon as present
 #' @param min_prop_samples minimum proportion of samples in either phenotype an exon has to be present in to be kept
 #' @param chosen_method stats model
-#' @param geneIndependent
+#' @param geneIndependent bool to (TRUE) remove non expressed genes
 #' @return a dataframe with differential inclusion information
 #' @importFrom data.table := data.table fread fifelse rbindlist uniqueN
 #' @importFrom dplyr arrange filter group_by mutate ungroup

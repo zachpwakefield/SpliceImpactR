@@ -48,7 +48,8 @@ Imports:
     MASS,
     ComplexUpset,
     scales,
-    tibble
+    tibble,
+    httr
 RoxygenNote: 7.2.3
 biocViews: AlternativeSplicing, DifferentialSplicing, StatisticalMethod
 Suggests: 

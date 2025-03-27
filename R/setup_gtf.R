@@ -122,11 +122,11 @@ setupAnnotation <- function(biomart_data) {
 #' import / load + save biomaRt data
 #' @param save_location path to save output
 #' @importFrom biomaRt useEnsembl getBM
+#' @importFrom httr config set_config
 #' @return various biomaRt results for use downstream in pipeline
 #'
 #' @examples
 #' \donttest{
-#' library(biomaRt)
 #' library(biomaRt)
 #' new_config <- httr::config(ssl_verifypeer = FALSE)
 #' httr::set_config(new_config, override = FALSE)
