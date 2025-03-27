@@ -13,7 +13,8 @@ fullASoutcome(
   cutoff = 0.1,
   cores = 1,
   bg_pre = NA,
-  tti_location = "/projectnb/evolution/zwakefield/allison_mettl/analysis/sir/",
+  tti_location = NULL,
+  tti_init = NULL,
   mOverlap = 0.05,
   s_gtf,
   plotAlignments = FALSE,
@@ -59,4 +60,63 @@ nothing in R, output to the output_directory
 }
 \description{
 Extract differentially included AFE, ALE from HIT Index data
+}
+\examples{
+pdir <- system.file("extdata", package="SpliceImpactR")
+dataDirectory <- paste0(pdir, "/")
+test_group <- paste0(dataDirectory, "rawData/", c("test1","test2", "test3"))
+control_group <- paste0(dataDirectory, "rawData/", c("control1", "control2", "control3"))
+data_df <- data.frame(
+    sample_names = c(control_group, test_group),
+    phenotype_names = c(
+      rep("control", length(control_group)),
+      rep("test", length(test_group))
+     ),
+   stringsAsFactors = FALSE
+  )
+
+transcripts_sample <- list(transDF = readr::read_csv(paste0(dataDirectory, "transcripts_limited_transDF.csv")),
+                     c_trans = readr::read_lines(paste0(dataDirectory, "transcripts_limited_c_trans.csv")))
+
+gtf_sample <- list(gtf = readr::read_csv(paste0(dataDirectory, "gtf_limited.csv")),
+            transcript_gtf = readr::read_csv(paste0(dataDirectory, "transcript_gtf_limited.csv")),
+            tgp_biomart = readr::read_csv(paste0(dataDirectory, "tgp_biomart_limited"))
+            )
+translations_sample <- readr::read_lines(paste0(dataDirectory, "translations_limited.csv"))
+biomart_data_sample <- list(ip = readr::read_csv(paste0(dataDirectory, "biomart_ip.csv")),
+                            code_regions = readr::read_csv(paste0(dataDirectory, "biomart_code_regions.csv")),
+                            pfam_exon_level = readr::read_csv(paste0(dataDirectory, "biomart_pfam_exon_level.csv")),
+                            fsd_exon_data = readr::read_csv(paste0(dataDirectory, "biomart_data_sample.csv")),
+                            pfam_data = readr::read_csv(paste0(dataDirectory, "biomart_pfam_exon.csv")))
+
+
+initDDI <- init_ddi(pdir = dataDirectory,
+                    output_location = NULL,
+                    ppidm_class = c("Gold_Standard", "Gold", "Silver", "Bronze")[1],
+                    removeDups = TRUE,
+                    cores = 1,
+                    pfam_data = biomart_data_sample$pfam_data)
+twoASfullRun <- fullASoutcome(as_types = c("AFE", "SE", "HIT"),
+                              output_directory = NULL,
+                              data_directory = dataDirectory,
+                              data_df,
+                              outlier_handle = "Inf",
+                              cutoff = .1,
+                              cores = 1,
+                              bg_pre = NA,
+                              tti_location = NULL,
+                              tti_init = NULL,
+                              mOverlap = .05,
+                              s_gtf = gtf_sample,
+                              plotAlignments = FALSE,
+                              transcripts = transcripts_sample,
+                              translations = translations_sample,
+                              biomart_data = biomart_data_sample,
+                              max_zero_prop = 1,
+                              min_prop_samples = 0,
+                              chosen_method = 'qbGLM')
+
+
+
+
 }

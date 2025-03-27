@@ -16,18 +16,90 @@
 #' @param max_zero_prop max prop of samples that can be 0
 #' @param min_prop_samples min prop of samples from each phenotype required to show a specific event
 #' @return nothing in R, output to the output_directory
+#'
+#' @examples
+#' pdir <- system.file("extdata", package="SpliceImpactR")
+#' dataDirectory <- paste0(pdir, "/")
+#' test_group <- paste0(dataDirectory, "rawData/", c("test1","test2", "test3"))
+#' control_group <- paste0(dataDirectory, "rawData/", c("control1", "control2", "control3"))
+#' data_df <- data.frame(
+#'     sample_names = c(control_group, test_group),
+#'     phenotype_names = c(
+#'       rep("control", length(control_group)),
+#'       rep("test", length(test_group))
+#'      ),
+#'    stringsAsFactors = FALSE
+#'   )
+#'
+#' transcripts_sample <- list(transDF = readr::read_csv(paste0(dataDirectory, "transcripts_limited_transDF.csv")),
+#'                      c_trans = readr::read_lines(paste0(dataDirectory, "transcripts_limited_c_trans.csv")))
+#'
+#' gtf_sample <- list(gtf = readr::read_csv(paste0(dataDirectory, "gtf_limited.csv")),
+#'             transcript_gtf = readr::read_csv(paste0(dataDirectory, "transcript_gtf_limited.csv")),
+#'             tgp_biomart = readr::read_csv(paste0(dataDirectory, "tgp_biomart_limited"))
+#'             )
+#' translations_sample <- readr::read_lines(paste0(dataDirectory, "translations_limited.csv"))
+#' biomart_data_sample <- list(ip = readr::read_csv(paste0(dataDirectory, "biomart_ip.csv")),
+#'                             code_regions = readr::read_csv(paste0(dataDirectory, "biomart_code_regions.csv")),
+#'                             pfam_exon_level = readr::read_csv(paste0(dataDirectory, "biomart_pfam_exon_level.csv")),
+#'                             fsd_exon_data = readr::read_csv(paste0(dataDirectory, "biomart_data_sample.csv")),
+#'                             pfam_data = readr::read_csv(paste0(dataDirectory, "biomart_pfam_exon.csv")))
+#'
+#'
+#' initDDI <- init_ddi(pdir = dataDirectory,
+#'                     output_location = NULL,
+#'                     ppidm_class = c("Gold_Standard", "Gold", "Silver", "Bronze")[1],
+#'                     removeDups = TRUE,
+#'                     cores = 1,
+#'                     pfam_data = biomart_data_sample$pfam_data)
+#' twoASfullRun <- fullASoutcome(as_types = c("AFE", "SE", "HIT"),
+#'                               output_directory = NULL,
+#'                               data_directory = dataDirectory,
+#'                               data_df,
+#'                               outlier_handle = "Inf",
+#'                               cutoff = .1,
+#'                               cores = 1,
+#'                               bg_pre = NA,
+#'                               tti_location = NULL,
+#'                               tti_init = NULL,
+#'                               mOverlap = .05,
+#'                               s_gtf = gtf_sample,
+#'                               plotAlignments = FALSE,
+#'                               transcripts = transcripts_sample,
+#'                               translations = translations_sample,
+#'                               biomart_data = biomart_data_sample,
+#'                               max_zero_prop = 1,
+#'                               min_prop_samples = 0,
+#'                               chosen_method = 'qbGLM')
+#'
+#'
+#'
+#'
 #' @export
+#'
+
 fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", "RI", "A5SS", "A3SS", "HIT"),
-                          output_directory, data_directory,
-                          data_df, outlier_handle = "Inf",
-                          cutoff = .1, cores = 1, bg_pre = NA,
-                          tti_location = "/projectnb/evolution/zwakefield/allison_mettl/analysis/sir/",
-                          mOverlap = .05, s_gtf, plotAlignments = FALSE, transcripts, translations,
+                          output_directory,
+                          data_directory,
+                          data_df,
+                          outlier_handle = "Inf",
+                          cutoff = .1,
+                          cores = 1,
+                          bg_pre = NA,
+                          tti_location = NULL,
+                          tti_init = NULL,
+                          mOverlap = .05,
+                          s_gtf,
+                          plotAlignments = FALSE,
+                          transcripts,
+                          translations,
                           biomart_data,
                           max_zero_prop = .5,
                           min_prop_samples = .5,
                           chosen_method = 'nbGLM') {
-  system(paste0("mkdir ",  output_directory))
+  if (!is.null(output_directory)) {
+    system(paste0("mkdir ",  output_directory))
+  }
   pdir <- system.file(package="SpliceImpactR")
   ##get bg for all classes
 
@@ -38,10 +110,9 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
   control_group <- data_df$sample_names[data_df$utc == "control"]
   test_group <- data_df$sample_names[data_df$utc == "test"]
 
-  bg_param <- suppressWarnings(is.na(bg_pre))
+  bg_param <- sum(is.na(bg) == FALSE) == length(bg)
   if (bg_param) {
-    bg_input <- gsub("[^/]*$", "", c(control_group, test_group))
-    bg <- getBackground(input=bg_input,
+    bg <- getBackground(input=c(control_group, test_group),
                         mOverlap,
                         cores,
                         exon_type = as_types[1],
@@ -49,21 +120,29 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
   } else {
     bg <- bg_pre
   }
-  if (tti_location == "") {
+
+  if (!is.null(tti_location) & !is.null(tti_init)) {
     iDDI <- init_ddi(pdir = pdir, output_location = output_location,
                      ppidm_class = "Gold_Standard", removeDups = TRUE, biomart_data$pfam_data)
-    tti_location <- output_location
   }
 
-  lapply(as_types, function(x) {
+  fullASresult <- lapply(as_types, function(x) {
     messageOut <- paste0(x, " analysis...")
     message(messageOut)
-    system(paste0("mkdir ",  paste0(output_directory, x, "/")))
+    if (!is.null(output_directory)) {
+      system(paste0("mkdir ",  paste0(output_directory, x, "/")))
+    }
     if (x == 'HIT') {
-      system(paste0("mkdir ",  paste0(output_directory, "/HITindex")))
-      hitCompare <- getHitCompare(data_df, paste0(output_directory, "/HITindex/"), .25)
+      if (!is.null(output_directory)) {
+        system(paste0("mkdir ",  paste0(output_directory, "/HITindex")))
+      }
+      hitCompare <- getHitCompare(data_df,
+                                  if (is.null(output_directory)) {NULL} else {paste0(output_directory, "/HITindex/")},
+                                  .25)
+      hitCompare
     } else {
-    fAS <- getfxnlASoutcome(output_location = paste0(output_directory, x, "/"),
+
+    fAS <- getfxnlASoutcome(output_location = if (is.null(output_directory)) {NULL} else {paste0(output_directory, x, "/")},
                             test_group = test_group,
                             control_group = control_group,
                             data_df = data_df,
@@ -72,7 +151,7 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
                             outlier_handle = outlier_handle,
                             cores = cores,
                             tti_location = tti_location,
-                            full_pipe = TRUE,
+                            full_pipe = FALSE,
                             mOverlap = mOverlap,
                             bg = bg,
                             gtf=s_gtf,
@@ -81,8 +160,13 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
                             biomart_data = biomart_data,
                             max_zero_prop,
                             min_prop_samples,
-                            chosen_method)
+                            chosen_method,
+                            initTTI = initDDI$edgelist
+                            )
+    fAS
     }
   })
-
+  fullASresult[[length(fullASresult) + 1]] <- bg
+  names(fullASresult) <- c(as_types, "Background")
+  return(fullASresult)
 }

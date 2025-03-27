@@ -140,15 +140,15 @@ getfxnlASoutcome <- function(output_location = NULL,
                    output_location = output_location, newGTF = gtf, saveAlignments = plotAlignments,
                    exon_data = biomart_data$fsd_exon_data)
 
-  if (nrow(pfg$paired_proBed) > 1) {
+  if (length(pfg) > 1) {
     if (exon_type %in% c("AFE", "ALE")) {
       proxPlot <- getProximalShift(exon_type, pfg$exon_pairs, pfg$paired_proBed, output_location)
     }
     length_comparison <- getLengthComparison(data_df, pfg$paired_proBed, output_location)
-  }
 
 
-  bg_param <- suppressWarnings(is.na(bg))
+
+  bg_param <- sum(is.na(bg) == FALSE) == length(bg)
   if (bg_param) {
     bg <- getBackground(input=c(control_group, test_group),
                         mOverlap = mOverlap,
@@ -196,5 +196,9 @@ getfxnlASoutcome <- function(output_location = NULL,
                 length_comparison = length_comparison,
                 initial_comparison = initial_comparison))
   }
+  } else {
+    return(list(diAS = diAS,
+                fg = fg))
+                 }
 
 }

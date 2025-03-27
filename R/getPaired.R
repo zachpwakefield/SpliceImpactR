@@ -195,8 +195,8 @@ getPaired <- function(foreground, et, nucleotides, newGTF, cores = 1, output_loc
 
     if (!is.null(output_location)) {
     system(paste0("mkdir ", output_location, "pairedOutput/"))
-    write_csv(exon_pairs_df, paste0(output_location, "pairedOutput/", "exon_pairs.csv"))
-    write_csv(combined_rows_df_expanded, paste0(output_location, "pairedOutput/", "paired_combined_rows.csv"))
+    readr::write_csv(exon_pairs_df, paste0(output_location, "pairedOutput/", "exon_pairs.csv"))
+    readr::write_csv(combined_rows_df_expanded, paste0(output_location, "pairedOutput/", "paired_combined_rows.csv"))
 
     pdf(paste0(output_location, "pairedOutput/", "primarySequencePlot.pdf"))
     print(gdf_comp)
