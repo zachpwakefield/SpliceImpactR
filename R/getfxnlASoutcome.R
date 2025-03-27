@@ -82,7 +82,7 @@ getfxnlASoutcome <- function(output_location = NULL,
                              test_group,control_group,data_df,
                              exon_type, cutoff = .1, outlier_handle = "Inf",
                              cores = 1,
-                             tti_location = "", full_pipe = TRUE,
+                             tti_location = NULL, full_pipe = TRUE,
                              bg = NA, mOverlap = .05, gtf,
                              plotAlignments = FALSE,
                              transcripts, translations,
@@ -154,17 +154,40 @@ getfxnlASoutcome <- function(output_location = NULL,
                         mOverlap = mOverlap,
                         cores = cores,
                         exon_type = exon_type,
-                        output_location = output_location, gtf=gtf, translations)
+                        output_location = output_location,
+                        gtf=gtf,
+                        translations)
   }
 
 
   #####
-  pfam <- getPfam(foreground = fg, background = bg, pdir = pdir,
-                  cores = cores, output_location = output_location, biomart_data)
+  pfam <- getPfam(foreground = fg,
+                  background = bg,
+                  pdir = pdir,
+                  cores = cores,
+                  output_location = output_location,
+                  biomart_data)
 
 
-  gD <- getDomainData(fg = fg, bg = bg, pfg=pfg, cores = cores, pfam = pfam, output_location = output_location,
-                fdr_use = .05, min_sample_success = 2, engine = "Pfam", topViz = 15)
+  gD <- getDomainData(fg = fg,
+                      bg = bg,
+                      pfg=pfg,
+                      cores = cores,
+                      pfam = pfam,
+                      output_location = output_location,
+                      fdr_use = .05,
+                      min_sample_success = 2,
+                      engine = "Pfam",
+                      topViz = 15)
+
+  if (is.null(tti_location) & is.null(tti_init)) {
+    initTTI <- init_ddi(pdir = pdir,
+                        output_location = output_location,
+                        ppidm_class = "Gold_Standard",
+                        cores = 1,
+                        removeDups = TRUE,
+                        biomart_data$pfam_data)
+  }
 
   if (nrow(pfg$paired_proBed) > 1) {
     tti <- getTTI(paired_foreground = pfg$paired_proBed,

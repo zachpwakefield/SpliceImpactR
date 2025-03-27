@@ -13,7 +13,7 @@ getfxnlASoutcome(
   cutoff = 0.1,
   outlier_handle = "Inf",
   cores = 1,
-  tti_location = "",
+  tti_location = NULL,
   full_pipe = TRUE,
   bg = NA,
   mOverlap = 0.05,

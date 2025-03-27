@@ -1,6 +1,7 @@
 test_that("setupBiomart returns a list of eight data frames", {
   expect_true(2 == 2)
   # library(biomaRt)
+  # library(httr)
   #
   # new_config <- httr::config(ssl_verifypeer = FALSE)
   # httr::set_config(new_config, override = FALSE)

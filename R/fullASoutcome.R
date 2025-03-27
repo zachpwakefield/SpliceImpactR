@@ -121,9 +121,13 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
     bg <- bg_pre
   }
 
-  if (!is.null(tti_location) & !is.null(tti_init)) {
-    iDDI <- init_ddi(pdir = pdir, output_location = output_location,
-                     ppidm_class = "Gold_Standard", removeDups = TRUE, biomart_data$pfam_data)
+  if (is.null(tti_location) & is.null(tti_init)) {
+    initTTI <- init_ddi(pdir = pdir,
+                        output_location = output_location,
+                        ppidm_class = "Gold_Standard",
+                        cores = 1,
+                        removeDups = TRUE,
+                        biomart_data$pfam_data)
   }
 
   fullASresult <- lapply(as_types, function(x) {
@@ -161,7 +165,7 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
                             max_zero_prop,
                             min_prop_samples,
                             chosen_method,
-                            initTTI = initDDI$edgelist
+                            initTTI = initTTI$edgelist
                             )
     fAS
     }
