@@ -117,7 +117,7 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
 
   if (is.null(tti_location) & is.null(initTTI)) {
     initTTI <- init_ddi(pdir = dataDirectory,
-                        output_location = output_location,
+                        output_location = output_directory,
                         ppidm_class = "Gold_Standard",
                         cores = 1,
                         removeDups = TRUE,

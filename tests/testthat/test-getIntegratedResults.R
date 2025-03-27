@@ -53,6 +53,10 @@ test_that("getIntegratedResults produces summaryTable and plots as expected", {
                                 min_prop_samples = 0,
                                 chosen_method = 'qbGLM')
 
+  fg_list <- list("AFE" = twoASfullRun$AFE$fg$proBed)
+  pfg_list <- list("AFE" = twoASfullRun$AFE$pfg$paired_proBed)
+  domain_list <- list("AFE" = twoASfullRun$AFE$gD$data)
+
   integrated <- getIntegratedResults(fg_list,
                                      pfg_list,
                                      domain_list)
