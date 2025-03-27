@@ -110,7 +110,7 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
   control_group <- data_df$sample_names[data_df$utc == "control"]
   test_group <- data_df$sample_names[data_df$utc == "test"]
 
-  bg_param <- sum(is.na(bg) == FALSE) == length(bg)
+  bg_param <- sum(is.na(bg_pre)) == length(bg_pre)
   if (bg_param) {
     bg <- getBackground(input=c(control_group, test_group),
                         mOverlap,

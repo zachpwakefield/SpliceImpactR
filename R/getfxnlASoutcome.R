@@ -148,7 +148,7 @@ getfxnlASoutcome <- function(output_location = NULL,
 
 
 
-  bg_param <- sum(is.na(bg) == FALSE) == length(bg)
+  bg_param <- sum(is.na(bg)) == length(bg)
   if (bg_param) {
     bg <- getBackground(input=c(control_group, test_group),
                         mOverlap = mOverlap,
