@@ -280,6 +280,7 @@ irRead <- function(addInf, coding_exons, exon_data, exon_length_df) {
 }
 
 #' Get alignment status of introns
+#' @importFrom methods is
 #' @param addInf addInf column passed -- extra info
 #' @param coding_exons coding exons from initFrameShift
 #' @param exon_length exon_data from initFrameShift
@@ -313,7 +314,7 @@ mxeRead <- function(addInf, coding_exons, exon_data, exon_length_df, newgtf) {
       strand <- unique(newgtf$strand[newgtf$transcriptID == addInf$transcript[x]])
       seOv <- getFLOverlap(addInf$transcript[x], addInf$transcript[x+1], ex = "SE", coding_exonsX = coding_exons,
                             eld = exon_length_df)
-      if (is(seOv, "character")) {
+      if (methods::is(seOv, "character")) {
         return(c("PartialMatch", "noRescue"))
       }
       fs_invest <- seOv[unique(which(seOv$t1 %in% downstreamExon+seOv$t2 %in% downstreamExon > 0)),]
@@ -545,6 +546,7 @@ alt5Read <- function(addInf, coding_exons, exon_data, exon_length_df) {
 }
 
 #' Get alignment status of se
+#' @importFrom methods is
 #' @param addInf addInf column passed -- extra info
 #' @param coding_exons coding exons from initFrameShift
 #' @param exon_length exon_data from initFrameShift
@@ -577,7 +579,7 @@ seRead <- function(addInf, coding_exons, exon_data, exon_length_df, newgtf) {
       strand <- unique(newgtf$strand[newgtf$transcriptID == addInf$transcript[seExon]])
       seOv <- getFLOverlap(addInf$transcript[x], addInf$transcript[x+1], ex = "SE", coding_exonsX = coding_exons,
                             eld = exon_length_df)
-      if (is(seOv, "character")) {
+      if (methods::is(seOv, "character")) {
         return(c("PartialMatch", "noRescue"))
       }
       fs_invest <- seOv[unique(which(seOv$t1 %in% downstreamExon+seOv$t2 %in% downstreamExon > 0)),]

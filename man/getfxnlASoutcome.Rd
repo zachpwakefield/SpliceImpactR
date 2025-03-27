@@ -61,6 +61,8 @@ getfxnlASoutcome(
 
 \item{translations}{from getTranslations}
 
+\item{biomart_data}{data straight from setup_biomart}
+
 \item{max_zero_prop}{max prop of samples that can be 0}
 
 \item{min_prop_samples}{min prop of samples from each phenotype required to show a specific event}

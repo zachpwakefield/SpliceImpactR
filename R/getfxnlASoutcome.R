@@ -20,6 +20,7 @@
 #' @param outlier_handle method for handling outliers
 #' @param cores number of cores to assign
 #' @param chosen_method statistical method to choose (qbGLM, nbGLM, zingGLM, wilcox)
+#' @param biomart_data data straight from setup_biomart
 #' @return nothing or all output from pipeline
 #'
 #' @examples

@@ -13,7 +13,7 @@
 #' @param pfg output from getPaired call
 #' @return the domain enrichment data and the enrichment plots
 #' @importFrom dplyr arrange filter first group_by
-#' @importFrom stats phyper p.adjust
+#' @importFrom stats phyper p.adjust reorder na.omit
 #' @importFrom ggplot2 scale_fill_manual theme_classic ggplot aes xlab ylab theme geom_bar geom_boxplot theme_classic coord_flip theme_bw ggtitle element_blank element_line facet_wrap
 #' @importFrom ggpubr ggarrange
 #' @importFrom data.table as.data.table
@@ -200,7 +200,7 @@ getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
     }
     bg_dom <- bg_dom[bg_dom != "none"]
 
-    if (sum(lengths(lapply(fg_dom_ul, na.omit))) == 0) {
+    if (sum(lengths(lapply(fg_dom_ul, stats::na.omit))) == 0) {
       noneFound <- paste0("No domains enriched in ", x, " set")
       message(noneFound)
       return(list(data.frame(), data.frame(vals = 0, types = x), data.frame(vals = 0, types = x)))
@@ -305,7 +305,7 @@ getDomainData <- function(fg, bg, pfg, pfam, cores = 1,
   dataFinal$reg <- factor(dataFinal$reg, levels = unique(dataFinal$reg))
   dataFinal$domain2 <- seq_along(dataFinal$domain)
   # dataFinal <- transform(dataFinal, variable=reorder(domain, domain2) )
-  enrichmentPlot <- ggplot2::ggplot(data=dataFinal, ggplot2::aes(x=reorder(domain, domain2), y=-log10(fdr), fill = reg)) +
+  enrichmentPlot <- ggplot2::ggplot(data=dataFinal, ggplot2::aes(x=stats::reorder(domain, domain2), y=-log10(fdr), fill = reg)) +
     ggplot2::geom_bar(stat="identity")+
     ggplot2::coord_flip() +
     ggplot2::theme_bw()+

@@ -114,7 +114,7 @@ getSizeFactors <- function(df) {
   geoMean <- exp(rowMeans(log(counts_mat+1)))
 
   sizeFactors_list <- apply(counts_mat, 2, function(col_j) {
-    median((col_j+1)/geoMean)
+    stats::median((col_j+1)/geoMean)
   })
 
   df <- dplyr::left_join(df, data.frame(sample_name = names(sizeFactors_list),
