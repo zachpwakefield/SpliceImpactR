@@ -42,7 +42,7 @@ test_that("fullASoutcome returns a list of length 4 with correct sub-structures"
                                 cores = 1,
                                 bg_pre = NA,
                                 tti_location = NULL,
-                                tti_init = initTTI$edgelist,
+                                initTTI = initTTI$edgelist,
                                 mOverlap = .05,
                                 s_gtf = gtf_sample,
                                 plotAlignments = FALSE,

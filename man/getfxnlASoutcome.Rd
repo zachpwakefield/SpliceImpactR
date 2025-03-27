@@ -126,5 +126,5 @@ oneASrun <- getfxnlASoutcome(output_location = NULL,
                              max_zero_prop = 1,
                              min_prop_samples = 0,
                              chosen_method = 'qbGLM',
-                             initTTI = initDDI$edgelist)
+                             initTTI = initDDI)
 }

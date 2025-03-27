@@ -66,7 +66,7 @@ test_that("getfxnlASoutcome returns a list of length 10 with specific sub-struct
     max_zero_prop   = 1,
     min_prop_samples = 0,
     chosen_method   = "qbGLM",
-    initTTI         = initDDI$edgelist
+    initTTI         = initDDI
   )
   expect_type(oneASrun, "list")
   expect_length(oneASrun, 10)

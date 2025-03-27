@@ -14,7 +14,7 @@ fullASoutcome(
   cores = 1,
   bg_pre = NA,
   tti_location = NULL,
-  tti_init = NULL,
+  initTTI = NULL,
   mOverlap = 0.05,
   s_gtf,
   plotAlignments = FALSE,
@@ -40,6 +40,8 @@ fullASoutcome(
 \item{bg_pre}{if bg was made earlier, param to give premade bg}
 
 \item{tti_location}{location of previously made transcript-transcript interactions network}
+
+\item{initTTI}{the edge list from initTTI}
 
 \item{mOverlap}{minimum overlap to call an exon as matched to annotation}
 
@@ -89,13 +91,6 @@ biomart_data_sample <- list(ip = readr::read_csv(paste0(dataDirectory, "biomart_
                             fsd_exon_data = readr::read_csv(paste0(dataDirectory, "biomart_data_sample.csv")),
                             pfam_data = readr::read_csv(paste0(dataDirectory, "biomart_pfam_exon.csv")))
 
-
-initDDI <- init_ddi(pdir = dataDirectory,
-                    output_location = NULL,
-                    ppidm_class = c("Gold_Standard", "Gold", "Silver", "Bronze")[1],
-                    removeDups = TRUE,
-                    cores = 1,
-                    pfam_data = biomart_data_sample$pfam_data)
 twoASfullRun <- fullASoutcome(as_types = c("AFE", "SE", "HIT"),
                               output_directory = NULL,
                               data_directory = dataDirectory,
@@ -105,7 +100,7 @@ twoASfullRun <- fullASoutcome(as_types = c("AFE", "SE", "HIT"),
                               cores = 1,
                               bg_pre = NA,
                               tti_location = NULL,
-                              tti_init = NULL,
+                              initTTI = NULL,
                               mOverlap = .05,
                               s_gtf = gtf_sample,
                               plotAlignments = FALSE,

@@ -15,6 +15,7 @@
 #' @param transcripts from getTranscripts
 #' @param max_zero_prop max prop of samples that can be 0
 #' @param min_prop_samples min prop of samples from each phenotype required to show a specific event
+#' @param initTTI the edge list from initTTI
 #' @return nothing in R, output to the output_directory
 #'
 #' @examples
@@ -45,13 +46,6 @@
 #'                             fsd_exon_data = readr::read_csv(paste0(dataDirectory, "biomart_data_sample.csv")),
 #'                             pfam_data = readr::read_csv(paste0(dataDirectory, "biomart_pfam_exon.csv")))
 #'
-#'
-#' initDDI <- init_ddi(pdir = dataDirectory,
-#'                     output_location = NULL,
-#'                     ppidm_class = c("Gold_Standard", "Gold", "Silver", "Bronze")[1],
-#'                     removeDups = TRUE,
-#'                     cores = 1,
-#'                     pfam_data = biomart_data_sample$pfam_data)
 #' twoASfullRun <- fullASoutcome(as_types = c("AFE", "SE", "HIT"),
 #'                               output_directory = NULL,
 #'                               data_directory = dataDirectory,
@@ -61,7 +55,7 @@
 #'                               cores = 1,
 #'                               bg_pre = NA,
 #'                               tti_location = NULL,
-#'                               tti_init = NULL,
+#'                               initTTI = NULL,
 #'                               mOverlap = .05,
 #'                               s_gtf = gtf_sample,
 #'                               plotAlignments = FALSE,
@@ -87,7 +81,7 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
                           cores = 1,
                           bg_pre = NA,
                           tti_location = NULL,
-                          tti_init = NULL,
+                          initTTI = NULL,
                           mOverlap = .05,
                           s_gtf,
                           plotAlignments = FALSE,
@@ -121,7 +115,7 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
     bg <- bg_pre
   }
 
-  if (is.null(tti_location) & is.null(tti_init)) {
+  if (is.null(tti_location) & is.null(initTTI)) {
     initTTI <- init_ddi(pdir = pdir,
                         output_location = output_location,
                         ppidm_class = "Gold_Standard",
@@ -165,7 +159,7 @@ fullASoutcome <- function(as_types = c("AFE", "ALE", "HFE", "HLE", "SE", "MXE", 
                             max_zero_prop,
                             min_prop_samples,
                             chosen_method,
-                            initTTI = initTTI$edgelist
+                            initTTI = initTTI
                             )
     fAS
     }

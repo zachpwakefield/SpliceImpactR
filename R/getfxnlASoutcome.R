@@ -76,7 +76,7 @@
 #'                              max_zero_prop = 1,
 #'                              min_prop_samples = 0,
 #'                              chosen_method = 'qbGLM',
-#'                              initTTI = initDDI$edgelist)
+#'                              initTTI = initDDI)
 #' @export
 getfxnlASoutcome <- function(output_location = NULL,
                              test_group,control_group,data_df,
@@ -180,7 +180,7 @@ getfxnlASoutcome <- function(output_location = NULL,
                       engine = "Pfam",
                       topViz = 15)
 
-  if (is.null(tti_location) & is.null(tti_init)) {
+  if (is.null(tti_location) & is.null(initTTI)) {
     initTTI <- init_ddi(pdir = pdir,
                         output_location = output_location,
                         ppidm_class = "Gold_Standard",
@@ -200,7 +200,7 @@ getfxnlASoutcome <- function(output_location = NULL,
                   output_location = output_location,
                   tti_location = tti_location,
                   tgp = gtf$tgp_biomart,
-                  init_edgelist = initTTI)
+                  init_edgelist = initTTI$edgelist)
   } else {
     tti <- NA
   }

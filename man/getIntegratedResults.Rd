@@ -49,7 +49,7 @@ biomart_data_sample <- list(ip = readr::read_csv(paste0(dataDirectory, "biomart_
                             pfam_data = readr::read_csv(paste0(dataDirectory, "biomart_pfam_exon.csv")))
 
 
-initDDI <- init_ddi(pdir = dataDirectory,
+initTTI <- init_ddi(pdir = dataDirectory,
                     output_location = NULL,
                     ppidm_class = c("Gold_Standard", "Gold", "Silver", "Bronze")[1],
                     removeDups = TRUE,
@@ -64,7 +64,7 @@ twoASfullRun <- fullASoutcome(as_types = c("AFE", "SE", "HIT"),
                               cores = 1,
                               bg_pre = NA,
                               tti_location = NULL,
-                              tti_init = NULL,
+                              initTTI = initTTI,
                               mOverlap = .05,
                               s_gtf = gtf_sample,
                               plotAlignments = FALSE,
