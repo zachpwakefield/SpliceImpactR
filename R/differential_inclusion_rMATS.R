@@ -11,6 +11,7 @@
 #' @importFrom data.table := data.table fread rbindlist fifelse
 #' @importFrom dplyr arrange select
 #' @importFrom stringr str_split_fixed
+#' @importFrom stats median
 #'
 #' @examples
 #'
@@ -137,8 +138,8 @@ differential_inclusion_rMATS <- function(control_names, test_names, et,
     all.y = FALSE   # do not add rows that appear only in 'sample_types'
   )
 
-  psi_data[, median_sum_IJC_SJC := round(median(IJC + SJC, na.rm = TRUE), digits = 0), by = sample_name]
-  psi_data$median_sum_IJC_SJC[is.na(psi_data$median_sum_IJC_SJC)] <- median(psi_data$median_sum_IJC_SJC, na.rm = TRUE)
+  psi_data[, median_sum_IJC_SJC := round(stats::median(IJC + SJC, na.rm = TRUE), digits = 0), by = sample_name]
+  psi_data$median_sum_IJC_SJC[is.na(psi_data$median_sum_IJC_SJC)] <- stats::median(psi_data$median_sum_IJC_SJC, na.rm = TRUE)
 
   psi_data[, c("psi_adjusted", "IJC", "SJC") := lapply(.SD, function(x) data.table::fifelse(is.na(x), 0, x)),
            .SDcols = c("psi_adjusted", "IJC", "SJC")]

@@ -10,6 +10,7 @@
 #' @importFrom Biostrings AAStringSet
 #' @importFrom dplyr left_join
 #' @importFrom msa msaPrettyPrint msa msaClustalW
+#' @importFrom stats median
 #' @keywords internal
 matchAlignType <- function(proBed, protCode, nucleotides, output_location = NULL, saveAlignments = FALSE, exon_type, newgtf, exon_data) {
 
@@ -23,7 +24,7 @@ matchAlignType <- function(proBed, protCode, nucleotides, output_location = NULL
 
   alignmentScores <- alignmentScorer(exon_type, df)
   alignmentScore <- alignmentScores$alignScore
-  alignmentScore[alignmentScore == -1] <- rep(median(alignmentScore[alignmentScore != 0]), sum(alignmentScore == -1))
+  alignmentScore[alignmentScore == -1] <- rep(stats::median(alignmentScore[alignmentScore != 0]), sum(alignmentScore == -1))
 
   alignmentTypesIntermediary <- getFrameShift(df, et = exon_type, newgtf, exon_data)
   alignmentTypes <- alignmentTypesIntermediary[seq(1, length(alignmentTypesIntermediary), by = 2)]

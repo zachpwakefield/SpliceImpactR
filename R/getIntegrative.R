@@ -56,6 +56,7 @@
 #' @importFrom ggplot2 geom_vline scale_fill_manual scale_y_continuous labs coord_flip facet_wrap
 #' @importFrom scales percent
 #' @importFrom ComplexUpset upset upset_set_size
+#' @importFrom stats median
 #'
 #' @examples
 #'
@@ -136,7 +137,7 @@ getIntegratedResults <- function(fg_list, pfg_list, domain_list) {
       Rescue = sum(!(pfg_list[[i]]$alignType %in% c("Match", "onePC", "PartialMatch", "FrameShift", "noRescue"))),
       PropRescue = sum(!(pfg_list[[i]]$alignType %in% c("Match", "onePC", "PartialMatch", "FrameShift", "noRescue"))) /
         sum(pfg_list[[i]]$alignType == "FrameShift"),
-      MedianScore = median(pfg_list[[i]]$pMatch[pfg_list[[i]]$pMatch > 0]),
+      MedianScore = stats::median(pfg_list[[i]]$pMatch[pfg_list[[i]]$pMatch > 0]),
       AlignmentScores = pfg_list[[i]]$pMatch[pfg_list[[i]]$pMatch > 0],
       Genes = pfg_list[[i]]$gene,
       Domains = if (nrow(domain_list[[i]])) {
@@ -230,7 +231,7 @@ getIntegratedResults <- function(fg_list, pfg_list, domain_list) {
 
   dataInt <- alignScoreFrame %>%
     dplyr::group_by(event) %>%
-    dplyr::mutate(Median = median(.data$AlignmentScores))
+    dplyr::mutate(Median = stats::median(.data$AlignmentScores))
 
   alignmentScorePlot <- ggplot2::ggplot(
     alignScoreFrame,

@@ -93,6 +93,7 @@ getSignificance <- function(psi_data_sf, chosen_method) {
 #' @importFrom data.table :=
 #' @importFrom tidyr pivot_wider
 #' @importFrom dplyr group_by summarize left_join
+#' @importFrom stats median
 #' @keywords internal
 getSizeFactors <- function(df) {
   df$reads <- df$nUP + df$nDOWN
