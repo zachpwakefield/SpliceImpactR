@@ -41,6 +41,10 @@ getfxnlASoutcome(
 
 \item{cutoff}{cutoff for significance of differential inclusion}
 
+\item{outlier_handle}{method for handling outliers}
+
+\item{cores}{number of cores to assign}
+
 \item{tti_location}{location of previuously made tti or ""}
 
 \item{full_pipe}{if TRUE, doesn't save output to R, only writes to output_location}
@@ -60,6 +64,8 @@ getfxnlASoutcome(
 \item{max_zero_prop}{max prop of samples that can be 0}
 
 \item{min_prop_samples}{min prop of samples from each phenotype required to show a specific event}
+
+\item{chosen_method}{statistical method to choose (qbGLM, nbGLM, zingGLM, wilcox)}
 
 \item{initTTI}{takes in output from the respective function for passing to getTTI}
 }

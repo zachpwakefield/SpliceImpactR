@@ -29,8 +29,6 @@ differential_inclusion_HITindex(
 \item{min_prop_samples}{minimum proportion of samples in either phenotype an exon has to be present in to be kept}
 
 \item{chosen_method}{stats model}
-
-\item{cores}{the number of cores requested}
 }
 \value{
 a dataframe with differential inclusion information

@@ -3,11 +3,11 @@
 #' @param test_names character vector of test_names
 #' @param control_names character vector of control_names
 #' @param et string of the exon_type
-#' @param cores the number of cores requested
 #' @param outlier_threshold the thresholding of the cooks distance, no outlier removal is "Inf"
 #' @param minReads threshold to count an exon as present
 #' @param min_prop_samples minimum proportion of samples in either phenotype an exon has to be present in to be kept
 #' @param chosen_method stats model
+#' @param geneIndependent
 #' @return a dataframe with differential inclusion information
 #' @importFrom data.table := data.table fread fifelse rbindlist uniqueN
 #' @importFrom dplyr arrange filter group_by mutate ungroup

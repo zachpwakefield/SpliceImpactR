@@ -25,6 +25,8 @@ getDomainData(
 
 \item{bg}{background from getBackground}
 
+\item{pfg}{output from getPaired call}
+
 \item{pfam}{pfam from getPfam}
 
 \item{cores}{the number of cores requested}

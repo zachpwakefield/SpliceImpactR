@@ -7,13 +7,13 @@
 getOverviewComparison(data_df, exon_type, output_location, minReads = 10)
 }
 \arguments{
+\item{data_df}{data_df made in specific format}
+
 \item{exon_type}{type of AS being investigated}
 
 \item{output_location}{location where everything is being saved, NULL if not desired}
 
-\item{control_names}{paths of control samples}
-
-\item{test_names}{paths of test samples}
+\item{minReads}{to use while filtering}
 }
 \value{
 4 individual plots and 1 combined plot.

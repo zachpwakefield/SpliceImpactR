@@ -10,6 +10,7 @@
 #' @param repeatingDomains whether to identify repeating domains being enriched or not
 #' @param topViz the max number of domains to put in each visualization
 #' @param output_location location to make background directory
+#' @param pfg output from getPaired call
 #' @return the domain enrichment data and the enrichment plots
 #' @importFrom dplyr arrange filter first group_by
 #' @importFrom stats phyper p.adjust

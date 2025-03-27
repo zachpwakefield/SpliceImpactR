@@ -122,6 +122,7 @@ setupAnnotation <- function(biomart_data) {
 #' import / load + save biomaRt data
 #' @param save_location path to save output
 #' @importFrom biomaRt useEnsembl getBM
+#' @importFrom httr set_config config
 #' @return various biomaRt results for use downstream in pipeline
 #'
 #' @examples

@@ -3,7 +3,7 @@
 #' @param test_names a vector of test_names
 #' @param control_names a vector of control_names
 #' @param et string of the exon_type
-#' @param cores the number of cores requested
+#' @param minReads read num to threshold on
 #' @param outlier_threshold the thresholding of the cooks distance, no outlier removal is "Inf"
 #' @param min_prop_samples min prop of samples to require an event to be identified in
 #' @param chosen_method method for stats analysis

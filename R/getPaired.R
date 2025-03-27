@@ -3,11 +3,11 @@
 #' @param foreground proBed from getForeground
 #' @param nucleotides made from setup get_c_nucs
 #' @param et exon_type being investigated
-#' @param pdir location of the package
 #' @param output_location location to make background directory
 #' @param cores number of requested cores
 #' @param saveAlignments bool to save alignment pdfs
 #' @param newGTF from setup get_gtf
+#' @param exon_data from biomart_data
 #' @return figures and dataframes with paired data
 #' @importFrom dplyr %>% mutate filter rename left_join
 #' @importFrom ggplot2 ggplot aes geom_histogram after_stat geom_density scale_fill_manual theme_classic xlab ylab

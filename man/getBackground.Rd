@@ -19,6 +19,8 @@ getBackground(
 
 \item{mOverlap}{overlap to identify a match to annotation}
 
+\item{cores}{number of cores to use}
+
 \item{exon_type}{placeholder for other functions}
 
 \item{output_location}{location to make background directory}

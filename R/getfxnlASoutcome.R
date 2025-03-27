@@ -17,6 +17,9 @@
 #' @param max_zero_prop max prop of samples that can be 0
 #' @param min_prop_samples min prop of samples from each phenotype required to show a specific event
 #' @param initTTI takes in output from the respective function for passing to getTTI
+#' @param outlier_handle method for handling outliers
+#' @param cores number of cores to assign
+#' @param chosen_method statistical method to choose (qbGLM, nbGLM, zingGLM, wilcox)
 #' @return nothing or all output from pipeline
 #'
 #' @examples

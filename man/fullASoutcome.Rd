@@ -33,9 +33,13 @@ fullASoutcome(
 
 \item{data_directory}{the path to the data, in the format specified by organizeSamples}
 
+\item{data_df}{data df}
+
 \item{outlier_handle}{value to threshold the outlier detection}
 
 \item{cutoff}{diInclusion cutoff to use to identify significance}
+
+\item{cores}{number of cores to allocate}
 
 \item{bg_pre}{if bg was made earlier, param to give premade bg}
 
@@ -45,17 +49,21 @@ fullASoutcome(
 
 \item{mOverlap}{minimum overlap to call an exon as matched to annotation}
 
+\item{s_gtf}{output from setup_gtf}
+
 \item{plotAlignments}{whether to plot alignments from getPaired/matchAlignType}
 
 \item{transcripts}{from getTranscripts}
 
 \item{translations}{from getTranslations}
 
+\item{biomart_data}{from setup gtf}
+
 \item{max_zero_prop}{max prop of samples that can be 0}
 
 \item{min_prop_samples}{min prop of samples from each phenotype required to show a specific event}
 
-\item{gtf}{output from setup_gtf}
+\item{chosen_method}{choice of staistical model (qbGLM, nbGLM, zinbGLM, wilcox)}
 }
 \value{
 nothing in R, output to the output_directory

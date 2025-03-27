@@ -6,6 +6,7 @@
 #' @param gtf full output from setup_gtf
 #' @param output_location location to make background directory
 #' @param translations from getTranslations
+#' @param cores number of cores to use
 #' @return matched : matched transcripts dataframe, bed : bed file of the matched transcripts
 #' proBed : output for further functions with protein code and protein info,
 #' proFast : fasta file of proteins identified in proBed

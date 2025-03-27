@@ -1,9 +1,9 @@
 #' Get comparison between phenotypes: count of AS event, count of AS event per gene, ECDF compare and save to Foreground subdir
 #'
-#' @param control_names paths of control samples
-#' @param test_names paths of test samples
 #' @param exon_type type of AS being investigated
 #' @param output_location location where everything is being saved, NULL if not desired
+#' @param data_df data_df made in specific format
+#' @param minReads to use while filtering
 #' @importFrom data.table fread
 #' @return 4 individual plots and 1 combined plot.
 #'

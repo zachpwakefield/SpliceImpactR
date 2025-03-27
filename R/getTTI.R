@@ -6,13 +6,11 @@
 #' @param max_vertices_for_viz max number of vertices to plot, saves time and space
 #' @param fdr fdr to cut off for geneset enrichment
 #' @param ppidm_class threshold of ppidm sets to use
-#' @param write_graphs save full graph interactions for each with signfiicant changes
 #' @param output_location location to make output
 #' @param tti_location if init_tti already performed, location of output or ""
-#' @param minOverlap minimum overlap to classify as matched to annotation
 #' @param tgp tgp_biomart from setup_gtf output
-#' @param cores number of requested cores
 #' @param init_edgelist the edgelist out of initTTI if not using saved location
+#' @param write_igraphs bool whether to write the graphs out or not (if large runs, takes up a lot of memory)
 #' @return differences between each tti pair and the overall results
 #' @importFrom igraph graph_from_edgelist V make_ego_graph write_graph simplify E layout.fruchterman.reingold
 #' @importFrom tidyr crossing

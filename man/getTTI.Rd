@@ -31,6 +31,8 @@ getTTI(
 
 \item{ppidm_class}{threshold of ppidm sets to use}
 
+\item{write_igraphs}{bool whether to write the graphs out or not (if large runs, takes up a lot of memory)}
+
 \item{output_location}{location to make output}
 
 \item{tti_location}{if init_tti already performed, location of output or ""}
@@ -38,12 +40,6 @@ getTTI(
 \item{tgp}{tgp_biomart from setup_gtf output}
 
 \item{init_edgelist}{the edgelist out of initTTI if not using saved location}
-
-\item{write_graphs}{save full graph interactions for each with signfiicant changes}
-
-\item{minOverlap}{minimum overlap to classify as matched to annotation}
-
-\item{cores}{number of requested cores}
 }
 \value{
 differences between each tti pair and the overall results

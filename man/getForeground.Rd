@@ -23,6 +23,10 @@ getForeground(
 \arguments{
 \item{input}{diExon info from the differentially included functions}
 
+\item{test_names}{path to test files without .{event}PSI}
+
+\item{control_names}{path to control files without .{event}PSI}
+
 \item{thresh}{delta psi threshold to filter}
 
 \item{fdr}{adj p to filter for}
@@ -32,6 +36,8 @@ getForeground(
 \item{exon_type}{placeholder for other functions}
 
 \item{output_location}{location to make background directory}
+
+\item{cores}{number of cores to assign}
 
 \item{gtf}{full output from setup_gtf}
 

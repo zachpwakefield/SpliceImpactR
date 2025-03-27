@@ -8,7 +8,7 @@
 #' @param cutoff diInclusion cutoff to use to identify significance
 #' @param plotAlignments whether to plot alignments from getPaired/matchAlignType
 #' @param bg_pre if bg was made earlier, param to give premade bg
-#' @param gtf output from setup_gtf
+#' @param s_gtf output from setup_gtf
 #' @param tti_location location of previously made transcript-transcript interactions network
 #' @param mOverlap minimum overlap to call an exon as matched to annotation
 #' @param translations from getTranslations
@@ -16,6 +16,10 @@
 #' @param max_zero_prop max prop of samples that can be 0
 #' @param min_prop_samples min prop of samples from each phenotype required to show a specific event
 #' @param initTTI the edge list from initTTI
+#' @param data_df data df
+#' @param cores number of cores to allocate
+#' @param biomart_data from setup gtf
+#' @param chosen_method choice of staistical model (qbGLM, nbGLM, zinbGLM, wilcox)
 #' @return nothing in R, output to the output_directory
 #'
 #' @examples

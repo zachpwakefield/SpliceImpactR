@@ -10,6 +10,9 @@
 #' @param min_prop_samples min proportion of samples needed to not be counted as outliers
 #' @param output_location location to make background directory
 #' @param translations from getTranslations
+#' @param test_names path to test files without .{event}PSI
+#' @param control_names path to control files without .{event}PSI
+#' @param cores number of cores to assign
 #' @return matched : matched transcripts dataframe, bed : bed file of the matched transcripts
 #' proBed : output for further functions with protein code and protein info,
 #' proFast : fasta file of proteins identified in proBed

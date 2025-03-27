@@ -30,7 +30,7 @@ getPaired(
 
 \item{saveAlignments}{bool to save alignment pdfs}
 
-\item{pdir}{location of the package}
+\item{exon_data}{from biomart_data}
 }
 \value{
 figures and dataframes with paired data
