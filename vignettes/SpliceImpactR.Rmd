@@ -14,7 +14,7 @@ package: SpliceImpactR
 output:
     BiocStyle::html_document
 vignette: >
-    %\VignetteIndexEntry{hypeR}
+    %\VignetteIndexEntry{SpliceImpactR}
     %\VignetteEncoding{UTF-8}
     %\VignetteEngine{knitr::rmarkdown}
 editor_options:
@@ -27,7 +27,7 @@ library(devtools)
 library(tidyverse)
 library(data.table)
 library(dplyr)
-devtools::load_all(".")
+library(SpliceImpactR)
 ```
 
 
