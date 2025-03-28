@@ -1,0 +1,221 @@
+---
+title: "SpliceImpactR"
+author:
+- name: Zachary Wakefield
+  affiliation:
+  - &1 Boston University, Boston, MA
+  - &2 Bioinformatics Program, Boston University, Boston, MA
+- name: Ana Fiszbein
+  affiliation:
+  - *1
+  - *2
+date: '`r format(Sys.Date(), "%B %e, %Y")`'
+package: SpliceImpactR
+output:
+    BiocStyle::html_document
+vignette: >
+    %\VignetteIndexEntry{hypeR}
+    %\VignetteEncoding{UTF-8}
+    %\VignetteEngine{knitr::rmarkdown}
+editor_options:
+    chunk_output_type: console
+---
+
+```{r, include=FALSE, messages=FALSE, warnings=FALSE}
+knitr::opts_chunk$set(comment="", fig.align="center", fig.width=8.75, cache=FALSE)
+library(devtools)
+library(tidyverse)
+library(data.table)
+library(dplyr)
+devtools::load_all(".")
+```
+
+
+
+# Introduction
+Paragraph about package
+
+# Documentation
+Please visit <https://montilab.github.io/hypeR-docs/> for documentation, examples, and demos for all features and usage or read our recent paper [hypeR: An R Package for Geneset Enrichment Workflows](https://doi.org/10.1093/bioinformatics/btz700) published in _Bioinformatics_. 
+
+# Requirements
+
+We recommend the latest version of R (\>= 4.0.0) but **hypeR** currently requires R (\>= 3.6.0) to be installed directly from Github or Bioconductor. To install with R (\>= 3.5.0) see below. Use with R (\< 3.5.0) is not recommended.
+
+# Installation
+
+Install the development version of the package from Github.
+
+``` r
+devtools::install_github("fiszbein-lab/SpliceImpactR")
+```
+
+Or install the development version of the package from Bioconductor.
+
+``` r
+BiocManager::install("fiszbein-lab/SpliceImpactR", version="devel")
+```
+
+ Or install with  Conda.
+```bash
+conda create --name spliceimpactr
+source activate spliceimpactr
+conda install -c r r-devtools
+R
+library(devtools)
+devtools::install_github("fiszbein-lab/SpliceImpactR")
+```
+
+Or install with previous versions of R.
+```bash
+git clone https://github.com/montilab/hypeR
+nano SpliceImpactR/DESCRIPTION
+# Change Line 8
+# Depends: R (>= 3.6.0) -> Depends: R (>= 3.5.0)
+R
+install.packages("path/to/SpliceImpactR", repos=NULL, type="source")
+```
+
+# Usage
+## Access gencode information
+__SpliceImpactR__ requires the acceession of various genome annotations, accessed through biomaRt and directly through gencode, here we access the gencode files
+```{r, eval=FALSE}
+## To save time, we add a directory path to save the annotations
+translations <- SpliceImpactR::getTranslations("/path/")
+
+transcripts <- SpliceImpactR::getTranscripts("/path/")
+```
+
+## Access biomaRt information
+Here we obtain further annotations through biomaRt
+```{r, eval=FALSE}
+## Getting access to biomaRt sometimes proves challenging, if errors in completing the ensembl call, run the following commented lines in the same chunk as the call
+# new_config <- httr::config(ssl_verifypeer = FALSE)
+# httr::set_config(new_config, override = FALSE)
+
+ensembl <- biomaRt::useEnsembl(biomart = "ensembl",
+                               dataset = "hsapiens_gene_ensembl")
+
+## To save time, we add a directory path to save the annotations
+biomart_data <- SpliceImpactR:::setupBiomart("/path/")
+
+gtf <- SpliceImpactR::getAnnotation(biomart_data)
+```
+
+## Toy genome annotation loading
+For the sake of this vignette, we use toy versions of the annotations for speed and ease
+```{r}
+# For purposes of these examples, data directory is in extdata, however this should be replaced with the directory path to  data
+dataDirectory <- paste0(system.file("extdata", package="SpliceImpactR"), "/")
+
+transcripts_sample <- list(transDF = readr::read_csv(paste0(dataDirectory, "transcripts_limited_transDF.csv"), 
+                                                           show_col_types = FALSE),
+                       c_trans = readr::read_lines(paste0(dataDirectory, "transcripts_limited_c_trans.csv")))
+
+gtf_sample <- list(gtf = readr::read_csv(paste0(dataDirectory, "gtf_limited.csv"), 
+                                                           show_col_types = FALSE),
+            transcript_gtf = readr::read_csv(paste0(dataDirectory, "transcript_gtf_limited.csv"), 
+                                                           show_col_types = FALSE),
+            tgp_biomart = readr::read_csv(paste0(dataDirectory, "tgp_biomart_limited"), 
+                                                           show_col_types = FALSE)
+            )
+
+translations_sample <- readr::read_lines(paste0(dataDirectory, "translations_limited.csv"))
+
+biomart_data_sample <- list(ip = readr::read_csv(paste0(dataDirectory, "biomart_ip.csv"), 
+                                                           show_col_types = FALSE),
+                            code_regions = readr::read_csv(paste0(dataDirectory, "biomart_code_regions.csv"), 
+                                                           show_col_types = FALSE),
+                            pfam_exon_level = readr::read_csv(paste0(dataDirectory, "biomart_pfam_exon_level.csv"), 
+                                                           show_col_types = FALSE),
+                            fsd_exon_data = readr::read_csv(paste0(dataDirectory, "biomart_data_sample.csv"), 
+                                                           show_col_types = FALSE),
+                            pfam_data = readr::read_csv(paste0(dataDirectory, "biomart_pfam_exon.csv"), 
+                                                           show_col_types = FALSE))
+
+```
+
+
+## Setting up data_df to identify conditions for comparison
+test_group and control_group should be formatted as vectors of the path to the files from the HIT Index and/or rMATS -- without the ".{type}PSI" ending (eg: if the AFEPSI files is in /files/sample1.AFEPSI, the path given should be /files/sample1)
+Rmats files should be renamed to be the same as the HIT Index file paths, just with the respective alternative splicing event: /files/sample1.SEPSI, /files/sample1.RIPSI
+```{r}
+# We are feeding the toy data in extdata/rawData here for computational speed
+test_group <- paste0(dataDirectory, "rawData/", c("test1","test2", "test3"))
+control_group <- paste0(dataDirectory, "rawData/", c("control1", "control2", "control3"))
+
+# the data_df should be organized as such
+data_df <- data.frame(
+    sample_names = c(control_group, test_group),
+    phenotype_names = c(
+      rep("control", length(control_group)),
+      rep("test", length(test_group))
+     ),
+   stringsAsFactors = FALSE
+  )
+```
+
+
+## Basic Usage
+The basic usage is able to be performed in one main call, fullASoutcome. THis generates output from multiple alternative RNA processing event types 
+```{r}
+# fullASoutcome performs the full pipeline on multiple alternative RNA processing events, only performed on AFE, SE, HIT here
+twoASfullRun <- fullASoutcome(as_types = c("AFE", "SE", "HIT"),
+                              output_directory = NULL,
+                              data_directory = dataDirectory,
+                              data_df,
+                              outlier_handle = "Inf",
+                              cutoff = .1,
+                              cores = 1,
+                              bg_pre = NA,
+                              tti_location = NULL,
+                              initTTI = NULL,
+                              mOverlap = .05,
+                              plotAlignments = FALSE,
+                              s_gtf = gtf_sample,
+                              transcripts = transcripts_sample,
+                              translations = translations_sample,
+                              biomart_data = biomart_data_sample,
+                              max_zero_prop = 1,
+                              min_prop_samples = 0,
+                              chosen_method = 'qbGLM')
+
+```
+
+
+## Output walkthrough
+For each alternative RNA processing event and the HIT Index comparison, we have various outputs
+```{r}
+twoASfullRun$AFE$pfg$gdf
+```
+
+
+Proximal shift plot
+```{r}
+twoASfullRun$AFE$proxPlot$proxPlot
+```
+
+Protein length comparison plot
+```{r}
+twoASfullRun$AFE$length_comparison
+```
+
+Overview comparison plot
+```{r}
+twoASfullRun$AFE$initial_comparison$comb_plot
+```
+
+
+## Integrated analysis
+In order to perform the holistic analysis, we need multiple types of altenrative RNA processing events with valid outputs -- in the toy data, we just provide valid AFE changes for speed
+```{r}
+fg_list <- list("AFE" = twoASfullRun$AFE$fg$proBed)
+pfg_list <- list("AFE" = twoASfullRun$AFE$pfg$paired_proBed)
+domain_list <- list("AFE" = twoASfullRun$AFE$gD$data)
+
+integrated <- getIntegratedResults(fg_list,
+                                   pfg_list,
+                                   domain_list)
+
+integrated$plots
+```

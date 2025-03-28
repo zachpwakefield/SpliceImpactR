@@ -55,5 +55,9 @@ Imports:
 RoxygenNote: 7.2.3
 biocViews: AlternativeSplicing, DifferentialSplicing, StatisticalMethod
 Suggests: 
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    knitr,
+    tidyverse,
+    testthat,
+    BiocStyle
 Config/testthat/edition: 3
