@@ -11,6 +11,8 @@
 #' @param tgp tgp_biomart from setup_gtf output
 #' @param init_edgelist the edgelist out of initTTI if not using saved location
 #' @param write_igraphs bool whether to write the graphs out or not (if large runs, takes up a lot of memory)
+#' @param enrichHypeR bool set default to FALSE for enrichment of interactions 
+#' with changing PPI -- need to install hypeR for this and current version broken
 #' @return differences between each tti pair and the overall results
 #' @importFrom igraph graph_from_edgelist V make_ego_graph write_graph simplify E layout.fruchterman.reingold
 #' @importFrom tidyr crossing
@@ -134,7 +136,8 @@
 #'               output_location = NULL,
 #'               tti_location = NULL,
 #'               tgp = gtf_sample$tgp_biomart,
-#'               init_edgelist = initDDI$edgelist)
+#'               init_edgelist = initDDI$edgelist,
+#'               enrichHypeR = FALSE)
 #' @export
 getTTI <- function(paired_foreground,
                    background,
@@ -146,7 +149,8 @@ getTTI <- function(paired_foreground,
                    output_location = NULL,
                    tti_location = NULL,
                    tgp,
-                   init_edgelist) {
+                   init_edgelist,
+                   enrichHypeR = FALSE) {
   # Create a directory for storing plots if plot_bool is TRUE
   if (!is.null(output_location)) {
     system(paste0("mkdir ", output_location, "tti"))
@@ -224,9 +228,15 @@ getTTI <- function(paired_foreground,
             list(0, NA, NA)
           } else {
             if (length(x[[2]]) > 0) {
-              list(x[[2]], getEnrichmentTTI(current_transcript = x[[1]], t_impacts = x[[2]], fdr = fdr, transGeneProt = tgp,
-                                            backgroundGenes = genes_in_sample, steps = steps,
-                                            output_location = output_location))
+              if (enrichHypeR) {
+                if (!requireNamespace("hypeR", quietly = TRUE)) {
+                  stop("Please install hypeR to use nbGLM.")
+                }
+                list(x[[2]], getEnrichmentTTI(current_transcript = x[[1]], t_impacts = x[[2]], fdr = fdr, transGeneProt = tgp,
+                                              backgroundGenes = genes_in_sample, steps = steps,
+                                              output_location = output_location))
+              } else {list(x[[2]], NA)}
+              
             } else {
               list(x[[2]], NA)
             }
@@ -364,6 +374,9 @@ getTTIiGraphPlot <- function(paired_transcript, gene, steps, full_graph, max_ver
 #' @keywords internal
 getEnrichmentTTI <- function(current_transcript, t_impacts, fdr, transGeneProt,
                              backgroundGenes, steps, output_location) {
+  if (!requireNamespace("hypeR", quietly = TRUE)) {
+    stop("Please install hypeR to use nbGLM.")
+  }
 
   # Extract gene names associated with the input transcript impacts
   enrichment_list <- transGeneProt$gene_name[transGeneProt$transcript_id %in% t_impacts]

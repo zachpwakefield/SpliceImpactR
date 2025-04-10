@@ -17,7 +17,7 @@ Description: Works by taking in processed data from the HIT Index and/or rMATS
     domain-domain interaction changes. Notably, we both identify alterantive 
     RNA processing event 'swaps' across condition and are able to perform 
     holistic analyses regarding the impact of different RNA processing events. 
-License: GPL-3 + file LICENSE
+License: GPL-3
 Encoding: UTF-8
 Imports: 
     readr,
@@ -26,8 +26,7 @@ Imports:
     data.table, 
     Biostrings, 
     parallel, 
-    igraph, 
-    hypeR,
+    igraph,
     rtracklayer,
     tidyr,
     ggplot2,
@@ -46,7 +45,7 @@ Imports:
     ComplexUpset,
     tibble,
     methods
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 biocViews: AlternativeSplicing, DifferentialSplicing, StatisticalMethod, 
     Alignment
 Suggests: 
@@ -60,6 +59,7 @@ Suggests:
     scales,
     circlize,
     MASS,
+    hypeR,
     pscl
 VignetteBuilder: knitr
 Config/testthat/edition: 3

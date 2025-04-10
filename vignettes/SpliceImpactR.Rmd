@@ -33,14 +33,12 @@ library(SpliceImpactR)
 
 
 # Introduction
-Paragraph about package
-
-# Documentation
-Please visit <https://montilab.github.io/hypeR-docs/> for documentation, examples, and demos for all features and usage or read our recent paper [hypeR: An R Package for Geneset Enrichment Workflows](https://doi.org/10.1093/bioinformatics/btz700) published in _Bioinformatics_. 
+An R package to identify functional impacts due to alternative RNA 
+processing events 
 
 # Requirements
 
-We recommend the latest version of R (\>= 4.0.0) but **hypeR** currently requires R (\>= 3.6.0) to be installed directly from Github or Bioconductor. To install with R (\>= 3.5.0) see below. Use with R (\< 3.5.0) is not recommended.
+We recommend the latest version of R (\>= 4.0.0)
 
 # Installation
 
@@ -56,25 +54,6 @@ Or install the development version of the package from Bioconductor.
 BiocManager::install("fiszbein-lab/SpliceImpactR", version="devel")
 ```
 
- Or install with  Conda.
-```bash
-conda create --name spliceimpactr
-source activate spliceimpactr
-conda install -c r r-devtools
-R
-library(devtools)
-devtools::install_github("fiszbein-lab/SpliceImpactR")
-```
-
-Or install with previous versions of R.
-```bash
-git clone https://github.com/montilab/hypeR
-nano SpliceImpactR/DESCRIPTION
-# Change Line 8
-# Depends: R (>= 3.6.0) -> Depends: R (>= 3.5.0)
-R
-install.packages("path/to/SpliceImpactR", repos=NULL, type="source")
-```
 
 # Usage
 ## Access gencode information

@@ -15,7 +15,8 @@ getTTI(
   output_location = NULL,
   tti_location = NULL,
   tgp,
-  init_edgelist
+  init_edgelist,
+  enrichHypeR = FALSE
 )
 }
 \arguments{
@@ -40,6 +41,9 @@ getTTI(
 \item{tgp}{tgp_biomart from setup_gtf output}
 
 \item{init_edgelist}{the edgelist out of initTTI if not using saved location}
+
+\item{enrichHypeR}{bool set default to FALSE for enrichment of interactions 
+with changing PPI -- need to install hypeR for this and current version broken}
 }
 \value{
 differences between each tti pair and the overall results
@@ -162,5 +166,6 @@ tti <- getTTI(paired_foreground = pfg$paired_proBed,
               output_location = NULL,
               tti_location = NULL,
               tgp = gtf_sample$tgp_biomart,
-              init_edgelist = initDDI$edgelist)
+              init_edgelist = initDDI$edgelist,
+              enrichHypeR = FALSE)
 }
