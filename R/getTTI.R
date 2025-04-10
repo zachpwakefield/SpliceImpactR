@@ -19,7 +19,6 @@
 #' @importFrom readr read_csv
 #' @importFrom parallel mclapply
 #' @importFrom dplyr select relocate
-#' @importFrom hypeR msigdb_gsets hypeR hyp_dots
 #'
 #' @examples
 #'
@@ -453,7 +452,6 @@ getEnrichmentTTI <- function(current_transcript, t_impacts, fdr, transGeneProt,
 #' @importFrom readr read_csv
 #' @importFrom parallel mclapply
 #' @importFrom dplyr select relocate
-#' @importFrom hypeR msigdb_gsets hypeR hyp_dots
 #' @importFrom biomaRt useEnsembl getBM
 #' @importFrom data.table fread
 #'
