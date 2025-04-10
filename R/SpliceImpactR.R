@@ -10,6 +10,6 @@
 #' holistic analyses regarding the impact of different RNA processing events. 
 #'
 #' @name SpliceImpactR
-#' @docType _PACKAGE
+#' @docType package
 #' @author Zachary Wakefield
-NULL
+"_PACKAGE"
