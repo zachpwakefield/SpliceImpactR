@@ -6,6 +6,9 @@
 \usage{
 paired_rMATS_helper(df, type)
 }
+\value{
+modified data frame for rMATS analysis
+}
 \description{
 Helper for rMATS pairing operation
 }

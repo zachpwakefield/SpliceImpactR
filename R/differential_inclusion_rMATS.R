@@ -262,6 +262,7 @@ differential_inclusion_rMATS <- function(control_names, test_names, et,
 
 #' Helper for rMATS pairing operation
 #'
+#' @return modified data frame for rMATS analysis
 #' @keywords internal
 paired_rMATS_helper <- function(df, type) {
   swapped_exon <- paste0(unlist(lapply(strsplit(df$exon, split = ":"), "[[", 1)), ":",
