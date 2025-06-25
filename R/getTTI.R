@@ -11,7 +11,7 @@
 #' @param tgp tgp_biomart from setup_gtf output
 #' @param init_edgelist the edgelist out of initTTI if not using saved location
 #' @param write_igraphs bool whether to write the graphs out or not (if large runs, takes up a lot of memory)
-#' @param enrichHypeR bool set default to FALSE for enrichment of interactions 
+#' @param enrichHypeR bool set default to FALSE for enrichment of interactions
 #' with changing PPI -- need to install hypeR for this and current version broken
 #' @return differences between each tti pair and the overall results
 #' @importFrom igraph graph_from_edgelist V make_ego_graph write_graph simplify E layout.fruchterman.reingold
@@ -228,14 +228,15 @@ getTTI <- function(paired_foreground,
           } else {
             if (length(x[[2]]) > 0) {
               if (enrichHypeR) {
-                if (!requireNamespace("hypeR", quietly = TRUE)) {
-                  stop("Please install hypeR to use nbGLM.")
-                }
-                list(x[[2]], getEnrichmentTTI(current_transcript = x[[1]], t_impacts = x[[2]], fdr = fdr, transGeneProt = tgp,
-                                              backgroundGenes = genes_in_sample, steps = steps,
-                                              output_location = output_location))
+                # if (!requireNamespace("hypeR", quietly = TRUE)) {
+                #   stop("Please install hypeR to use nbGLM.")
+                # }
+                list(x[[2]], NA)
+                     # getEnrichmentTTI(current_transcript = x[[1]], t_impacts = x[[2]], fdr = fdr, transGeneProt = tgp,
+                     #                          backgroundGenes = genes_in_sample, steps = steps,
+                     #                          output_location = output_location))
               } else {list(x[[2]], NA)}
-              
+
             } else {
               list(x[[2]], NA)
             }
@@ -368,74 +369,74 @@ getTTIiGraphPlot <- function(paired_transcript, gene, steps, full_graph, max_ver
   names(tti_graphs) <- paired_transcript
   return(tti_graphs)
 }
-#' enrichment helper function
-#' @return geneset enrichment from hypeR
-#' @keywords internal
-getEnrichmentTTI <- function(current_transcript, t_impacts, fdr, transGeneProt,
-                             backgroundGenes, steps, output_location) {
-  if (!requireNamespace("hypeR", quietly = TRUE)) {
-    stop("Please install hypeR to use nbGLM.")
-  }
-
-  # Extract gene names associated with the input transcript impacts
-  enrichment_list <- transGeneProt$gene_name[transGeneProt$transcript_id %in% t_impacts]
-
-  # Retrieve gene sets for different GO categories, KEGG, Biocarta, and Hallmark pathways using the hypeR package
-  GO.cc <- hypeR::msigdb_gsets("Homo sapiens", "C5", "GO:CC", clean=TRUE)
-  GO.mf <- hypeR::msigdb_gsets("Homo sapiens", "C5", "GO:MF", clean=TRUE)
-  GO.bp <- hypeR::msigdb_gsets("Homo sapiens", "C5", "GO:BP", clean=TRUE)
-  genesetsC2 <- hypeR::msigdb_gsets("Homo sapiens", "C2", "CP:KEGG", clean=TRUE)
-  genesetsH <- hypeR::msigdb_gsets("Homo sapiens", "H", clean=TRUE)
-
-
-  # Perform enrichment analysis using hypergeometric test for each gene set category
-  # And generate dot plots for visualizing the enrichment results
-  cc_table <- hypeR::hypeR(enrichment_list, GO.cc, background = length(backgroundGenes), test="hypergeometric")
-  cc_dots <- hypeR::hyp_dots(cc_table, fdr = fdr, title = "GO Cell Comp Enrichment", merge = TRUE,
-                             top = 10, abrv = 150)
-
-  mf_table <- hypeR::hypeR(enrichment_list, GO.mf, background = length(backgroundGenes), test="hypergeometric")
-  mf_dots <- hypeR::hyp_dots(mf_table, fdr = fdr, title = "GO Mol FXN Enrichment", merge = TRUE,
-                             top = 10, abrv = 150)
-
-  bp_table <- hypeR::hypeR(enrichment_list, GO.bp, background = length(backgroundGenes), test="hypergeometric")
-  bp_dots <- hypeR::hyp_dots(bp_table, fdr = fdr, title = "GO Biol Proc Enrichment", merge = TRUE,
-                             top = 10, abrv = 150)
-
-  kg_table <- hypeR::hypeR(enrichment_list, genesetsC2, background = length(backgroundGenes), test="hypergeometric")
-  kg_dots <- hypeR::hyp_dots(kg_table, fdr = fdr, title = "KEGG Enrichment", merge = TRUE,
-                             top = 10, abrv = 150)
-
-
-  hm_table <- hypeR::hypeR(enrichment_list, genesetsH, background = length(backgroundGenes), test="hypergeometric")
-  hm_dots <- hypeR::hyp_dots(hm_table, fdr = fdr, title = "Hallmark Enrichment", merge = TRUE,
-                             top = 10, abrv = 150)
-
-  # If plot_bool is TRUE, save the plots to a PDF file
-  if (!is.null(output_location)) {
-    pdf(paste0(output_location, "tti/", current_transcript, '_unique_tti_', steps, '_steps_enrichment.pdf'))
-    print(cc_dots)
-    print(mf_dots)
-    print(bp_dots)
-    print(kg_dots)
-    print(hm_dots)
-    dev.off()
-  }
-
-  # Organize the enrichment tables and plots into a list for each category
-  enrichment_tables_plots <- list("cellularComponent" = list(table = cc_table, dots = cc_dots),
-                                  "molecularFunction" = list(table = mf_table, dots = mf_dots),
-                                  "biologicalProcess" = list(table = bp_table, dots = bp_dots),
-                                  "kegg" = list(table = kg_table, dots = kg_dots),
-                                  "hallmark" = list(table = hm_table, dots = hm_dots))
-
-  # Return the list containing the enrichment tables and plots
-  return(list("cellularComponent" = list(table = cc_table, dots = cc_dots),
-              "molecularFunction" = list(table = mf_table, dots = mf_dots),
-              "biologicalProcess" = list(table = bp_table, dots = bp_dots),
-              "kegg" = list(table = kg_table, dots = kg_dots),
-              "hallmark" = list(table = hm_table, dots = hm_dots)))
-}
+# enrichment helper function
+# @return geneset enrichment from hypeR
+# @keywords internal
+# getEnrichmentTTI <- function(current_transcript, t_impacts, fdr, transGeneProt,
+#                              backgroundGenes, steps, output_location) {
+#   if (!requireNamespace("hypeR", quietly = TRUE)) {
+#     stop("Please install hypeR to use nbGLM.")
+#   }
+#
+#   # Extract gene names associated with the input transcript impacts
+#   enrichment_list <- transGeneProt$gene_name[transGeneProt$transcript_id %in% t_impacts]
+#
+#   # Retrieve gene sets for different GO categories, KEGG, Biocarta, and Hallmark pathways using the hypeR package
+#   GO.cc <- hypeR::msigdb_gsets("Homo sapiens", "C5", "GO:CC", clean=TRUE)
+#   GO.mf <- hypeR::msigdb_gsets("Homo sapiens", "C5", "GO:MF", clean=TRUE)
+#   GO.bp <- hypeR::msigdb_gsets("Homo sapiens", "C5", "GO:BP", clean=TRUE)
+#   genesetsC2 <- hypeR::msigdb_gsets("Homo sapiens", "C2", "CP:KEGG", clean=TRUE)
+#   genesetsH <- hypeR::msigdb_gsets("Homo sapiens", "H", clean=TRUE)
+#
+#
+#   # Perform enrichment analysis using hypergeometric test for each gene set category
+#   # And generate dot plots for visualizing the enrichment results
+#   cc_table <- hypeR::hypeR(enrichment_list, GO.cc, background = length(backgroundGenes), test="hypergeometric")
+#   cc_dots <- hypeR::hyp_dots(cc_table, fdr = fdr, title = "GO Cell Comp Enrichment", merge = TRUE,
+#                              top = 10, abrv = 150)
+#
+#   mf_table <- hypeR::hypeR(enrichment_list, GO.mf, background = length(backgroundGenes), test="hypergeometric")
+#   mf_dots <- hypeR::hyp_dots(mf_table, fdr = fdr, title = "GO Mol FXN Enrichment", merge = TRUE,
+#                              top = 10, abrv = 150)
+#
+#   bp_table <- hypeR::hypeR(enrichment_list, GO.bp, background = length(backgroundGenes), test="hypergeometric")
+#   bp_dots <- hypeR::hyp_dots(bp_table, fdr = fdr, title = "GO Biol Proc Enrichment", merge = TRUE,
+#                              top = 10, abrv = 150)
+#
+#   kg_table <- hypeR::hypeR(enrichment_list, genesetsC2, background = length(backgroundGenes), test="hypergeometric")
+#   kg_dots <- hypeR::hyp_dots(kg_table, fdr = fdr, title = "KEGG Enrichment", merge = TRUE,
+#                              top = 10, abrv = 150)
+#
+#
+#   hm_table <- hypeR::hypeR(enrichment_list, genesetsH, background = length(backgroundGenes), test="hypergeometric")
+#   hm_dots <- hypeR::hyp_dots(hm_table, fdr = fdr, title = "Hallmark Enrichment", merge = TRUE,
+#                              top = 10, abrv = 150)
+#
+#   # If plot_bool is TRUE, save the plots to a PDF file
+#   if (!is.null(output_location)) {
+#     pdf(paste0(output_location, "tti/", current_transcript, '_unique_tti_', steps, '_steps_enrichment.pdf'))
+#     print(cc_dots)
+#     print(mf_dots)
+#     print(bp_dots)
+#     print(kg_dots)
+#     print(hm_dots)
+#     dev.off()
+#   }
+#
+#   # Organize the enrichment tables and plots into a list for each category
+#   enrichment_tables_plots <- list("cellularComponent" = list(table = cc_table, dots = cc_dots),
+#                                   "molecularFunction" = list(table = mf_table, dots = mf_dots),
+#                                   "biologicalProcess" = list(table = bp_table, dots = bp_dots),
+#                                   "kegg" = list(table = kg_table, dots = kg_dots),
+#                                   "hallmark" = list(table = hm_table, dots = hm_dots))
+#
+#   # Return the list containing the enrichment tables and plots
+#   return(list("cellularComponent" = list(table = cc_table, dots = cc_dots),
+#               "molecularFunction" = list(table = mf_table, dots = mf_dots),
+#               "biologicalProcess" = list(table = bp_table, dots = bp_dots),
+#               "kegg" = list(table = kg_table, dots = kg_dots),
+#               "hallmark" = list(table = hm_table, dots = hm_dots)))
+# }
 
 
 #' initiates tti network for entire genome, can be very time consumng

@@ -42,7 +42,7 @@ getTTI(
 
 \item{init_edgelist}{the edgelist out of initTTI if not using saved location}
 
-\item{enrichHypeR}{bool set default to FALSE for enrichment of interactions 
+\item{enrichHypeR}{bool set default to FALSE for enrichment of interactions
 with changing PPI -- need to install hypeR for this and current version broken}
 }
 \value{
